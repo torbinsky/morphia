@@ -93,8 +93,6 @@ public class ReflectionUtils
      * 
      * @param type
      *            the class for which we want to retrieve the Methods
-     * @param methods
-     *            the list to start from (can be null)
      * @return an array of all declared and inherited fields
      */
 	public static List<Method> getDeclaredAndInheritedMethods(final Class type) {

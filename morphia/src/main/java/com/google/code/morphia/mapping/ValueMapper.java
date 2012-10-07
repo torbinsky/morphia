@@ -1,9 +1,9 @@
 package com.google.code.morphia.mapping;
 
-import java.util.Map;
-
 import com.google.code.morphia.mapping.cache.EntityCache;
 import com.mongodb.DBObject;
+
+import java.util.Map;
 
 /**
  * Simple mapper that just uses the Mapper.getOptions().converts
@@ -11,7 +11,7 @@ import com.mongodb.DBObject;
  *
  */
 class ValueMapper implements CustomMapper {
-	public void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, Mapper mapr) {
+	public void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, DefaultMapper mapr) {
 		try {
 			mapr.converters.toDBObject(entity, mf, dbObject, mapr.getOptions());
 		} catch (Exception e) {
@@ -19,7 +19,7 @@ class ValueMapper implements CustomMapper {
 		}
 	}
 
-	public void fromDBObject(DBObject dbObject, MappedField mf, Object entity, EntityCache cache, Mapper mapr) {
+	public void fromDBObject(DBObject dbObject, MappedField mf, Object entity, EntityCache cache, DefaultMapper mapr) {
 		try {
 			mapr.converters.fromDBObject(dbObject, mf, entity);
 		} catch (Exception e) {

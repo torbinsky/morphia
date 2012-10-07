@@ -1,9 +1,5 @@
 package com.google.code.morphia.dao;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.DatastoreImpl;
 import com.google.code.morphia.Key;
@@ -17,7 +13,20 @@ import com.mongodb.Mongo;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
+ *
+ * The base class for DAO style data access through Morphia.
+ *
+ * Imagine you have an Account entity. Build an AccountDAO that extends
+ * this class and accepts Account entities for saving.
+ * Your AccountDAO subclass inherits the generic methods here, and you
+ * augment with custom finders and manipulators as required within your
+ * subclasses.
+ *
  * @author Olafur Gauti Gudmundsson
  * @author Scott Hernandez
  */
@@ -25,7 +34,7 @@ import com.mongodb.WriteResult;
 public class BasicDAO<T, K> implements DAO<T, K> {
 	
 	protected Class<T> entityClazz;
-	protected DatastoreImpl ds;
+	protected Datastore ds;
 	
 	public BasicDAO(Class<T> entityClass, Mongo mongo, Morphia morphia, String dbName) {
 		initDS(mongo, morphia, dbName);
@@ -33,7 +42,7 @@ public class BasicDAO<T, K> implements DAO<T, K> {
 	}
 	
 	public BasicDAO(Class<T> entityClass, Datastore ds) {
-		this.ds = (DatastoreImpl) ds;
+		this.ds = ds;
 		initType(entityClass);
 	}
 	
@@ -49,7 +58,6 @@ public class BasicDAO<T, K> implements DAO<T, K> {
 	}
 	
 	protected BasicDAO(Datastore ds) {
-		this.ds = (DatastoreImpl) ds;
 		initType(((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]));
 	}
 	
@@ -66,7 +74,7 @@ public class BasicDAO<T, K> implements DAO<T, K> {
 	 * Converts from a List<Key> to their id values
 	 * 
 	 * @param keys
-	 * @return
+	 * @return The ids of the keys
 	 */
 	protected List<?> keysToIds(List<Key<T>> keys) {
 		ArrayList ids = new ArrayList(keys.size() * 2);

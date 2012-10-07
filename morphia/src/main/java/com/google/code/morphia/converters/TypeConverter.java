@@ -38,16 +38,16 @@ public abstract class TypeConverter {
 		return isSupported(mf.getType(), mf);
 	}
 	
-	/** decode the {@link DBObject} and provide the corresponding java (type-safe) object<br><b>NOTE: optionalExtraInfo might be null</b>**/
+	/** decode the {@link com.mongodb.DBObject} and provide the corresponding java (type-safe) object<br><b>NOTE: optionalExtraInfo might be null</b>**/
 	public abstract Object decode(Class targetClass, Object fromDBObject, MappedField optionalExtraInfo)
 			throws MappingException;
 	
-	/** decode the {@link DBObject} and provide the corresponding java (type-safe) object **/
+	/** decode the {@link com.mongodb.DBObject} and provide the corresponding java (type-safe) object **/
 	public final Object decode(Class targetClass, Object fromDBObject) throws MappingException {
 		return decode(targetClass, fromDBObject, null);
 	}
 	
-	/** encode the type safe java object into the corresponding {@link DBObject}<br><b>NOTE: optionalExtraInfo might be null</b>**/
+	/** encode the type safe java object into the corresponding {@link com.mongodb.DBObject}<br><b>NOTE: optionalExtraInfo might be null</b>**/
 	public final Object encode(Object value) throws MappingException {
 		return encode(value, null);
 	}
@@ -66,7 +66,7 @@ public abstract class TypeConverter {
 		return false;
 	}
 	
-	/** encode the (type-safe) java object into the corresponding {@link DBObject}**/
+	/** encode the (type-safe) java object into the corresponding {@link com.mongodb.DBObject}**/
 	public Object encode(Object value, MappedField optionalExtraInfo) {
 		return value; // as a default impl
 	}

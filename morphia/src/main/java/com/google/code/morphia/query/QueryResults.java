@@ -1,9 +1,9 @@
 package com.google.code.morphia.query;
 
+import com.google.code.morphia.Key;
+
 import java.util.Iterator;
 import java.util.List;
-
-import com.google.code.morphia.Key;
 
 public interface QueryResults<T>  extends Iterable<T> {
 	/**

@@ -16,54 +16,23 @@
 
 package com.google.code.morphia;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Vector;
-
+import com.google.code.morphia.TestInheritanceMappings.MapLike;
+import com.google.code.morphia.annotations.*;
+import com.google.code.morphia.mapping.Mapper;
+import com.google.code.morphia.mapping.MappingException;
+import com.google.code.morphia.mapping.cache.DefaultEntityCache;
+import com.google.code.morphia.testmodel.*;
+import com.google.code.morphia.testutil.AssertedFailure;
+import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.code.morphia.TestInheritanceMappings.MapLike;
-import com.google.code.morphia.annotations.AlsoLoad;
-import com.google.code.morphia.annotations.Embedded;
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Id;
-import com.google.code.morphia.annotations.Serialized;
-import com.google.code.morphia.mapping.Mapper;
-import com.google.code.morphia.mapping.MappingException;
-import com.google.code.morphia.mapping.cache.DefaultEntityCache;
-import com.google.code.morphia.testmodel.Address;
-import com.google.code.morphia.testmodel.Article;
-import com.google.code.morphia.testmodel.Circle;
-import com.google.code.morphia.testmodel.Hotel;
-import com.google.code.morphia.testmodel.PhoneNumber;
-import com.google.code.morphia.testmodel.Rectangle;
-import com.google.code.morphia.testmodel.RecursiveChild;
-import com.google.code.morphia.testmodel.RecursiveParent;
-import com.google.code.morphia.testmodel.Translation;
-import com.google.code.morphia.testmodel.TravelAgency;
-import com.google.code.morphia.testutil.AssertedFailure;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.DBRef;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Olafur Gauti Gudmundsson
@@ -608,7 +577,7 @@ public class TestMapping  extends TestBase {
 
 	@Test
     public void testFinalFieldNotPersisted() throws Exception {
-		((DatastoreImpl)ds).getMapper().getOptions().ignoreFinals = true;
+		ds.getMapper().getOptions().ignoreFinals = true;
 		morphia.map(ContainsFinalField.class);
 		Key<ContainsFinalField> savedKey = ds.save(new ContainsFinalField("blah"));
 		ContainsFinalField loaded = ds.get(ContainsFinalField.class, savedKey.getId());

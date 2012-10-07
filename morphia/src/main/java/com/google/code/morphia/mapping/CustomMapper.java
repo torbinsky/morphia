@@ -14,6 +14,6 @@ import com.mongodb.DBObject;
  *
  */
 public interface CustomMapper {
-	void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, Mapper mapr);
-	void fromDBObject(DBObject dbObject, MappedField mf, Object entity, EntityCache cache, Mapper mapr);
+	void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, DefaultMapper mapr);
+	void fromDBObject(DBObject dbObject, MappedField mf, Object entity, EntityCache cache, DefaultMapper mapr);
 }

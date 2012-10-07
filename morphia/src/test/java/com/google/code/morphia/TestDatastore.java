@@ -16,36 +16,21 @@
 
 package com.google.code.morphia;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.bson.types.ObjectId;
-import org.junit.Test;
-
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.EntityListeners;
-import com.google.code.morphia.annotations.Id;
-import com.google.code.morphia.annotations.PostLoad;
-import com.google.code.morphia.annotations.PostPersist;
-import com.google.code.morphia.annotations.PreLoad;
-import com.google.code.morphia.annotations.PrePersist;
-import com.google.code.morphia.annotations.Transient;
+import com.google.code.morphia.annotations.*;
 import com.google.code.morphia.mapping.Mapper;
 import com.google.code.morphia.testmodel.Address;
 import com.google.code.morphia.testmodel.Hotel;
 import com.google.code.morphia.testmodel.Rectangle;
 import com.google.code.morphia.testutil.AssertedFailure;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBDecoderFactory;
-import com.mongodb.DBObject;
-import com.mongodb.LazyDBDecoder;
-import com.mongodb.LazyWriteableDBDecoder;
+import com.mongodb.*;
+import org.bson.types.ObjectId;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -198,7 +183,7 @@ public class TestDatastore  extends TestBase {
 		
 		try {
 			LifecycleTestObj life1 = new LifecycleTestObj();
-			((DatastoreImpl) ds).getMapper().addMappedClass(LifecycleTestObj.class);
+			ds.getMapper().addMappedClass(LifecycleTestObj.class);
 			ds.save(life1);
 			assertTrue(life1.prePersist);
 			assertTrue(life1.prePersistWithParam);
@@ -227,7 +212,7 @@ public class TestDatastore  extends TestBase {
 
 		try {
 			LifecycleTestObj life1 = new LifecycleTestObj();
-			((DatastoreImpl)ds).getMapper().addMappedClass(LifecycleTestObj.class);
+			ds.getMapper().addMappedClass(LifecycleTestObj.class);
 			ds.save(life1);
 			assertTrue(LifecycleListener.prePersist);
 			assertTrue(LifecycleListener.prePersistWithEntity);

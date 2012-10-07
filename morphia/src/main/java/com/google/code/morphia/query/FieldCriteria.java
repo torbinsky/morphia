@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.code.morphia.logging.Logr;
 import com.google.code.morphia.logging.MorphiaLoggerFactory;
+import com.google.code.morphia.mapping.DefaultMapper;
 import com.google.code.morphia.mapping.MappedClass;
 import com.google.code.morphia.mapping.MappedField;
 import com.google.code.morphia.mapping.Mapper;
@@ -27,7 +28,7 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
 	}
 	protected FieldCriteria(QueryImpl<?> query, String field, FilterOperator op, Object value, boolean validateNames, boolean validateTypes, boolean not) {
 		StringBuffer sb = new StringBuffer(field); //validate might modify prop string to translate java field name to db field name
-		MappedField mf = Mapper.validate(query.getEntityClass(), query.getDatastore().getMapper(), sb, op, value, validateNames, validateTypes);
+		MappedField mf = DefaultMapper.validate(query.getEntityClass(), query.getDatastore().getMapper(), sb, op, value, validateNames, validateTypes);
 		field = sb.toString();
 
 		Mapper mapr = query.getDatastore().getMapper();

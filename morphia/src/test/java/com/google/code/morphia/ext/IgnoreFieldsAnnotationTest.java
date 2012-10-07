@@ -16,23 +16,21 @@
 
 package com.google.code.morphia.ext;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.google.code.morphia.DatastoreImpl;
 import com.google.code.morphia.TestBase;
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
 import com.google.code.morphia.annotations.Transient;
 import com.google.code.morphia.mapping.MappedClass;
 import com.google.code.morphia.mapping.MappedField;
+import org.bson.types.ObjectId;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
@@ -69,8 +67,7 @@ public class IgnoreFieldsAnnotationTest extends TestBase {
 	
 	//remove any MappedField specified in @IngoreFields on the class.
 	void processIgnoreFieldsAnnotations(){
-		DatastoreImpl dsi = (DatastoreImpl) ds;
-		for(MappedClass mc : dsi.getMapper().getMappedClasses()) {
+		for(MappedClass mc : ds.getMapper().getMappedClasses()) {
 			IgnoreFields ignores = (IgnoreFields) mc.getAnnotation(IgnoreFields.class);
 			if (ignores != null) {
 				for(String field : ignores.value().split(",")) {

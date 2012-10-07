@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>morphia-parent</artifactId>
-		<groupId>com.google.code.morphia</groupId>
-		<version>1.1</version>
+		<groupId>com.github.jmkgreen.morphia</groupId>
+		<version>1.2</version>
 		<relativePath>../</relativePath>
 	</parent>
-	<groupId>com.google.code.morphia</groupId>
+	<groupId>${parent.groupId}</groupId>
 	<artifactId>morphia-entityscanner-plug</artifactId>
 	<version>1.00-SNAPSHOT</version>
 	<name>EntityScanner Plugin</name>
@@ -60,9 +60,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.morphia</groupId>
+			<groupId>${parent.groupId}</groupId>
 			<artifactId>morphia</artifactId>
-			<version>1.00-SNAPSHOT</version>
+			<version>${morphia.version}</version>
 		</dependency>
 		
 	</dependencies>
@@ -70,6 +70,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-shade-plugin</artifactId>
+                <version>2.0</version>
 				<executions>
 					<execution>
 						<phase>package</phase>

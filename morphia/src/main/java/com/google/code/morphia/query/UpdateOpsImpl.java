@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.code.morphia.mapping.DefaultMapper;
 import com.google.code.morphia.mapping.MappedField;
 import com.google.code.morphia.mapping.Mapper;
 import com.mongodb.BasicDBObject;
@@ -154,7 +155,7 @@ public class UpdateOpsImpl<T> implements UpdateOperations<T> {
 		MappedField mf = null;
 		if (validateNames || validateTypes) {
 			StringBuffer sb = new StringBuffer(f);
-			mf = Mapper.validate(clazz, mapr, sb, FilterOperator.EQUAL, val, validateNames, validateTypes);
+			mf = DefaultMapper.validate(clazz, mapr, sb, FilterOperator.EQUAL, val, validateNames, validateTypes);
 			f = sb.toString();
 		}
 

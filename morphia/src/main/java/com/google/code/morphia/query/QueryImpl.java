@@ -1,32 +1,20 @@
 package com.google.code.morphia.query;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.bson.BSONObject;
-import org.bson.types.CodeWScope;
-
 import com.google.code.morphia.Datastore;
-import com.google.code.morphia.DatastoreImpl;
 import com.google.code.morphia.Key;
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.logging.Logr;
 import com.google.code.morphia.logging.MorphiaLoggerFactory;
+import com.google.code.morphia.mapping.DefaultMapper;
 import com.google.code.morphia.mapping.MappedClass;
 import com.google.code.morphia.mapping.MappedField;
 import com.google.code.morphia.mapping.Mapper;
 import com.google.code.morphia.mapping.cache.EntityCache;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.Bytes;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.ReadPreference;
+import com.mongodb.*;
+import org.bson.BSONObject;
+import org.bson.types.CodeWScope;
+
+import java.util.*;
 
 /**
  * <p>Implementation of Query</p>
@@ -45,7 +33,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	private String[] fields = null;
 	private Boolean includeFields = null;
 	private BasicDBObject sort = null;
-	private DatastoreImpl ds = null;
+	private Datastore ds = null;
 	private DBCollection dbColl = null;
 	private int offset = 0;
 	private int limit = -1;
@@ -64,7 +52,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		
 		this.query = this;
 		this.clazz = clazz;
-		this.ds = ((DatastoreImpl)ds);
+		this.ds = ds;
 		this.dbColl = coll;
 		this.cache = this.ds.getMapper().createEntityCache();
 		
@@ -80,7 +68,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		this.limit = limit;
 	}
 
-	public QueryImpl(Class<T> clazz, DBCollection coll, DatastoreImpl ds, DBObject baseQuery) {
+	public QueryImpl(Class<T> clazz, DBCollection coll, Datastore ds, DBObject baseQuery) {
 		this(clazz, coll, ds);
 		this.baseQuery = (BasicDBObject) baseQuery;
 	}
@@ -139,7 +127,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		return obj;
 	}
 	
-	public DatastoreImpl getDatastore() {
+	public Datastore getDatastore() {
 		return ds;
 	}
 	
@@ -150,7 +138,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		Map<String, Integer> fieldsFilter = new HashMap<String, Integer>();
 		for(String field : this.fields) {
 			StringBuffer sb = new StringBuffer(field); //validate might modify prop string to translate java field name to db field name
-			Mapper.validate(clazz, ds.getMapper(), sb, FilterOperator.EQUAL, null, validateName, false);
+			DefaultMapper.validate(clazz, ds.getMapper(), sb, FilterOperator.EQUAL, null, validateName, false);
 			field = sb.toString();
 			fieldsFilter.put(field, (includeFields ? 1 : 0));
 		}
@@ -439,7 +427,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 			
 			if(validate) {
 				StringBuffer sb = new StringBuffer(s);
-				Mapper.validate(clazz, mapr, sb, FilterOperator.IN, "", true, false);
+				DefaultMapper.validate(clazz, mapr, sb, FilterOperator.IN, "", true, false);
 				s = sb.toString();
 			}
 			ret = ret.add(s, dir);

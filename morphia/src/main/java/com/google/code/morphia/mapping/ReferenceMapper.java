@@ -3,12 +3,7 @@
  */
 package com.google.code.morphia.mapping;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import com.google.code.morphia.DatastoreImpl;
+import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Key;
 import com.google.code.morphia.annotations.Reference;
 import com.google.code.morphia.logging.Logr;
@@ -27,11 +22,16 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 @SuppressWarnings({ "unchecked", "rawtypes" })
 class ReferenceMapper implements CustomMapper {
 	public static final Logr log = MorphiaLoggerFactory.get(ReferenceMapper.class);
 	
-	public void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, Mapper mapr) {
+	public void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, DefaultMapper mapr) {
 		String name = mf.getNameToStore();
 		
 		Object fieldValue = mf.getFieldValue(entity);
@@ -99,7 +99,7 @@ class ReferenceMapper implements CustomMapper {
 	}
 	
 	private void writeMap(final MappedField mf, final DBObject dbObject, String name, Object fieldValue,
-			Mapper mapr) {
+			DefaultMapper mapr) {
 		Map<Object, Object> map = (Map<Object, Object>) fieldValue;
 		if ((map != null)) {
 			Map values = mapr.getOptions().objectFactory.createMap(mf);
@@ -147,11 +147,11 @@ class ReferenceMapper implements CustomMapper {
 	 *             instead.
 	 */
 	@Deprecated
-	void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, Mapper mapr) {
+	void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, DefaultMapper mapr) {
 		fromDBObject(dbObject, mf, entity, mapr.createEntityCache(), mapr);
 	}
 
-	public void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, Mapper mapr) {
+	public void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, DefaultMapper mapr) {
 		Class fieldType = mf.getType();
 		
 		Reference refAnn = mf.getAnnotation(Reference.class);
@@ -166,7 +166,7 @@ class ReferenceMapper implements CustomMapper {
 	}
 	
 	private void readSingle(final DBObject dbObject, final MappedField mf, final Object entity, Class fieldType,
-			Reference refAnn, EntityCache cache, Mapper mapr) {
+			Reference refAnn, EntityCache cache, DefaultMapper mapr) {
 		Class referenceObjClass = fieldType;
 
 		DBRef dbRef = (DBRef) mf.getDbObjectValue(dbObject);
@@ -192,7 +192,7 @@ class ReferenceMapper implements CustomMapper {
 	}
 	
 	private void readCollection(final DBObject dbObject, final MappedField mf, final Object entity, Reference refAnn,
-			final EntityCache cache, final Mapper mapr) {
+			final EntityCache cache, final DefaultMapper mapr) {
 		// multiple references in a List
 		Class referenceObjClass = mf.getSubClass();
 		Collection references = mf.isSet() ? mapr.getOptions().objectFactory.createSet(mf) : mapr.getOptions().objectFactory.createList(mf);
@@ -206,7 +206,7 @@ class ReferenceMapper implements CustomMapper {
 				
 				if (dbVal instanceof List) {
 					List<DBRef> refList = (List) dbVal;
-					DatastoreImpl dsi = (DatastoreImpl) mapr.datastoreProvider.get();
+					Datastore dsi = mapr.datastoreProvider.get();
 					List<Key<Object>> keys = dsi.getKeysByRefs(refList);
 					
 					if (keys.size() != refList.size()) {
@@ -255,13 +255,13 @@ class ReferenceMapper implements CustomMapper {
 		}
 	}
 	
-	boolean exists(Class c, final DBRef dbRef, EntityCache cache, Mapper mapr) {
+	boolean exists(Class c, final DBRef dbRef, EntityCache cache, DefaultMapper mapr) {
 		Key key = mapr.refToKey(dbRef);
 		Boolean cached = cache.exists(key);
 		if (cached != null)
 			return cached;
 
-		DatastoreImpl dsi = (DatastoreImpl) mapr.datastoreProvider.get();
+		Datastore dsi = mapr.datastoreProvider.get();
 
 		DBCollection dbColl = dsi.getCollection(c);
 		if (!dbColl.getName().equals(dbRef.getRef()))
@@ -274,7 +274,7 @@ class ReferenceMapper implements CustomMapper {
 		return exists;
 	}
 	
-	Object resolveObject(final DBRef dbRef, final MappedField mf, EntityCache cache, Mapper mapr) {
+	Object resolveObject(final DBRef dbRef, final MappedField mf, EntityCache cache, DefaultMapper mapr) {
 		if (dbRef == null)
 			return null;
 		
@@ -304,7 +304,7 @@ class ReferenceMapper implements CustomMapper {
 	}
 	
 	private void readMap(final DBObject dbObject, final MappedField mf, final Object entity, final Reference refAnn,
-			final EntityCache cache, final Mapper mapr) {
+			final EntityCache cache, final DefaultMapper mapr) {
 		Class referenceObjClass = mf.getSubClass();
 		Map m = mapr.getOptions().objectFactory.createMap(mf);
 		
@@ -334,7 +334,7 @@ class ReferenceMapper implements CustomMapper {
 		mf.setFieldValue(entity, m);
 	}
 	
-	private Object createOrReuseProxy(final Class referenceObjClass, final DBRef dbRef, EntityCache cache, Mapper mapr) {
+	private Object createOrReuseProxy(final Class referenceObjClass, final DBRef dbRef, EntityCache cache, DefaultMapper mapr) {
 		Key key = mapr.refToKey(dbRef);
 		Object proxyAlreadyCreated = cache.getProxy(key);
 		if (proxyAlreadyCreated != null) {

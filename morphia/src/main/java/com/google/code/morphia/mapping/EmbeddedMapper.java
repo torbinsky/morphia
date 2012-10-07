@@ -21,7 +21,7 @@ import com.mongodb.DBObject;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 class EmbeddedMapper implements CustomMapper{
-	public void toDBObject(final Object entity, final MappedField mf, final DBObject dbObject, Map<Object, DBObject> involvedObjects, Mapper mapr) {
+	public void toDBObject(final Object entity, final MappedField mf, final DBObject dbObject, Map<Object, DBObject> involvedObjects, DefaultMapper mapr) {
 		String name = mf.getNameToStore();
 		
 		Object fieldValue = mf.getFieldValue(entity);
@@ -49,7 +49,7 @@ class EmbeddedMapper implements CustomMapper{
 		}
 	}
 
-	private void writeCollection(final MappedField mf, final DBObject dbObject, Map<Object, DBObject> involvedObjects, String name, Object fieldValue, Mapper mapr) {
+	private void writeCollection(final MappedField mf, final DBObject dbObject, Map<Object, DBObject> involvedObjects, String name, Object fieldValue, DefaultMapper mapr) {
 		Iterable coll = null;
 		
 		if (fieldValue != null)
@@ -84,7 +84,7 @@ class EmbeddedMapper implements CustomMapper{
 		}
 	}
 
-	private void writeMap(final MappedField mf, final DBObject dbObject, Map<Object, DBObject> involvedObjects, String name, Object fieldValue, Mapper mapr) {
+	private void writeMap(final MappedField mf, final DBObject dbObject, Map<Object, DBObject> involvedObjects, String name, Object fieldValue, DefaultMapper mapr) {
 		Map<String, Object> map = (Map<String, Object>) fieldValue;
 		if (map != null) {
 			BasicDBObject values = new BasicDBObject();
@@ -116,7 +116,7 @@ class EmbeddedMapper implements CustomMapper{
 		}
 	}
 	
-	public void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, Mapper mapr) {
+	public void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, DefaultMapper mapr) {
 		try {
 			if (mf.isMap()) {
 				readMap(dbObject, mf, entity, cache, mapr);
@@ -152,7 +152,7 @@ class EmbeddedMapper implements CustomMapper{
 		}
 	}
 
-	private void readCollection(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, Mapper mapr) {
+	private void readCollection(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, DefaultMapper mapr) {
 		// multiple documents in a List
 		Collection values = mf.isSet() ? mapr.getOptions().objectFactory.createSet(mf) : mapr.getOptions().objectFactory.createList(mf);
 		
@@ -193,7 +193,7 @@ class EmbeddedMapper implements CustomMapper{
 		}
 	}
 	
-	private void readMap(final DBObject dbObject, final MappedField mf, final Object entity, final EntityCache cache, final Mapper mapr) {
+	private void readMap(final DBObject dbObject, final MappedField mf, final Object entity, final EntityCache cache, final DefaultMapper mapr) {
 		final Map map = mapr.getOptions().objectFactory.createMap(mf);
 		
 		DBObject dbObj = (DBObject) mf.getDbObjectValue(dbObject);
@@ -225,7 +225,7 @@ class EmbeddedMapper implements CustomMapper{
 		}
 	}
 
-	private Object readMapOrCollectionOrEntity(DBObject dbObj, MappedField mf, EntityCache cache, Mapper mapr) {
+	private Object readMapOrCollectionOrEntity(DBObject dbObj, MappedField mf, EntityCache cache, DefaultMapper mapr) {
 		if(Map.class.isAssignableFrom(mf.getSubClass()) || Iterable.class.isAssignableFrom(mf.getSubClass())) {
 			MapOrCollectionMF mocMF = new MapOrCollectionMF((ParameterizedType)mf.getSubType());
 			mapr.fromDb(dbObj, mocMF, cache);

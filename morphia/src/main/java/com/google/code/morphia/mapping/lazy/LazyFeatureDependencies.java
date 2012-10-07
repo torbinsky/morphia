@@ -38,7 +38,7 @@ public class LazyFeatureDependencies {
 	}
 	
 	/**
-	 * @return
+	 * @return A LazyProxyFactory
 	 */
 	public static LazyProxyFactory createDefaultProxyFactory() {
 		if (testDependencyFullFilled()) {

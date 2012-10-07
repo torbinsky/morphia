@@ -16,27 +16,19 @@
 
 package com.google.code.morphia;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.google.code.morphia.annotations.Entity;
+import com.google.code.morphia.annotations.Id;
+import com.google.code.morphia.query.MorphiaIterator;
+import com.mongodb.*;
 import junit.framework.Assert;
-
 import org.bson.types.ObjectId;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Id;
-import com.google.code.morphia.query.MorphiaIterator;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
-import com.mongodb.ReflectionDBObject;
-import com.mongodb.WriteConcern;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -189,7 +181,7 @@ public class TestPerf  extends TestBase{
     }
 
 	public void loadAddresses(int count, boolean raw, boolean strict) {
-    	DBCollection dbColl = db.getCollection(((DatastoreImpl)ds).getMapper().getCollectionName(Address.class));
+    	DBCollection dbColl = db.getCollection(ds.getMapper().getCollectionName(Address.class));
 
     	for(int i=0;i<count;i++) {
     		if(raw) {
@@ -201,7 +193,7 @@ public class TestPerf  extends TestBase{
     }
 
 	public void loadAddresses2(int count, boolean raw, boolean strict) {
-    	DBCollection dbColl = db.getCollection(((DatastoreImpl)ds).getMapper().getCollectionName(Address.class));
+    	DBCollection dbColl = db.getCollection(ds.getMapper().getCollectionName(Address.class));
     	Iterable it = raw ? dbColl.find().limit(count) : ds.find(Address.class).limit(count).fetch();
 
     	for(Object o : it)
@@ -215,7 +207,7 @@ public class TestPerf  extends TestBase{
     }
 
 	public void loadAddresses3(int count, boolean raw, boolean strict) {
-    	DBCollection dbColl = db.getCollection(((DatastoreImpl)ds).getMapper().getCollectionName(Address.class));
+    	DBCollection dbColl = db.getCollection(ds.getMapper().getCollectionName(Address.class));
     	Iterable it = raw ? dbColl.find().limit(count) : ds.find(Address.class).limit(count).fetch();
 
     	if (raw)
@@ -235,7 +227,7 @@ public class TestPerf  extends TestBase{
     }
 
 	public void insertAddresses(int count, boolean raw, boolean strict) {
-    	DBCollection dbColl = db.getCollection(((DatastoreImpl)ds).getMapper().getCollectionName(Address.class));
+    	DBCollection dbColl = db.getCollection(ds.getMapper().getCollectionName(Address.class));
 
     	for(int i=0;i<count;i++) {
 			Address addr = new Address();
