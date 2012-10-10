@@ -7,7 +7,7 @@
 		<version>1.2</version>
 		<relativePath>../</relativePath>
 	</parent>
-	<groupId>${parent.groupId}</groupId>
+	<groupId>com.github.jmkgreen.morphia</groupId>
 	<artifactId>morphia-entityscanner-plug</artifactId>
 	<version>1.00-SNAPSHOT</version>
 	<name>EntityScanner Plugin</name>

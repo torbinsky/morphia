@@ -7,7 +7,7 @@
 		<version>1.2</version>
 		<relativePath>../</relativePath>
 	</parent>
-	<groupId>${parent.groupId}</groupId>
+	<groupId>com.github.jmkgreen.morphia</groupId>
 	<artifactId>morphia-jrebel-plug</artifactId>
 	<version>1.00-SNAPSHOT</version>
 	<name>JRebel Plugin</name>
@@ -15,7 +15,7 @@
 	<dependencies>
 		<!-- automatically looses the optional dependencies -->
 		<dependency>
-			<groupId>${parent.groupId}</groupId>
+			<groupId>com.github.jmkgreen.morphia</groupId>
 			<artifactId>morphia</artifactId>
 			<version>${morphia.version}</version>
 			<scope>compile</scope>
@@ -42,7 +42,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<JavaRebel-Plugin>com.google.code.morphia.ext.jrebel.JRebelPlugin</JavaRebel-Plugin>
+							<JavaRebel-Plugin>com.github.jmkgreen.morphia.ext.jrebel.JRebelPlugin</JavaRebel-Plugin>
 						</manifestEntries>
 					</archive>
 				</configuration>

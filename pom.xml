@@ -9,7 +9,7 @@
 	<name>Morphia Build</name>
 	<description>Build Project for Morphia</description>
 
-	<url>http://code.google.com/p/morphia/</url>
+	<url>http://github.com/jmkgreen/morphia/</url>
 
     <properties>
         <morphia.version>0.100.0-SNAPSHOT</morphia.version>

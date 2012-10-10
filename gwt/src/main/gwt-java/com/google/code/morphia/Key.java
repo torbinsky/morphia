@@ -1,10 +1,10 @@
-package com.google.code.morphia;
+package com.github.jmkgreen.morphia;
 
 import java.io.Serializable;
 
 /**
  * gwt client impl. 
- * @see com.google.code.morphia.Key
+ * @see com.github.jmkgreen.morphia.Key
  * @author Scott Hernandez (adapted to morphia/mongodb)
  */
 public class Key<T> implements Serializable, Comparable<Key<?>> {

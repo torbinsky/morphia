@@ -9,7 +9,7 @@
 		<relativePath>../</relativePath>
 	</parent>
 
-	<groupId>${parent.groupId}</groupId>
+	<groupId>com.github.jmkgreen.morphia</groupId>
 	<artifactId>morphia-no-proxy-deps</artifactId>
 	<version>1.00-SNAPSHOT</version>
 	<name>morphia-no-proxy-deps</name>
@@ -37,7 +37,7 @@
 	<dependencies>
 		<!--  automatically looses the optional dependencies -->
 		<dependency>
-			<groupId>${parent.groupId}</groupId>
+			<groupId>com.github.jmkgreen.morphia</groupId>
 			<artifactId>morphia</artifactId>
 			<version>${morphia.version}</version>
 		</dependency>
