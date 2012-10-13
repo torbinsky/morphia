@@ -2,6 +2,9 @@
 target/
 *.class
 
+.idea
+.classpath
+.project
 
 # Package Files #
 *.jar
