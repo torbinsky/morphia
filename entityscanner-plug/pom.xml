@@ -60,7 +60,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>${parent.groupId}</groupId>
+			<groupId>com.github.jmkgreen.morphia</groupId>
 			<artifactId>morphia</artifactId>
 			<version>${morphia.version}</version>
 		</dependency>
