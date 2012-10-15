@@ -16,29 +16,29 @@ import com.github.jmkgreen.morphia.mapping.lazy.LazyFeatureDependencies;
 
 /**
  * Tests mapper functions; this is tied to some of the internals.
- * 
+ *
  * @author scotthernandez
- * 
+ *
  */
 public class TestMapper extends TestBase {
 	public static class A {
 		static int loadCount = 0;
 		@Id ObjectId id;
-		
+
 		String getId() {
 			return id.toString();
 		}
-		
+
 		@PostLoad
 		protected void postConstruct() {
 			if (A.loadCount > 1) {
 				throw new RuntimeException();
 			}
-			
+
 			A.loadCount++;
 		}
 	}
-	
+
 	@Entity("holders")
 	public static class HoldsMultipleA {
 		@Id ObjectId id;
@@ -47,7 +47,7 @@ public class TestMapper extends TestBase {
 		@Reference
 		A a2;
 	}
-	
+
 	@Entity("holders")
 	public static class HoldsMultipleALazily {
 		@Id ObjectId id;
@@ -58,11 +58,11 @@ public class TestMapper extends TestBase {
 		@Reference(lazy = true)
 		A a3;
 	}
-	
+
 	public static class CustomId implements Serializable {
-		
+
 		private static final long serialVersionUID = 1L;
-		
+
 		@Property("v")
 		ObjectId id;
 		@Property("t")
@@ -79,10 +79,10 @@ public class TestMapper extends TestBase {
 			result = prime * result + ((type == null) ? 0 : type.hashCode());
 			return result;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
 		@Override
@@ -113,10 +113,10 @@ public class TestMapper extends TestBase {
 			}
 			return true;
 		}
-		
+
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
@@ -133,12 +133,16 @@ public class TestMapper extends TestBase {
 			return builder.toString();
 		}
 	}
-	
+
 	public static class UsesCustomIdObject {
 		@Id CustomId id;
 		String text;
 	}
-	
+
+    /**
+     * FIXME does this fail under Java 7?
+     * @throws Exception
+     */
 	@Test
 	public void SingleLookup() throws Exception {
 		A a = new A();
@@ -150,7 +154,7 @@ public class TestMapper extends TestBase {
 		Assert.assertEquals(1, A.loadCount);
 		Assert.assertTrue(holder.a1 == holder.a2);
 	}
-	
+
 	@Test
 	public void SingleProxy() throws Exception {
         // TODO us: exclusion does not work properly with maven + junit4
@@ -173,22 +177,22 @@ public class TestMapper extends TestBase {
 		Assert.assertFalse(holder.a1 == holder.a2);
 		// FIXME currently not guaranteed:
 		// Assert.assertTrue(holder.a1 == holder.a3);
-		
+
 		// A.loadCount=0;
 		// Assert.assertEquals(holder.a1.getId(), holder.a2.getId());
-		
+
 	}
-	
+
 	@Test
 	public void SerializableId() throws Exception {
 		CustomId cId = new CustomId();
 		cId.id = new ObjectId();
 		cId.type = "banker";
-		
+
 		UsesCustomIdObject ucio = new UsesCustomIdObject();
 		ucio.id = cId;
 		ucio.text = "hllo";
 		ds.save(ucio);
 	}
-	
+
 }
