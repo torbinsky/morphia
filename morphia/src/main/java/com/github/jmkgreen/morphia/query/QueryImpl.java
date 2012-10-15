@@ -18,18 +18,18 @@ import java.util.*;
 
 /**
  * <p>Implementation of Query</p>
- * 
+ *
  * @author Scott Hernandez
  *
  * @param <T> The type we will be querying for, and returning.
  */
 public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Criteria {
 	private static final Logr log = MorphiaLoggerFactory.get(QueryImpl.class);
-	
+
 	private EntityCache cache;
 	private boolean validateName = true;
 	private boolean validateType = true;
-	
+
 	private String[] fields = null;
 	private Boolean includeFields = null;
 	private BasicDBObject sort = null;
@@ -46,22 +46,22 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	private boolean tail = false;
 	private boolean tail_await_data;
 	private ReadPreference readPref = null;
-	
+
 	public QueryImpl(Class<T> clazz, DBCollection coll, Datastore ds) {
 		super(CriteriaJoin.AND);
-		
+
 		this.query = this;
 		this.clazz = clazz;
 		this.ds = ds;
 		this.dbColl = coll;
 		this.cache = this.ds.getMapper().createEntityCache();
-		
+
 		MappedClass mc = this.ds.getMapper().getMappedClass(clazz);
 		Entity entAn = mc == null ? null : mc.getEntityAnnotation();
 		if (entAn != null)
-			this.readPref = this.ds.getMapper().getMappedClass(clazz).getEntityAnnotation().queryNonPrimary() ? ReadPreference.SECONDARY : null;
+			this.readPref = this.ds.getMapper().getMappedClass(clazz).getEntityAnnotation().queryNonPrimary() ? ReadPreference.secondaryPreferred() : null;
 	}
-	
+
 	public QueryImpl(Class<T> clazz, DBCollection coll, Datastore ds, int offset, int limit) {
 		this(clazz, coll, ds);
 		this.offset = offset;
@@ -72,7 +72,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		this(clazz, coll, ds);
 		this.baseQuery = (BasicDBObject) baseQuery;
 	}
-	
+
 	@Override
 	public QueryImpl<T> clone(){
 		QueryImpl<T> n = new QueryImpl<T>(clazz, dbColl, ds);
@@ -103,7 +103,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	public DBCollection getCollection() {
 		return dbColl;
 	}
-	
+
 	public void setQueryObject(DBObject query) {
 		this.baseQuery = (BasicDBObject) query;
 	}
@@ -114,25 +114,25 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	public int getLimit() {
 		return limit;
 	}
-	
+
 	public DBObject getQueryObject() {
 		DBObject obj = new BasicDBObject();
-		
+
 		if (this.baseQuery != null) {
 			obj.putAll((BSONObject)this.baseQuery);
 		}
-		
+
 		this.addTo(obj);
-		
+
 		return obj;
 	}
-	
+
 	public Datastore getDatastore() {
 		return ds;
 	}
-	
+
 	public DBObject getFieldsObject() {
-		if (fields == null || fields.length == 0) 
+		if (fields == null || fields.length == 0)
 			return null;
 
 		Map<String, Integer> fieldsFilter = new HashMap<String, Integer>();
@@ -142,43 +142,43 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 			field = sb.toString();
 			fieldsFilter.put(field, (includeFields ? 1 : 0));
 		}
-		
+
 		//Add className field just in case.
 		if (includeFields)
 			fieldsFilter.put(Mapper.CLASS_NAME_FIELDNAME, 1);
-		
+
 		return new BasicDBObject(fieldsFilter);
 	}
-	
+
 	public DBObject getSortObject() {
 		return (sort == null) ? null : sort;
 	}
-	
+
 	public boolean isValidatingNames() {
 		return validateName;
 	}
-	
+
 	public boolean isValidatingTypes() {
 		return validateType;
 	}
-	
+
 	public long countAll() {
 		DBObject query = getQueryObject();
 		if (log.isTraceEnabled())
 			log.trace("Executing count(" + dbColl.getName() + ") for query: " + query);
 		return dbColl.getCount(query);
 	}
-	
+
 	public DBCursor prepareCursor() {
 		DBObject query = getQueryObject();
 		DBObject fields = getFieldsObject();
-		
+
 		if (log.isTraceEnabled())
 			log.trace("Running query(" + dbColl.getName() + ") : " + query + ", fields:" + fields + ",off:" + offset + ",limit:" + limit);
 
 		DBCursor cursor = dbColl.find(query, fields);
 		cursor.setDecoderFactory( this.ds.getDecoderFact() );
-		
+
 		if (offset > 0)
 			cursor.skip(offset);
 		if (limit > 0)
@@ -195,11 +195,11 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		if (null != readPref) {
 			cursor.setReadPreference(readPref);
 		}
-		
+
 		if (noTimeout) {
 			cursor.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
 		}
-		
+
 		if (tail) {
 			cursor.addOption(Bytes.QUERYOPTION_TAILABLE);
 			if (tail_await_data)
@@ -209,16 +209,16 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		//Check for bad options.
 		if (snapshotted && (sort!=null || indexHint!=null))
 			log.warning("Snapshotted query should not have hint/sort.");
-		
+
 		if (tail && (sort!=null))
 		{
 		    // i don´t think that just warning is enough here, i´d favor a RTE, agree?
 			log.warning("Sorting on tail is not allowed.");
 		}
-		
+
 		return cursor;
 	}
-	
+
 
 	public Iterable<T> fetch() {
 		DBCursor cursor = prepareCursor();
@@ -227,7 +227,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 
 		return new MorphiaIterator<T,T>(cursor, ds.getMapper(), clazz, dbColl.getName(), cache);
 	}
-	
+
 
 	public Iterable<Key<T>> fetchKeys() {
 		String[] oldFields = fields;
@@ -243,7 +243,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		includeFields = oldInclude;
 		return new MorphiaKeyIterator<T>(cursor, ds.getMapper(), clazz, dbColl.getName());
 	}
-	
+
 
 	@SuppressWarnings("unchecked")
 	public List<T> asList() {
@@ -253,7 +253,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 			results.add(ent);
 
 		if (log.isTraceEnabled())
-			log.trace(String.format("\nasList: %s \t %d entities, iterator time: driver %n ms, mapper %n ms \n cache: %s \n for $s \n ", 
+			log.trace(String.format("\nasList: %s \t %d entities, iterator time: driver %n ms, mapper %n ms \n cache: %s \n for $s \n ",
 					dbColl.getName(),
 					results.size(),
 					iter.getDriverTime(),
@@ -263,7 +263,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 
 		return results;
 	}
-	
+
 
 	public List<Key<T>> asKeyList() {
 		List<Key<T>> results = new ArrayList<Key<T>>();
@@ -271,7 +271,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 			results.add(key);
 		return results;
 	}
-	
+
 
 	public Iterable<T> fetchEmptyEntities() {
 		String[] oldFields = fields;
@@ -283,7 +283,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		includeFields = oldInclude;
 		return res;
 	}
-	
+
 	/**
 	 * Converts the textual operator (">", "<=", etc) into a FilterOperator.
 	 * Forgiving about the syntax; != and <> are NOT_EQUAL, = and == are EQUAL.
@@ -291,7 +291,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	protected FilterOperator translate(String operator)
 	{
 		operator = operator.trim();
-		
+
 		if (operator.equals("=") || operator.equals("=="))
 			return FilterOperator.EQUAL;
 		else if (operator.equals(">"))
@@ -323,25 +323,25 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		else
 			throw new IllegalArgumentException("Unknown operator '" + operator + "'");
 	}
-	
+
 	public Query<T> filter(String condition, Object value) {
 		String[] parts = condition.trim().split(" ");
 		if (parts.length < 1 || parts.length > 6)
 			throw new IllegalArgumentException("'" + condition + "' is not a legal filter condition");
-		
+
 		String prop = parts[0].trim();
 		FilterOperator op = (parts.length == 2) ? this.translate(parts[1]) : FilterOperator.EQUAL;
-		
+
 		this.add(new FieldCriteria(this, prop, op, value, this.validateName, this.validateType));
 
-		return this;	
+		return this;
 	}
 
 	public Query<T> where(CodeWScope js) {
 		this.add(new WhereCriteria(js));
 		return this;
 	}
-	
+
 	public Query<T> where(String js) {
 		this.add(new WhereCriteria(js));
 		return this;
@@ -350,10 +350,10 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	public Query<T> enableValidation(){ validateName = validateType = true; return this; }
 
 	public Query<T> disableValidation(){ validateName = validateType = false; return this; }
-	
+
 	QueryImpl<T> validateNames() {validateName = true; return this; }
 	QueryImpl<T> disableTypeValidation() {validateType = false; return this; }
-	
+
 	public T get() {
 		int oldLimit = limit;
 		limit = 1;
@@ -361,7 +361,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		limit = oldLimit;
 		return (it.hasNext()) ? it.next() : null ;
 	}
-	
+
 
 	public Key<T> getKey() {
 		int oldLimit = limit;
@@ -370,18 +370,18 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		limit = oldLimit;
 		return (it.hasNext()) ?  it.next() : null;
 	}
-	
+
 
 	public Query<T> limit(int value) {
 		this.limit = value;
 		return this;
 	}
-	
+
 	public Query<T> batchSize(int value) {
 		this.batchSize = value;
 		return this;
 	}
-	
+
 	public int getBatchSize() {
 		return batchSize;
 	}
@@ -395,21 +395,21 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		this.offset = value;
 		return this;
 	}
-	
+
 
 	public Query<T> order(String condition) {
 		if (snapshotted)
 			throw new QueryException("order cannot be used on a snapshotted query.");
-		
+
 		//reset order
 		if (condition == null || condition.trim().isEmpty())
 			sort = null;
-		
+
 		sort = parseFieldsString(condition, clazz, this.ds.getMapper(), this.validateName);
-		
+
 		return this;
 	}
-	
+
 	/** parses the string and validates each part*/
 	@SuppressWarnings("rawtypes")
 	public static BasicDBObject parseFieldsString(String str, Class clazz, Mapper mapr, boolean validate) {
@@ -418,13 +418,13 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		for (String s : parts) {
 			s = s.trim();
 			int dir = 1;
-			
+
 			if (s.startsWith("-"))
 			{
 				dir = -1;
 				s = s.substring(1).trim();
 			}
-			
+
 			if(validate) {
 				StringBuffer sb = new StringBuffer(s);
 				DefaultMapper.validate(clazz, mapr, sb, FilterOperator.IN, "", true, false);
@@ -438,11 +438,11 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	public Iterator<T> iterator() {
 		return fetch().iterator();
 	}
-	
+
 	public Iterator<T> tail() {
 		return tail(true);
 	}
-	
+
 	public Iterator<T> tail(boolean awaitData) {
 		//Create a new query for this, so the current one is not affected.
 		QueryImpl<T> tailQ = clone();
@@ -450,19 +450,19 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		tailQ.tail_await_data = awaitData;
 		return tailQ.fetch().iterator();
 	}
-	
+
 	public Class<T> getEntityClass() {
 		return this.clazz;
 	}
-	
+
 	public String toString() {
 		return this.getQueryObject().toString();
 	}
-	
+
 	public FieldEnd<? extends Query<T>> field(String name) {
 		return this.field(name, this.validateName);
 	}
-	
+
 	private FieldEnd<? extends Query<T>> field(String field, boolean validate) {
 		return new FieldEndImpl<QueryImpl<T>>(this, field, this, validate);
 	}
@@ -474,7 +474,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	private FieldEnd<? extends CriteriaContainerImpl> criteria(String field, boolean validate) {
 		CriteriaContainerImpl container = new CriteriaContainerImpl(this, CriteriaJoin.AND);
 		this.add(container);
-		
+
 		return new FieldEndImpl<CriteriaContainerImpl>(this, field, container, validate);
 	}
 
@@ -502,9 +502,9 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		return this;
 	}
 
-	/** Enabled snapshotted mode where duplicate results 
-	 * (which may be updated during the lifetime of the cursor) 
-	 *  will not be returned. Not compatible with order/sort and hint. 
+	/** Enabled snapshotted mode where duplicate results
+	 * (which may be updated during the lifetime of the cursor)
+	 *  will not be returned. Not compatible with order/sort and hint.
 	 **/
 	public Query<T> enableSnapshotMode() {
 		snapshotted = true;
@@ -524,12 +524,12 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 	}
 
 	public Query<T> queryNonPrimary() {
-		readPref = ReadPreference.SECONDARY;
+		readPref = ReadPreference.secondaryPreferred();
 		return this;
 	}
 
 	public Query<T> queryPrimaryOnly() {
-		readPref = ReadPreference.PRIMARY;
+		readPref = ReadPreference.primary();
 		return this;
 	}
 
@@ -544,7 +544,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 		noTimeout = false;
 		return this;
 	}
-	
+
 	@Override
 	public String getFieldName() {
 		return null;
