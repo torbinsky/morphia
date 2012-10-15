@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia.mapping;
 
@@ -23,7 +23,7 @@ public class ListOfDoubleArrayMappingTest extends TestBase {
 		@Id ObjectId id;
 		List<Double[]> points = new ArrayList<Double[]>();
 	}
-	
+
 
 	@Test
 	public void testMapping() throws Exception {
@@ -33,10 +33,11 @@ public class ListOfDoubleArrayMappingTest extends TestBase {
 		ds.save(ent);
 		ContainsListDoubleArray loaded = ds.get(ent);
 		Assert.assertNotNull(loaded.id);
-//		Assert.assertEquals(1.1D, loaded.points.get(0)[0], 0);
-//		Assert.assertEquals(2.2D, loaded.points.get(0)[1], 0);
-		
+                Assert.assertNotNull(loaded.points);
+		Assert.assertEquals(1.1D, loaded.points.get(0)[0], 0);
+		Assert.assertEquals(2.2D, loaded.points.get(0)[1], 0);
+
 	}
-	
-	
+
+
 }
