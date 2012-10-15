@@ -162,8 +162,7 @@ public class Morphia {
      *
      * @param entityClass
      * @param dbObject
-     * @param <T>
-     * @return
+     * @return The typed instance
      */
     public <T> T fromDBObject(Class<T> entityClass, DBObject dbObject) {
         return fromDBObject(entityClass, dbObject, mapper.createEntityCache());
@@ -178,8 +177,7 @@ public class Morphia {
      * @param entityClass
      * @param dbObject
      * @param cache
-     * @param <T>
-     * @return
+     * @return The typed instance
      * @throws MappingException
      * @see Mapper#fromDBObject(Class, com.mongodb.DBObject, com.github.jmkgreen.morphia.mapping.cache.EntityCache)
      */
