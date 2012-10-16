@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Scott Hernandez
  */
-//@Ignore
+@Ignore
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class TestPerf  extends TestBase{
     /**
