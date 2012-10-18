@@ -140,7 +140,7 @@ public class TestMapper extends TestBase {
 	}
 
     /**
-     * FIXME does this fail under Java 7?
+     * FIXME does this fail under OpenJDK 7 32 bit?
      * @throws Exception
      */
 	@Test
