@@ -11,9 +11,21 @@
 
     <url>http://github.com/jmkgreen/morphia/</url>
 
+    <parent>
+      <groupId>org.sonatype.oss</groupId>
+      <artifactId>oss-parent</artifactId>
+      <version>7</version>
+    </parent>
+
     <properties>
         <morphia.version>0.100.0-SNAPSHOT</morphia.version>
     </properties>
+
+    <scm>
+        <connection>scm:git:git@github.com:jmkgreen/morphia.git</connection>
+        <developerConnection>scm:git:git@github.com:jmkgreen/morphia.git</developerConnection>
+        <url>git@github.com:jmkgreen/morphia.git</url>
+    </scm>
 
     <licenses>
         <license>
