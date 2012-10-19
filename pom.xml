@@ -18,7 +18,7 @@
     </parent>
 
     <properties>
-        <morphia.version>0.100.0-SNAPSHOT</morphia.version>
+        <morphia.version>1.0</morphia.version>
     </properties>
 
     <scm>
