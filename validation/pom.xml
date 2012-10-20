@@ -5,13 +5,13 @@
 	<parent>
 		<artifactId>morphia-parent</artifactId>
 		<groupId>com.github.jmkgreen.morphia</groupId>
-		<version>1.2</version>
+		<version>1.2.1</version>
 		<relativePath>../</relativePath>
 	</parent>
 
 	<groupId>com.github.jmkgreen.morphia</groupId>
 	<artifactId>morphia-validation</artifactId>
-	<version>1.00-SNAPSHOT</version>
+	<version>1.00</version>
 	<name>JSR303 Validation</name>
 	<packaging>jar</packaging>
 
@@ -22,7 +22,7 @@
 			<artifactId>morphia</artifactId>
 			<version>${morphia.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
@@ -36,14 +36,14 @@
 			<version>4.1.0.Final</version>
 			<scope>test</scope>
 		</dependency>
-			
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			 <version>1.5.6</version>
 			<optional>true</optional>
 		</dependency>
-		
+
 	</dependencies>
 	<repositories>
 		<repository>
