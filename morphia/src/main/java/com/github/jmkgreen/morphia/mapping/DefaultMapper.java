@@ -404,7 +404,7 @@ public class DefaultMapper implements Mapper {
         entity = ProxyHelper.unwrap(entity);
 //		String keyClassName = entity.getClass().getName();
         MappedClass mc = getMappedClass(entity.getClass());
-//		
+//
 //		if (getMappedClasses().containsKey(keyClassName))
 //			mc = getMappedClasses().get(keyClassName);
 //		else
@@ -417,6 +417,9 @@ public class DefaultMapper implements Mapper {
     }
 
     public <T> Key<T> getKey(T entity) {
+        if (entity == null)
+            throw new MappingException("getKey has been passed a null entity");
+
         if (entity instanceof ProxiedEntityReference) {
             ProxiedEntityReference proxy = (ProxiedEntityReference) entity;
             return (Key<T>) proxy.__getKey();
@@ -429,6 +432,7 @@ public class DefaultMapper implements Mapper {
         Object id = getId(entity);
         if (id == null)
             throw new MappingException("Could not get id for " + entity.getClass().getName());
+
         return new Key<T>((Class<T>) entity.getClass(), id);
     }
 
