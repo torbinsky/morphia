@@ -140,11 +140,14 @@ public class TestMapper extends TestBase {
 	}
 
     /**
-     * FIXME does this fail under OpenJDK 7 32 bit?
+     * Should only load one instance of A.
+     * Ensure {@link A#id A's id} is zero at start of each test
+     * using it!
      * @throws Exception
      */
 	@Test
 	public void SingleLookup() throws Exception {
+		A.loadCount = 0;
 		A a = new A();
 		HoldsMultipleA holder = new HoldsMultipleA();
 		holder.a1 = a;
