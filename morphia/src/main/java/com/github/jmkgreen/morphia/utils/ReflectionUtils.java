@@ -57,7 +57,7 @@ import com.mongodb.DBRef;
 
 /**
  * Various reflection utility methods, used mainly in the Mapper.
- * 
+ *
  * @author Olafur Gauti Gudmundsson
  */
 @SuppressWarnings({"unchecked","rawtypes"})
@@ -67,7 +67,7 @@ public class ReflectionUtils
     /**
      * Get an array of all fields declared in the supplied class, and all its
      * superclasses (except java.lang.Object).
-     * 
+     *
      * @param type
      *            the class for which we want to retrieve the Fields
      * @param returnFinalFields
@@ -90,7 +90,7 @@ public class ReflectionUtils
     /**
      * Get a list of all methods declared in the supplied class, and all its
      * superclasses (except java.lang.Object), recursively.
-     * 
+     *
      * @param type
      *            the class for which we want to retrieve the Methods
      * @return an array of all declared and inherited fields
@@ -98,7 +98,7 @@ public class ReflectionUtils
 	public static List<Method> getDeclaredAndInheritedMethods(final Class type) {
 		return getDeclaredAndInheritedMethods(type, new ArrayList());
 	}
-	
+
     protected static List<Method> getDeclaredAndInheritedMethods(final Class type, List<Method> methods)
     {
         if ((type == null) || (type == Object.class))
@@ -153,7 +153,7 @@ public class ReflectionUtils
 
     /**
      * Check if a class implements a specific interface.
-     * 
+     *
      * @param type
      *            the class we want to check
      * @param interfaceClass
@@ -167,7 +167,7 @@ public class ReflectionUtils
 
     /**
      * Check if a class extends a specific class.
-     * 
+     *
      * @param type
      *            the class we want to check
      * @param superClass
@@ -181,7 +181,7 @@ public class ReflectionUtils
 
     /**
      * Check if the class supplied represents a valid property type.
-     * 
+     *
      * @param type
      *            the class we want to check
      * @return true if the class represents a valid property type
@@ -191,10 +191,10 @@ public class ReflectionUtils
     		return isPropertyType(((ParameterizedType)type).getRawType());
     	if (type instanceof Class)
     		return isPropertyType((Class)type);
-    		
+
     	throw new RuntimeException("bad type, not parameterized...");
     }
-    
+
     public static boolean isPropertyType(final Class type)
     {
         if (type == null)
@@ -202,11 +202,11 @@ public class ReflectionUtils
             return false;
         }
 
-        return  isPrimitiveLike(type) || (type == DBRef.class) || (type == Pattern.class) || 
-        		(type == CodeWScope.class) || (type == ObjectId.class) || (type == Key.class) || 
+        return  isPrimitiveLike(type) || (type == DBRef.class) || (type == Pattern.class) ||
+        		(type == CodeWScope.class) || (type == ObjectId.class) || (type == Key.class) ||
         		(type == DBObject.class) || (type == BasicDBObject.class)  ;
     }
-    
+
     public static boolean isPrimitiveLike(final Class type) {
         if (type == null)
         {
@@ -217,13 +217,13 @@ public class ReflectionUtils
                 || (type == Short.class) 	|| (type == Integer.class) 	|| (type == int.class) 		|| (type == Long.class)
                 || (type == long.class) 	|| (type == Double.class) 	|| (type == double.class) 	|| (type == float.class)
                 || (type == Float.class) 	|| (type == Boolean.class) 	|| (type == boolean.class) 	|| (type == Byte.class)
-                || (type == byte.class) 	|| (type == Date.class) 	|| (type == Locale.class) 	|| (type == Class.class) 
+                || (type == byte.class) 	|| (type == Date.class) 	|| (type == Locale.class) 	|| (type == Class.class)
                 || (type == UUID.class) 	|| (type == URI.class)		|| type.isEnum();
     }
 
     /**
      * Get the (first) class that parameterizes the Field supplied.
-     * 
+     *
      * @param field
      *            the field
      * @return the class that parameterizes the field, or null if field is not
@@ -237,7 +237,7 @@ public class ReflectionUtils
     /**
      * Get the class that parameterizes the Field supplied, at the index
      * supplied (field can be parameterized with multiple param classes).
-     * 
+     *
      * @param field
      *            the field
      * @param index
@@ -341,7 +341,7 @@ public class ReflectionUtils
         {
             TypeVariable typeVariable = typeVars[index];
 			Type[] bounds = typeVariable.getBounds();
-			
+
 			Type type = bounds[0];
 			if (type instanceof Class) {
 				return (Class) type;// broke for enumset, cause bounds contain
@@ -358,7 +358,7 @@ public class ReflectionUtils
 
     /**
      * Check if a field is parameterized with a specific class.
-     * 
+     *
      * @param field
      *            the field
      * @param c
@@ -390,7 +390,7 @@ public class ReflectionUtils
     /**
      * Check if the field supplied is parameterized with a valid JCR property
      * type.
-     * 
+     *
      * @param field
      *            the field
      * @return true if the field is parameterized with a valid JCR property
@@ -416,13 +416,17 @@ public class ReflectionUtils
     	ArrayList<T> found = getAnnotations(c, annClass);
     	if (found != null && found.size()>0)
     		return found.get(0);
-    	else 
+    	else
     		return null;
     }
-    
+
     /**
-     * Returns the (first) instance of the annotation, on the class (or any
-     * superclass, or interfaces implemented).
+     * Returns a list of the found Annotations hierarchically.
+     *
+     * Returns the given class, it's super-classes (and their interfaces),
+     * and finally the interfaces of the given class, in that order.
+     *
+     * @return An ArrayList of <T>.
      */
     public static <T> ArrayList<T> getAnnotations(final Class c, final Class<T> annClass)
     {
@@ -432,40 +436,35 @@ public class ReflectionUtils
         {
              found.add((T) c.getAnnotation(annClass));
         }
-//        else
-//        {
-            // need to check all superclasses
-    		
-            Class parent = c.getSuperclass();
-            while ((parent != null) && (parent != Object.class))
+
+        Class parent = c.getSuperclass();
+        while ((parent != null) && (parent != Object.class))
+        {
+            if (parent.isAnnotationPresent(annClass))
             {
-                if (parent.isAnnotationPresent(annClass))
-                {
-                    found.add((T) parent.getAnnotation(annClass));
-                }
-
-                // ...and interfaces that the superclass implements
-                for (Class interfaceClass : parent.getInterfaces())
-                {
-                    if (interfaceClass.isAnnotationPresent(annClass))
-                    {
-                    	found.add((T) interfaceClass.getAnnotation(annClass));
-                    }
-                }
-
-                parent = parent.getSuperclass();
+                found.add((T) parent.getAnnotation(annClass));
             }
 
-            // ...and all implemented interfaces
-            for (Class interfaceClass : c.getInterfaces())
+            // ...and interfaces that the superclass implements
+            for (Class interfaceClass : parent.getInterfaces())
             {
                 if (interfaceClass.isAnnotationPresent(annClass))
                 {
-                	found.add((T)interfaceClass.getAnnotation(annClass));
+                    found.add((T) interfaceClass.getAnnotation(annClass));
                 }
             }
-//        }
-        // no annotation found, use the defaults
+
+            parent = parent.getSuperclass();
+        }
+
+        // ...and all implemented interfaces
+        for (Class interfaceClass : c.getInterfaces())
+        {
+            if (interfaceClass.isAnnotationPresent(annClass))
+            {
+                found.add((T)interfaceClass.getAnnotation(annClass));
+            }
+        }
         return found;
     }
 
@@ -650,11 +649,11 @@ public class ReflectionUtils
 	public static ArrayList iterToList (Iterable it) {
 		if (it instanceof ArrayList) return (ArrayList) it;
 		if (it == null) return null;
-		
+
 		ArrayList ar = new ArrayList();
 		for(Object o : it)
 			ar.add(o);
-		
+
 		return ar;
 	}
 
@@ -670,12 +669,12 @@ public class ReflectionUtils
 			return exampleArray;
 		}
 	}
-	
+
 
 	/**
 	 * Get the underlying class for a type, or null if the type is a variable
 	 * type.
-	 * 
+	 *
 	 * @param type
 	 *            the type
 	 * @return the underlying class
@@ -697,11 +696,11 @@ public class ReflectionUtils
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Get the actual type arguments a child class has used to extend a generic
 	 * base class.
-	 * 
+	 *
 	 * @param baseClass
 	 *            the base class
 	 * @param childClass
@@ -720,19 +719,19 @@ public class ReflectionUtils
 			} else {
 				ParameterizedType parameterizedType = (ParameterizedType) type;
 				Class<?> rawType = (Class) parameterizedType.getRawType();
-				
+
 				Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
 				TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
 				for (int i = 0; i < actualTypeArguments.length; i++) {
 					resolvedTypes.put(typeParameters[i], actualTypeArguments[i]);
 				}
-				
+
 				if (!rawType.equals(baseClass)) {
 					type = rawType.getGenericSuperclass();
 				}
 			}
 		}
-		
+
 		// finally, for each actual type argument provided to baseClass,
 		// determine (if possible)
 		// the raw class for that type argument.
@@ -752,7 +751,7 @@ public class ReflectionUtils
 		}
 		return typeArgumentsAsClasses;
 	}
-	
+
 	public static <T> Class<?> getTypeArgument(Class<? extends T> clazz, TypeVariable<? extends GenericDeclaration> tv) {
 		Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
 		Type type = clazz;
@@ -765,19 +764,19 @@ public class ReflectionUtils
 			} else {
 				ParameterizedType parameterizedType = (ParameterizedType) type;
 				Class<?> rawType = (Class) parameterizedType.getRawType();
-				
+
 				Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
 				TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
 				for (int i = 0; i < actualTypeArguments.length; i++) {
 					if (typeParameters[i].equals(tv)) {
 						Class cls = getClass(actualTypeArguments[i]);
-						if (cls != null) 
+						if (cls != null)
 							return cls;
 						return getClass(resolvedTypes.get(actualTypeArguments[i]));
 					}
 					resolvedTypes.put(typeParameters[i], actualTypeArguments[i]);
 				}
-				
+
 				if (!rawType.equals(Object.class)) {
 					type = rawType.getGenericSuperclass();
 				}
