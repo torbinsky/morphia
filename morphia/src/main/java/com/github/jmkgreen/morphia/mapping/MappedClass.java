@@ -123,7 +123,7 @@ public class MappedClass {
     // TODO: Remove this and make these fields dynamic or auto-set some other way
     public void update() {
         embeddedAn = (Embedded) getAnnotation(Embedded.class);
-        entityAn = (Entity) getAnnotation(Entity.class);
+        entityAn = (Entity) getFirstAnnotation(Entity.class);
         // polymorphicAn = (Polymorphic) getAnnotation(Polymorphic.class);
         List<MappedField> fields = getFieldsAnnotatedWith(Id.class);
         if (fields != null && fields.size() > 0)
@@ -202,6 +202,12 @@ public class MappedClass {
         }
     }
 
+    /**
+     * Adds the given Annotation to the internal list for the given Class.
+     *
+     * @param clazz
+     * @param ann
+     */
     public void addAnnotation(Class<? extends Annotation> clazz, Annotation ann) {
         if (ann == null || clazz == null) return;
 
@@ -425,7 +431,24 @@ public class MappedClass {
     }
 
     /**
-     * @return the instance if it was found, if more than onw was found, the last one added
+     * Returns the first found Annotation, or null.
+     *
+     * @param clazz The Annotation to find.
+     * @return First found Annotation or null of none found.
+     */
+    public Annotation getFirstAnnotation(Class<? extends Annotation> clazz) {
+        ArrayList<Annotation> found = foundAnnotations.get(clazz);
+        if (found == null || found.isEmpty()) {
+            return null;
+        }
+        return found.get(0);
+    }
+
+    /**
+     * Returns the last found Annotation instance or null.
+     *
+     * @param clazz The Annotation to find.
+     * @return the instance if it was found, if more than one was found, the last one added
      */
     public Annotation getAnnotation(Class<? extends Annotation> clazz) {
         ArrayList<Annotation> found = foundAnnotations.get(clazz);
@@ -433,7 +456,9 @@ public class MappedClass {
     }
 
     /**
-     * @return the instance if it was found, if more than onw was found, the last one added
+     * Returns all found Annotations for given Class (hierarchically).
+     *
+     * @return The ArrayList if found, else null
      */
     public ArrayList<Annotation> getAnnotations(Class<? extends Annotation> clazz) {
         ArrayList<Annotation> found = foundAnnotations.get(clazz);
