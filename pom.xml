@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jmkgreen.morphia</groupId>
     <artifactId>morphia-parent</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Morphia Build</name>
@@ -18,7 +18,7 @@
     </parent>
 
     <properties>
-        <morphia.version>1.0</morphia.version>
+        <morphia.version>1.0.1-SNAPSHOT</morphia.version>
     </properties>
 
     <scm>
@@ -44,7 +44,7 @@
             <id>scotthernandez</id>
             <name>Scott Hernandez</name>
             <email>scotthernandez (hot/g mail)</email>
-            <timezone>(GMT-08:00) Pacific Time(US &amp; Canada)</timezone>
+            <timezone>-8</timezone>
         </developer>
         <developer>
             <id>us@thomas-daily.de</id>
