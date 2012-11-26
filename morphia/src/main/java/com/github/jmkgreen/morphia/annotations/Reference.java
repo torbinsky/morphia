@@ -26,6 +26,25 @@ import java.lang.annotation.Target;
 import com.github.jmkgreen.morphia.mapping.Mapper;
 
 /**
+ * Identifies that a field should be mapped to MongoDB DBRef.
+ *
+ * <p>
+ * If your field's value is a a document that could be
+ * stored in more than one collection, DBRef is a solution.
+ * </p>
+ * <p>
+ * For all other use-cases, use manual linking for performance reasons.
+ * </p>
+ * <p>
+ * A manual link is simply a field that holds a reference to another
+ * entity document that your own application creates and maintains.
+ * </p>
+ *
+ * <p>
+ * The _id of the referenced document must be a type that the
+ * mongo-java-driver natively supports within it's BasicBSONEncoder
+ * implementation, Morphia does not (yet) support more complex mapping.
+ * </p>
  *
  * @author Olafur Gauti Gudmundsson
  * @author Scott Hernandez
