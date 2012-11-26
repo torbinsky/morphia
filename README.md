@@ -8,3 +8,5 @@ The intention of this fork is to:
 2. Provide a 1.0 release
 3. Maintain compatibility with newer MongoDB driver releases
 4. Fix and improve the code
+
+[![Build Status](https://secure.travis-ci.org/jmkgreen/morphia.png?branch=master)](https://travis-ci.org/jmkgreen/morphia)
