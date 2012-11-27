@@ -1,9 +1,8 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia.issue45;
 
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -12,6 +11,7 @@ import com.github.jmkgreen.morphia.annotations.Embedded;
 import com.github.jmkgreen.morphia.annotations.Entity;
 import com.github.jmkgreen.morphia.annotations.Transient;
 import com.github.jmkgreen.morphia.testutil.TestEntity;
+import org.junit.Assert;
 
 public class TestEmptyEntityMapping extends TestBase
 {

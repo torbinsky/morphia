@@ -6,13 +6,13 @@ package com.github.jmkgreen.morphia.mapping;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
 import com.github.jmkgreen.morphia.TestBase;
 import com.github.jmkgreen.morphia.annotations.Id;
+import org.junit.Assert;
 
 /**
  * @author scotthernandez

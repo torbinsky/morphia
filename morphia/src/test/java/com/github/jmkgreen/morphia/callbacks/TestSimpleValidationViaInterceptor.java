@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia.callbacks;
 
@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -24,30 +23,31 @@ import com.github.jmkgreen.morphia.mapping.MappedClass;
 import com.github.jmkgreen.morphia.mapping.MappedField;
 import com.github.jmkgreen.morphia.mapping.Mapper;
 import com.mongodb.DBObject;
+import org.junit.Assert;
 
 /**
  * @author Uwe Schaefer, (us@thomas-daily.de)
- * 
+ *
  */
 public class TestSimpleValidationViaInterceptor extends TestBase {
-	
+
 	static class E {
 		@Id
 		private ObjectId _id = new ObjectId();
-		
+
 		@NonNull
 		Date lastModified;
-		
+
 		@PrePersist
 		void entityCallback() {
 			lastModified = new Date();
 		}
 	}
-	
+
 	static class E2 {
 		@Id
 		private ObjectId _id = new ObjectId();
-		
+
 		@NonNull
 		String mustFailValidation;
 	}
@@ -56,7 +56,7 @@ public class TestSimpleValidationViaInterceptor extends TestBase {
 	@Target( { ElementType.FIELD })
 	public static @interface NonNull {
 	}
-	
+
 	public static class NonNullValidation extends AbstractEntityInterceptor {
 		public void prePersist(Object ent, DBObject dbObj, Mapper mapr) {
 			MappedClass mc = mapr.getMappedClass(ent);
@@ -66,16 +66,16 @@ public class TestSimpleValidationViaInterceptor extends TestBase {
 					throw new NonNullValidationException(mf);
 			}
 		}
-		
+
 		static class NonNullValidationException extends RuntimeException {
-			
+
 			public NonNullValidationException(MappedField mf) {
 				super("NonNull field is null " + mf.getFullName());
 			}
 
 		}
 	}
-	
+
 	static {
 		MappedField.interestingAnnotations.add(NonNull.class);
 	}
@@ -86,7 +86,7 @@ public class TestSimpleValidationViaInterceptor extends TestBase {
 		morphia.getMapper().addInterceptor(new NonNullValidation());
 		morphia.map(E.class);
 		morphia.map(E2.class);
-		
+
 		ds.save(new E());
 		try {
 			ds.save(new E2());
@@ -94,6 +94,6 @@ public class TestSimpleValidationViaInterceptor extends TestBase {
 		} catch (NonNullValidationException e) {
 			// expected
 		}
-		
+
 	}
 }

@@ -16,7 +16,6 @@
 
 package com.github.jmkgreen.morphia;
 
-import junit.framework.Assert;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -24,6 +23,7 @@ import org.junit.Test;
 import com.github.jmkgreen.morphia.annotations.Entity;
 import com.github.jmkgreen.morphia.annotations.Id;
 import com.github.jmkgreen.morphia.annotations.NotSaved;
+import org.junit.Assert;
 
 /**
  *

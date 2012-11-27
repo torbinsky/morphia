@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -35,13 +34,14 @@ import com.github.jmkgreen.morphia.annotations.Id;
 import com.github.jmkgreen.morphia.mapping.MappedClass;
 import com.github.jmkgreen.morphia.mapping.MappedField;
 import com.github.jmkgreen.morphia.mapping.Mapper;
+import org.junit.Assert;
 
 /**
  *
  * @author Scott Hernandez
  */
 public class ExternalMapperExtTest extends TestBase {
-	
+
 	/**
 	 * The skeleton to apply from.
 	 * @author skot
@@ -51,7 +51,7 @@ public class ExternalMapperExtTest extends TestBase {
 	private static class Skeleton {
 		@Id String id;
 	}
-	
+
 	/**
 	 * Uneditable class
 	 * @author skot
@@ -60,13 +60,13 @@ public class ExternalMapperExtTest extends TestBase {
 	private static class EntityWithNoAnnotations {
 		String id;
 	}
-	
+
 	private static class CloneMapper {
 		Mapper mapr;
 		public CloneMapper(Mapper mapr) {
 			this.mapr = mapr;
 		}
-		
+
 		void map(Class sourceClass, Class destClass){
 			MappedClass destMC = mapr.getMappedClass(destClass);
 			MappedClass sourceMC = mapr.getMappedClass(sourceClass);
@@ -85,36 +85,36 @@ public class ExternalMapperExtTest extends TestBase {
 						destMF.addAnnotation((Class)e.getKey(), (Annotation)e.getValue());
 				}
 			}
-			
+
 		}
-		
+
 		MappedClass addAnnotation(Class clazz, String field, Annotation... annotations) {
 			if (annotations == null || annotations.length == 0)
 				throw new IllegalArgumentException("Must specify annotations");
-			
+
 			MappedClass mc = mapr.getMappedClass(clazz);
 			MappedField mf = mc.getMappedFieldByJavaField(field);
 			if(mf == null)
 				throw new IllegalArgumentException("Field \""+ field + "\" does not exist on: " + mc);
-			
+
 			for(Annotation an : annotations)
 				mf.putAnnotation(an);
-			
+
 			return mc;}
-			
+
 		}
-		
+
 	@Test
 	public void testExternalMapping() throws Exception {
 		Mapper mapr = morphia.getMapper();
 		ExternalMapperExtTest.CloneMapper helper = new CloneMapper(mapr);
 		helper.map(Skeleton.class, EntityWithNoAnnotations.class);
-		MappedClass mc = mapr.getMappedClass(EntityWithNoAnnotations.class); 
+		MappedClass mc = mapr.getMappedClass(EntityWithNoAnnotations.class);
 		mc.update();
 		assertNotNull(mc.getIdField());
 		assertNotNull(mc.getEntityAnnotation());
 		Assert.assertEquals("special", mc.getEntityAnnotation().value());
-		
+
 		EntityWithNoAnnotations ent = new EntityWithNoAnnotations();
 		ent.id = "test";
 		Key<EntityWithNoAnnotations> k = ds.save(ent);
