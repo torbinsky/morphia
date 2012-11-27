@@ -20,7 +20,7 @@ import com.github.jmkgreen.morphia.annotations.Entity;
 import com.github.jmkgreen.morphia.annotations.Id;
 import com.github.jmkgreen.morphia.query.MorphiaIterator;
 import com.mongodb.*;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.bson.types.ObjectId;
 import org.junit.Ignore;
 import org.junit.Test;

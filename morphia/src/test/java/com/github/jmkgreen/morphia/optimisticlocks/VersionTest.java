@@ -5,7 +5,7 @@ package com.github.jmkgreen.morphia.optimisticlocks;
 
 import java.util.ConcurrentModificationException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

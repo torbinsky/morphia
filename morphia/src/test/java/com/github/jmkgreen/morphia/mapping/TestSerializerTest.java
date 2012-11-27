@@ -5,7 +5,7 @@ package com.github.jmkgreen.morphia.mapping;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;

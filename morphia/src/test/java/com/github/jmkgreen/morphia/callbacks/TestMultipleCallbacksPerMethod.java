@@ -1,6 +1,6 @@
 package com.github.jmkgreen.morphia.callbacks;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.bson.types.ObjectId;
 import org.junit.Test;

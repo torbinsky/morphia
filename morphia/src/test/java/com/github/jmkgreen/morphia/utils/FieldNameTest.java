@@ -1,30 +1,30 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia.utils;
 
 import org.junit.Test;
-
+import org.junit.Assert;
 import com.github.jmkgreen.morphia.testutil.AssertedFailure;
 
 public class FieldNameTest {
-	
+
 	private String foo;
 	private String bar;
 
 	@Test
 	public void testFieldNameOf() throws Exception {
 		String name = "foo";
-		junit.framework.Assert.assertEquals("foo", FieldName.of("foo"));
+		Assert.assertTrue("foo".equals(FieldName.of("foo")));
 		junit.framework.Assert.assertEquals("bar", FieldName.of("bar"));
 		new AssertedFailure(FieldName.FieldNameNotFoundException.class) {
-			
+
 			@Override
 			protected void thisMustFail() throws Throwable {
 				FieldName.of("buh");
 			}
 		};
-		junit.framework.Assert.assertEquals("x", FieldName.of(E2.class, "x"));
+		Assert.assertTrue("x".equals(FieldName.of(E2.class, "x")));
 		junit.framework.Assert.assertEquals("y", FieldName.of(E2.class, "y"));
 	}
 }

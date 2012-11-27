@@ -5,7 +5,7 @@ package com.github.jmkgreen.morphia.converters;
 
 import java.util.EnumSet;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

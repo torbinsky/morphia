@@ -19,7 +19,7 @@ import com.github.jmkgreen.morphia.annotations.Entity;
 import com.github.jmkgreen.morphia.annotations.Id;
 import com.github.jmkgreen.morphia.annotations.Index;
 import com.github.jmkgreen.morphia.annotations.Indexes;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

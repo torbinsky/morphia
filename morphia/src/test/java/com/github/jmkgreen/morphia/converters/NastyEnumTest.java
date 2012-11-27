@@ -3,7 +3,7 @@
  */
 package com.github.jmkgreen.morphia.converters;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

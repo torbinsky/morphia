@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia.converters;
 
@@ -14,66 +14,67 @@ import com.github.jmkgreen.morphia.TestBase;
 import com.github.jmkgreen.morphia.mapping.MappedField;
 import com.github.jmkgreen.morphia.mapping.MappingException;
 import com.github.jmkgreen.morphia.testutil.TestEntity;
+import org.junit.Assert;
 
 /**
  * @author Uwe Schaefer
- * 
+ *
  */
 @SuppressWarnings("rawtypes")
 public class CustomConverterInEmbed extends TestBase {
-	
+
 	public static class E1 extends TestEntity {
 		private static final long serialVersionUID = 1L;
 		List<Foo> foo = new LinkedList<Foo>();
 	}
-	
+
 	public static class E2 extends TestEntity {
 		private static final long serialVersionUID = 1L;
 		Map<String, Foo> foo = new HashMap<String, Foo>();
 	}
-	
+
 	// unknown type to convert
 	public static class Foo {
 		private String string;
-		
+
 		Foo(){}
 		public Foo(String string) {
 			this.string = string;
 		}
-		
+
 		@Override
 		public String toString() {
 			return string;
 		}
 	}
-	
+
 	public static class FooConverter extends TypeConverter implements SimpleValueConverter  {
-		
+
 		public boolean done;
-		
+
 		public FooConverter() {
 			super(Foo.class);
 		}
-		
+
 		@Override
 		public Object decode(Class targetClass, Object fromDBObject, MappedField optionalExtraInfo)
 				throws MappingException {
 			return new Foo((String) fromDBObject);
 		}
-		
+
 		@Override
 		public Object encode(Object value, MappedField optionalExtraInfo) {
 			done = true;
 			return value.toString();
 		}
-		
+
 		public boolean didConversion() {
 			return done;
 		}
 	}
-	
+
 	//FIXME issue 101
-	
+
 	@Test
 	public void testConversionInList() throws Exception {
 		FooConverter fc = new FooConverter();
@@ -81,7 +82,7 @@ public class CustomConverterInEmbed extends TestBase {
 		E1 e = new E1();
 		e.foo.add(new Foo("bar"));
 		ds.save(e);
-		junit.framework.Assert.assertTrue(fc.didConversion());
+		Assert.assertTrue(fc.didConversion());
 	}
 
 	@Test
@@ -91,14 +92,14 @@ public class CustomConverterInEmbed extends TestBase {
 		E2 e = new E2();
 		e.foo.put("bar",new Foo("bar"));
 		ds.save(e);
-		
+
 		junit.framework.Assert.assertTrue(fc.didConversion());
-		
+
 		e = ds.find(E2.class).get();
-		junit.framework.Assert.assertNotNull(e.foo);
-		junit.framework.Assert.assertFalse(e.foo.isEmpty());
-		junit.framework.Assert.assertTrue(e.foo.containsKey("bar"));
-		junit.framework.Assert.assertEquals(e.foo.get("bar").string, "bar");
+		Assert.assertNotNull(e.foo);
+		Assert.assertFalse(e.foo.isEmpty());
+		Assert.assertTrue(e.foo.containsKey("bar"));
+		Assert.assertEquals(e.foo.get("bar").string, "bar");
 	}
 
 }
