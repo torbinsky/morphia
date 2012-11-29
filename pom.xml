@@ -51,7 +51,7 @@
     </developers>
 
     <properties>
-        <mongo-java-driver.version>2.9.3</mongo-java-driver.version>
+        <mongo-java-driver.version>2.10.0</mongo-java-driver.version>
         <proxytoys.version>1.0</proxytoys.version>
         <cglib-nodep.version>2.2.2</cglib-nodep.version>
         <slf4j.version>1.7.2</slf4j.version>
@@ -64,6 +64,7 @@
         <scannotation.version>1.0.2</scannotation.version>
         <gwt.version>2.5.0</gwt.version>
         <junit.version>4.11</junit.version>
+        <github.global.server>github</github.global.server>
     </properties>
 
     <dependencyManagement>
