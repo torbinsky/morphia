@@ -9,7 +9,7 @@
 	</parent>
 
 	<groupId>com.github.jmkgreen.morphia</groupId>
-	<artifactId>morphia-guice-plug</artifactId>
+	<artifactId>morphia-guice-plugin</artifactId>
 	<name>Guice Plugin</name>
 	<packaging>jar</packaging>
 

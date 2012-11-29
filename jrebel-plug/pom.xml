@@ -9,7 +9,7 @@
 	</parent>
 
 	<groupId>com.github.jmkgreen.morphia</groupId>
-	<artifactId>morphia-jrebel-plug</artifactId>
+	<artifactId>morphia-jrebel-plugin</artifactId>
 	<name>JRebel Plugin</name>
 	<packaging>jar</packaging>
 

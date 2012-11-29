@@ -53,15 +53,16 @@
         <mongo-java-driver.version>2.9.3</mongo-java-driver.version>
         <proxytoys.version>1.0</proxytoys.version>
         <cglib-nodep.version>2.2.2</cglib-nodep.version>
-        <slf4j.version>1.6.6</slf4j.version>
+        <slf4j.version>1.7.2</slf4j.version>
         <validation-api.version>1.0.0.GA</validation-api.version>
         <hibernate-validator.version>4.3.0.Final</hibernate-validator.version>
         <javarebel.version>2.0.2</javarebel.version>
-        <guice.version>2.0</guice.version>
+        <guice.version>3.0</guice.version>
         <reflections.version>0.9.8</reflections.version>
         <guava.version>13.0.1</guava.version>
         <scannotation.version>1.0.2</scannotation.version>
         <gwt.version>2.5.0</gwt.version>
+        <junit.version>4.11</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -177,10 +178,8 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <type>jar</type>
+            <version>${junit.version}</version>
             <scope>test</scope>
-            <optional>false</optional>
         </dependency>
     </dependencies>
 
@@ -317,7 +316,7 @@
         <module>jrebel-plug</module>
         <module>guice-plug</module>
         <module>entityscanner-plug</module>
-       <!-- <module>gwt</module> -->
+        <module>gwt</module>
     </modules>
 
 </project>

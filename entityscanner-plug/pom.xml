@@ -9,7 +9,7 @@
 	</parent>
 
 	<groupId>com.github.jmkgreen.morphia</groupId>
-	<artifactId>morphia-entityscanner-plug</artifactId>
+	<artifactId>morphia-entityscanner-plugin</artifactId>
 	<name>EntityScanner Plugin</name>
 	<packaging>jar</packaging>
 
