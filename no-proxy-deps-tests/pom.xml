@@ -6,13 +6,13 @@
 		<artifactId>morphia-parent</artifactId>
 		<groupId>com.github.jmkgreen.morphia</groupId>
 		<version>1.2.2-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
 
 	<groupId>com.github.jmkgreen.morphia</groupId>
 	<artifactId>morphia-no-proxy-deps</artifactId>
 	<name>morphia-no-proxy-deps</name>
 	<packaging>jar</packaging>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -34,11 +34,9 @@
 	</build>
 
 	<dependencies>
-		<!--  automatically looses the optional dependencies -->
 		<dependency>
 			<groupId>com.github.jmkgreen.morphia</groupId>
 			<artifactId>morphia</artifactId>
-            <version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

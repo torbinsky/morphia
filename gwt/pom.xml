@@ -10,12 +10,8 @@
 
 	<groupId>com.github.jmkgreen.morphia</groupId>
 	<artifactId>gwt</artifactId>
-	<name>Morphia Google Web Toolkit Extension</name>
+	<name>Google Web Toolkit Extension</name>
 	<packaging>jar</packaging>
-
-	<properties>
-		<gwt.version>2.1.0</gwt.version>
-	</properties>
 
 	<build>
 		<resources>
@@ -68,27 +64,24 @@
 		<dependency>
 			<groupId>com.github.jmkgreen.morphia</groupId>
 			<artifactId>morphia</artifactId>
-            <version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
-			<version>${gwt.version}</version>
-			<type>jar</type>
 		</dependency>
+
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-dev</artifactId>
-			<version>${gwt.version}</version>
-			<type>jar</type>
 		</dependency>
+
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
-			<version>2.3</version>
-			<type>jar</type>
 		</dependency>
 	</dependencies>
+
 	<reporting>
 		<plugins>
 			<plugin>
