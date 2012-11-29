@@ -93,7 +93,7 @@ public class CustomConverterInEmbed extends TestBase {
 		e.foo.put("bar",new Foo("bar"));
 		ds.save(e);
 
-		junit.framework.Assert.assertTrue(fc.didConversion());
+		Assert.assertTrue(fc.didConversion());
 
 		e = ds.find(E2.class).get();
 		Assert.assertNotNull(e.foo);
