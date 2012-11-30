@@ -9,7 +9,13 @@
     <packaging>pom</packaging>
 
     <name>Morphia Build</name>
-    <description>Build Project for Morphia</description>
+    <description>
+        Morphia is an Object-Document Mapper, written in Java for MongoDB.
+        Application developer authoring code in Java and using the mongo-java-driver
+        can use Morphia to map POJO classes into MongoDB documents and vice-versa.
+        Morphia provides a Datastore, Query, and DAO-style interfaces including CRUD
+        services in a type-safe manner.
+    </description>
 
     <url>http://github.com/jmkgreen/morphia/</url>
 
@@ -56,7 +62,7 @@
         <cglib-nodep.version>2.2.2</cglib-nodep.version>
         <slf4j.version>1.7.2</slf4j.version>
         <validation-api.version>1.0.0.GA</validation-api.version>
-        <hibernate-validator.version>4.3.0.Final</hibernate-validator.version>
+        <hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
         <javarebel.version>2.0.2</javarebel.version>
         <guice.version>3.0</guice.version>
         <reflections.version>0.9.8</reflections.version>
@@ -268,6 +274,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <message>Creating site for ${project.version}</message>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>downloads-maven-plugin</artifactId>
+                <configuration>
+                    <description>${project.version} release of ${project.name}</description>
+                    <override>true</override>
+                    <includeAttached>true</includeAttached>
+                </configuration>
             </plugin>
         </plugins>
 
@@ -421,9 +439,9 @@
             </plugin>
 
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.5.1</version>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.6.0.201210061924</version>
             </plugin>
 
             <plugin>
