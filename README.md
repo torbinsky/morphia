@@ -16,7 +16,11 @@ Available from [the downloads page on GitHub](https://github.com/jmkgreen/morphi
 	</tr>
 	<tr>
 		<td>Group ID</td><td>com.jmkgreen.morphia</td>
+		
+	</tr>
 		<td>Artifact ID</td><td>morphia</td>
+	</tr>
+	<tr>
 		<td>Version</td><td>1.2.2</td>
 	</tr>
 </table>
