@@ -15,7 +15,7 @@ Available from [the downloads page on GitHub](https://github.com/jmkgreen/morphi
 		<th colspan="2">Maven Dependency</td>
 	</tr>
 	<tr>
-		<td>Group ID</td><td>com.jmkgreen.morphia</td>
+		<td>Group ID</td><td>com.github.jmkgreen.morphia</td>
 		
 	</tr>
 		<td>Artifact ID</td><td>morphia</td>
