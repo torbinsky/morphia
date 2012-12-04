@@ -1,12 +1,12 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia.logging.slf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.bson.types.ObjectId;
 import org.junit.After;
