@@ -5,7 +5,7 @@
 
     <groupId>com.github.jmkgreen.morphia</groupId>
     <artifactId>morphia-parent</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.2</version>
     <packaging>pom</packaging>
 
     <name>Morphia Build</name>
@@ -565,7 +565,7 @@
         <module>jrebel-plug</module>
         <module>guice-plug</module>
         <module>entityscanner-plug</module>
-        <module>gwt</module>
+        <!--<module>gwt</module>-->
     </modules>
 
 </project>
