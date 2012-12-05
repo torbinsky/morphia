@@ -11,7 +11,9 @@ release.properties
 .classpath
 .project
 *.iml
-
+*.tag
+*.next
+*.releasebackup
 
 # Package Files #
 *.jar
