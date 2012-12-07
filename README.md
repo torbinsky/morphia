@@ -8,7 +8,7 @@ To use, add Morphia to your Java SE or EE project alongside the mongo-java-drive
 
 Available from [the downloads page on GitHub](https://github.com/jmkgreen/morphia/downloads) - latest release and snapshots are available routinely.
 
-*Maven* users: Releases are available in Central. Snapshots are available via [OSS Sonartype](https://oss.sonatype.org).
+*Maven* users: Releases are available in Central. Snapshots are available via [OSS Sonatype](https://oss.sonatype.org).
 
 <table>
 	<tr>
