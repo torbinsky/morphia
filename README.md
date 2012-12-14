@@ -30,7 +30,7 @@ Available from [the downloads page on GitHub](https://github.com/jmkgreen/morphi
 The [wiki](https://github.com/jmkgreen/morphia/wiki) has quite a lot of good example code.
 It was copied over from the original GoogleCode site.
 
-Maven Site docs are [here](http://jmkgreen.github.com/morphia)
+Maven Site docs are [here](http://jmkgreen.github.com/morphia).
 
 JavaDoc packages are available for more detailed IDE-based help.
 
