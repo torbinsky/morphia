@@ -2,20 +2,20 @@
 
 <rss version="0.91">
   <channel>
-    <title>Guice Plugin - Checkstyle report</title>
-    <link>http://github.com/jmkgreen/morphia/morphia-guice-plugin/</link>
-    <description>Guice Plugin - Checkstyle report</description>
+    <title>EntityScanner Plugin - Checkstyle report</title>
+    <link>http://github.com/jmkgreen/morphia/morphia-entityscanner-plugin/</link>
+    <description>EntityScanner Plugin - Checkstyle report</description>
     <language>en-us</language>
     <copyright>&#169;2012</copyright>
     <item>
-      <title>File: 3,
-             Errors: 32,
+      <title>File: 2,
+             Errors: 4,
              Warnings: 0,
              Infos: 0
       </title>
-            <link>http://github.com/jmkgreen/morphia/morphia-guice-plugin//checkstyle.html</link>
+            <link>http://github.com/jmkgreen/morphia/morphia-entityscanner-plugin//checkstyle.html</link>
       <description>
-        <p>Click <a href="http://github.com/jmkgreen/morphia/morphia-guice-plugin//checkstyle.html">here</a> for the full Checkstyle report.</p>
+        <p>Click <a href="http://github.com/jmkgreen/morphia/morphia-entityscanner-plugin//checkstyle.html">here</a> for the full Checkstyle report.</p>
 
         <table summary="Files" boder="1">
           <thead>
@@ -29,21 +29,7 @@
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://github.com/jmkgreen/morphia/morphia-guice-plugin//checkstyle.html#com.github.jmkgreen.morphia.ext.guice.GuiceObjectFactory.java">com/github/jmkgreen/morphia/ext/guice/GuiceObjectFactory.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  30
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://github.com/jmkgreen/morphia/morphia-guice-plugin//checkstyle.html#com.github.jmkgreen.morphia.ext.guice.package-info.java">com/github/jmkgreen/morphia/ext/guice/package-info.java</a>
+                  <a href="http://github.com/jmkgreen/morphia/morphia-entityscanner-plugin//checkstyle.html#com.github.jmkgreen.morphia.ext.entityscanner.package-info.java">com/github/jmkgreen/morphia/ext/entityscanner/package-info.java</a>
                 </td>
                 <td>
                   0
@@ -57,7 +43,7 @@
               </tr>
                           <tr>
                 <td>
-                  <a href="http://github.com/jmkgreen/morphia/morphia-guice-plugin//checkstyle.html#com.github.jmkgreen.morphia.ext.guice.GuiceExtension.java">com/github/jmkgreen/morphia/ext/guice/GuiceExtension.java</a>
+                  <a href="http://github.com/jmkgreen/morphia/morphia-entityscanner-plugin//checkstyle.html#com.github.jmkgreen.morphia.ext.entityscanner.EntityScanner.java">com/github/jmkgreen/morphia/ext/entityscanner/EntityScanner.java</a>
                 </td>
                 <td>
                   0
@@ -66,7 +52,7 @@
                   0
                 </td>
                 <td>
-                  2
+                  4
                 </td>
               </tr>
                       </tbody>
