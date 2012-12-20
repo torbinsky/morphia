@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd version="4.3" timestamp="2012-12-20T09:41:33.625">
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/DatastoreImpl.java">
+<violation beginline="132" endline="134" begincolumn="13" endcolumn="109" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia" class="DatastoreImpl" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="1275" endline="1277" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="com.github.jmkgreen.morphia" class="DatastoreImpl" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/config/MorphiaConfiguration.java">
+<violation beginline="16" endline="16" begincolumn="18" endcolumn="35" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="com.github.jmkgreen.morphia.config" class="MorphiaConfiguration" method="assertBeforeInit" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'assertBeforeInit()'.
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/logging/MorphiaLoggerFactory.java">
+<violation beginline="37" endline="38" begincolumn="11" endcolumn="9" rule="EmptyCatchBlock" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.logging" class="MorphiaLoggerFactory" method="newInstance" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/logging/jdk/ShortFormatter.java">
+<violation beginline="38" endline="39" begincolumn="15" endcolumn="13" rule="EmptyCatchBlock" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.logging.jdk" class="ShortFormatter" method="format" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/MappedClass.java">
+<violation beginline="330" endline="330" begincolumn="20" endcolumn="37" rule="OverrideBothEqualsAndHashcode" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedClass" method="equals" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#OverrideBothEqualsAndHashcode" priority="3">
+Ensure you override both equals() and hashCode()
+</violation>
+<violation beginline="404" endline="405" begincolumn="13" endcolumn="79" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedClass" method="getOrCreateInstance" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/MappedField.java">
+<violation beginline="157" endline="158" begincolumn="13" endcolumn="73" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedField" method="discoverType" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="162" endline="163" begincolumn="13" endcolumn="151" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedField" method="discoverType" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="184" endline="186" begincolumn="15" endcolumn="13" rule="EmptyCatchBlock" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedField" method="discoverCTor" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="201" endline="202" begincolumn="21" endcolumn="90" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedField" method="discoverCTor" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="211" endline="213" begincolumn="19" endcolumn="17" rule="EmptyCatchBlock" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedField" method="discoverCTor" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+<violation beginline="213" endline="215" begincolumn="19" endcolumn="17" rule="EmptyCatchBlock" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="MappedField" method="discoverCTor" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyCatchBlock" priority="3">
+Avoid empty catch blocks
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/ReferenceMapper.java">
+<violation beginline="53" endline="54" begincolumn="13" endcolumn="41" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping" class="ReferenceMapper" method="writeSingle" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/cache/DefaultEntityCache.java">
+<violation beginline="15" endline="15" begincolumn="31" endcolumn="33" rule="UnusedPrivateField" ruleset="Unused Code Rules" package="com.github.jmkgreen.morphia.mapping.cache" class="DefaultEntityCache" variable="log" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateField" priority="3">
+Avoid unused private fields such as 'log'.
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/lazy/DatastoreHolder.java">
+<violation beginline="11" endline="13" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.lazy" class="DatastoreHolder" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/validation/fieldrules/IdDoesNotMix.java">
+<violation beginline="25" endline="27" begincolumn="13" endcolumn="119" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="IdDoesNotMix" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/validation/fieldrules/LazyReferenceMissingDependencies.java">
+<violation beginline="23" endline="27" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="LazyReferenceMissingDependencies" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="24" endline="26" begincolumn="17" endcolumn="91" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="LazyReferenceMissingDependencies" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/validation/fieldrules/MapNotSerializable.java">
+<violation beginline="23" endline="36" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="MapNotSerializable" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="27" endline="29" begincolumn="21" endcolumn="60" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="MapNotSerializable" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="32" endline="34" begincolumn="21" endcolumn="60" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="MapNotSerializable" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/validation/fieldrules/MisplacedProperty.java">
+<violation beginline="23" endline="27" begincolumn="13" endcolumn="13" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="MisplacedProperty" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/mapping/validation/fieldrules/VersionMisuse.java">
+<violation beginline="34" endline="36" begincolumn="21" endcolumn="85" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.mapping.validation.fieldrules" class="VersionMisuse" method="check" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/query/FieldEndImpl.java">
+<violation beginline="119" endline="120" begincolumn="13" endcolumn="100" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.query" class="FieldEndImpl" method="hasAnyOf" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+<violation beginline="196" endline="196" begincolumn="33" endcolumn="80" rule="UnusedPrivateMethod" ruleset="Unused Code Rules" package="com.github.jmkgreen.morphia.query" class="FieldEndImpl" method="opts" externalInfoUrl="http://pmd.sourceforge.net/rules/unusedcode.html#UnusedPrivateMethod" priority="3">
+Avoid unused private methods such as 'opts(String,Object,String,Object)'.
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/query/QueryImpl.java">
+<violation beginline="523" endline="523" begincolumn="42" endcolumn="57" rule="ClassCastExceptionWithToArray" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.query" class="QueryImpl" method="retrieveKnownFields" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#ClassCastExceptionWithToArray" priority="3">
+This usage of the Collection.toArray() method will throw a ClassCastException.
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/utils/Assert.java">
+<violation beginline="13" endline="15" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="17" endline="21" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="23" endline="25" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="27" endline="31" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="33" endline="35" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="37" endline="41" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="43" endline="45" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="47" endline="51" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="53" endline="55" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="57" endline="61" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="63" endline="65" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="67" endline="71" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="73" endline="75" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+<violation beginline="77" endline="79" begincolumn="25" endcolumn="5" rule="UnnecessaryFinalModifier" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="Assert" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#UnnecessaryFinalModifier" priority="3">
+Unnecessary final modifier in final class
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/utils/FieldName.java">
+<violation beginline="65" endline="65" begincolumn="19" endcolumn="49" rule="AvoidThreadGroup" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="FieldName" method="callingClass" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#AvoidThreadGroup" priority="3">
+Avoid using java.lang.ThreadGroup; it is not thread safe
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/com/github/jmkgreen/morphia/utils/ReflectionUtils.java">
+<violation beginline="288" endline="294" begincolumn="17" endcolumn="17" rule="CollapsibleIfStatements" ruleset="Basic Rules" package="com.github.jmkgreen.morphia.utils" class="ReflectionUtils" method="getTypeArgumentOfParameterizedClass" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#CollapsibleIfStatements" priority="3">
+These nested if statements could be combined
+</violation>
+</file>
+<file name="/Users/dhudson/git/morphia/morphia/src/main/java/relocated/morphia/org/apache/commons/collections/ReferenceMap.java">
+<violation beginline="560" endline="560" begincolumn="38" endcolumn="38" rule="EmptyWhileStmt" ruleset="Basic Rules" package="relocated.morphia.org.apache.commons.collections" class="ReferenceMap" method="clear" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#EmptyWhileStmt" priority="3">
+Avoid empty while statements
+</violation>
+<violation beginline="873" endline="873" begincolumn="20" endcolumn="29" rule="OverrideBothEqualsAndHashcode" ruleset="Basic Rules" package="relocated.morphia.org.apache.commons.collections" class="ReferenceMap$SoftRef" method="hashCode" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#OverrideBothEqualsAndHashcode" priority="3">
+Ensure you override both equals() and hashCode()
+</violation>
+<violation beginline="889" endline="889" begincolumn="20" endcolumn="29" rule="OverrideBothEqualsAndHashcode" ruleset="Basic Rules" package="relocated.morphia.org.apache.commons.collections" class="ReferenceMap$WeakRef" method="hashCode" externalInfoUrl="http://pmd.sourceforge.net/rules/basic.html#OverrideBothEqualsAndHashcode" priority="3">
+Ensure you override both equals() and hashCode()
+</violation>
+</file>
+</pmd>
