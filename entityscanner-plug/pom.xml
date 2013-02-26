@@ -54,12 +54,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>com.github.jmkgreen.morphia</groupId>
 			<artifactId>morphia</artifactId>
 		</dependency>
