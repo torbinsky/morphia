@@ -24,6 +24,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Identify the field to be mapped to the _id field in BSON.
+ *
+ * @see <a href="http://docs.mongodb.org/manual/reference/glossary/>Glossary at MongoDB</a>
  * @author Olafur Gauti Gudmundsson
  * @author Scott Hernandez
  */

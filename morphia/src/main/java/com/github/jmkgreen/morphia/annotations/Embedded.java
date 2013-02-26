@@ -25,6 +25,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Identifies a field to hold a sub-document. This is the default for all fields.
+ *
  * @author Olafur Gauti Gudmundsson
  * @author Scott Hernandez
  */

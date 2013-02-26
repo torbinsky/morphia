@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
 /**
  * Specified on fields that should be Indexed.
  *
+ * @see <a href="http://docs.mongodb.org/manual/core/indexes/">Index, at MongoDB</a>
  * @author Scott Hernandez
  */
 @Documented
