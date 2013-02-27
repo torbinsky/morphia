@@ -17,7 +17,7 @@
         services in a type-safe manner.
     </description>
 
-    <url>http://github.com/jmkgreen/morphia/</url>
+    <url>http://github.com/torbinsky/morphia/</url>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -26,9 +26,9 @@
     </parent>
 
     <scm>
-        <connection>scm:git:git@github.com:jmkgreen/morphia.git</connection>
-        <developerConnection>scm:git:git@github.com:jmkgreen/morphia.git</developerConnection>
-        <url>https://github.com/jmkgreen/morphia</url>
+        <connection>scm:git:git@github.com:torbinsky/morphia.git</connection>
+        <developerConnection>scm:git:git@github.com:torbinsky/morphia.git</developerConnection>
+        <url>https://github.com/torbinsky/morphia</url>
     </scm>
 
     <licenses>

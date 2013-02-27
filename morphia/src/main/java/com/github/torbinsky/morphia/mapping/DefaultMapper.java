@@ -148,7 +148,7 @@ public class DefaultMapper implements Mapper {
     /**
      * Add MappedClass to internal cache, possibly validating first.
      */
-    private MappedClass addMappedClass(MappedClass mc, boolean validate) {
+    protected MappedClass addMappedClass(MappedClass mc, boolean validate) {
         if (validate)
             mc.validate();
 
