@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.github.torbinsky.morphia</groupId>
+  <artifactId>morphia-parent</artifactId>
+  <version>1.2.3-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
+    <lastUpdated>20130227223601</lastUpdated>
+  </versioning>
+</metadata>
