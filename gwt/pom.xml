@@ -4,11 +4,11 @@
 
     <parent>
         <artifactId>morphia-parent</artifactId>
-        <groupId>com.github.jmkgreen.morphia</groupId>
+        <groupId>com.github.torbinsky.morphia</groupId>
         <version>1.2.3-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.github.jmkgreen.morphia</groupId>
+    <groupId>com.github.torbinsky.morphia</groupId>
     <artifactId>morphia-gwt</artifactId>
     <name>Google Web Toolkit Extension</name>
     <packaging>jar</packaging>
@@ -62,7 +62,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.jmkgreen.morphia</groupId>
+            <groupId>com.github.torbinsky.morphia</groupId>
             <artifactId>morphia</artifactId>
         </dependency>
 

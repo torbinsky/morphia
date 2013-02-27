@@ -1,4 +1,4 @@
-package com.github.jmkgreen.morphia;
+package com.github.torbinsky.morphia;
 
 import java.io.Serializable;
 
@@ -6,7 +6,7 @@ import java.io.Serializable;
  * gwt client impl.
  *
  * @author Scott Hernandez (adapted to morphia/mongodb)
- * @see com.github.jmkgreen.morphia.Key
+ * @see com.github.torbinsky.morphia.Key
  */
 public class Key<T> implements Serializable, Comparable<Key<?>> {
     private static final long serialVersionUID = 1L;
