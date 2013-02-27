@@ -32,5 +32,10 @@
 			<artifactId>guice</artifactId>
 			<version>3.0</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>inject</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 </project>

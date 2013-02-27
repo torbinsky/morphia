@@ -16,6 +16,5 @@ release.properties
 *.releasebackup
 
 # Package Files #
-*.jar
 *.war
 *.ear
