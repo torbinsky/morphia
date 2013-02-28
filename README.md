@@ -1,6 +1,6 @@
 ### Basic Introduction
 
-Morphia provides an annotation-driven approach to mapping POJO based entities into and out of MongoDB. As such, Morphia is an ODM (or Object Document Mapper).
+Morphia provides an annotation-driven approach to mapping POJO based entities into and out of MongoDB. Therefore, Morphia is an ODM (or Object Document Mapper).
 
 To use, add Morphia to your Java SE or EE project alongside the mongo-java-driver (which Morphia depends on). Then, create POJOs representing your entities just like you would with JPA entities. Finally, either use Morphia's Datastore interface to store and retrieve entities, or hand that responsibility to a type-safe DAO that can extend from the shipped BasicDAO.
 
