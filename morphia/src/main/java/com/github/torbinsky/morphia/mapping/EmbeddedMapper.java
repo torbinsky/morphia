@@ -67,7 +67,7 @@ class EmbeddedMapper implements CustomMapper {
                 else {
                     Object val;
                     if (Collection.class.isAssignableFrom(o.getClass()) || Map.class.isAssignableFrom(o.getClass()))
-                        val = mapr.toMongoObject(o, true);
+                        val = mapr.toMongoObjectFromJavaObj(o, true);
                     else
                         val = mapr.toDBObject(o, involvedObjects);
 
@@ -98,7 +98,7 @@ class EmbeddedMapper implements CustomMapper {
                     val = mapr.converters.encode(entryVal);
                 else {
                     if (Map.class.isAssignableFrom(entryVal.getClass()) || Collection.class.isAssignableFrom(entryVal.getClass()))
-                        val = mapr.toMongoObject(entryVal, true);
+                        val = mapr.toMongoObjectFromJavaObj(entryVal, true);
                     else
                         val = mapr.toDBObject(entryVal, involvedObjects);
 

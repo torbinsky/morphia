@@ -1,5 +1,9 @@
 package com.github.torbinsky.morphia.query;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.github.torbinsky.morphia.logging.Logr;
 import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.github.torbinsky.morphia.mapping.DefaultMapper;
@@ -9,9 +13,6 @@ import com.github.torbinsky.morphia.mapping.Mapper;
 import com.github.torbinsky.morphia.utils.ReflectionUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FieldCriteria extends AbstractCriteria implements Criteria {
     private static final Logr log = MorphiaLoggerFactory.get(FieldCriteria.class);

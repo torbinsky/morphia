@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>morphia-parent</artifactId>
 		<groupId>com.github.torbinsky.morphia</groupId>
-		<version>1.2.3-SNAPSHOT</version>
+		<version>1.2.4-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.github.torbinsky.morphia</groupId>

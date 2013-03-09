@@ -1,6 +1,9 @@
 package com.github.torbinsky.morphia.mapping;
 
+import javax.inject.Provider;
+
 import com.github.torbinsky.morphia.tenant.IsTenant;
+import com.github.torbinsky.morphia.utils.InvalidTenantCollectionIdentifierException;
 
 /**
  * 
@@ -10,16 +13,25 @@ import com.github.torbinsky.morphia.tenant.IsTenant;
  */
 public class TenantMappedClass extends MappedClass {
 
-	private IsTenant tenant;
+	private Provider<IsTenant> tenantProvider;
 
-	public TenantMappedClass(IsTenant tenant, Class<?> clazz, DefaultMapper mapr) {
+	public TenantMappedClass(Provider<IsTenant> tenant, Class<?> clazz, DefaultMapper mapr) {
 		super(clazz, mapr);
-		this.tenant = tenant;
+		this.tenantProvider = tenant;
 	}
 
 	@Override
 	public String getCollectionName() {
-		return super.getCollectionName() + "_" + tenant.getCollectionSuffix();
+		IsTenant tenant = tenantProvider.get();
+		
+		if (tenant.getCollectionSuffix() == null) {
+			throw new InvalidTenantCollectionIdentifierException("Tenant[" + tenant.getCollectionSuffix() + "] has a null identifier.");
+		}
+		
+		String collectionBaseName = super.getCollectionName();
+		String collectionSuffix = tenantProvider.get().getCollectionSuffix();
+		
+		return collectionBaseName + "_" + collectionSuffix;
 	}
 
 	@Override

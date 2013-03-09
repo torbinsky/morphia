@@ -51,6 +51,8 @@ public class TenantMapper extends DefaultMapper {
 
 		return mc;
 	}
+	
+	
 
 	private MappedClass mapClass(@SuppressWarnings("rawtypes") Class c) {
 		// Check if the Class is annotated to be Tenant-specific
@@ -69,7 +71,7 @@ public class TenantMapper extends DefaultMapper {
 			IsTenant tenant = tenantProvider.get();
 			if (tenant != null) {
 				if (tenant.getCollectionSuffix() != null) {
-					return new TenantMappedClass(tenant, c, this);
+					return new TenantMappedClass(tenantProvider, c, this);
 				} else {
 					throw new InvalidTenantCollectionIdentifierException("Tenant[" + tenant.getCollectionSuffix() + "] has a null identifier.");
 				}

@@ -283,7 +283,7 @@ public class DefaultMapper implements Mapper {
      * Used (mainly) by query/update operations
      * </p>
      */
-    Object toMongoObject(Object javaObj, boolean includeClassName) {
+    Object toMongoObjectFromJavaObj(Object javaObj, boolean includeClassName) {
         if (javaObj == null)
             return null;
 
@@ -330,7 +330,7 @@ public class DefaultMapper implements Mapper {
                 else {
                     HashMap m = new HashMap();
                     for (Map.Entry e : (Iterable<Map.Entry>) ((Map) newObj).entrySet())
-                        m.put(e.getKey(), toMongoObject(e.getValue(), includeClassName));
+                        m.put(e.getKey(), toMongoObjectFromJavaObj(e.getValue(), includeClassName));
 
                     return m;
                 }
@@ -339,10 +339,10 @@ public class DefaultMapper implements Mapper {
                 ArrayList<Object> vals = new ArrayList<Object>();
                 if (type.isArray())
                     for (Object obj : (Object[]) newObj)
-                        vals.add(toMongoObject(obj, includeClassName));
+                        vals.add(toMongoObjectFromJavaObj(obj, includeClassName));
                 else
                     for (Object obj : (Iterable) newObj)
-                        vals.add(toMongoObject(obj, includeClassName));
+                        vals.add(toMongoObjectFromJavaObj(obj, includeClassName));
 
                 return vals;
             } else {
@@ -395,7 +395,7 @@ public class DefaultMapper implements Mapper {
                 }
             } catch (Exception e) {
                 log.error("Error converting value(" + value + ") to reference.", e);
-                mappedValue = toMongoObject(value, false);
+                mappedValue = toMongoObjectFromJavaObj(value, false);
             }
         }//serialized
         else if (mf != null && mf.hasAnnotation(Serialized.class))
@@ -408,7 +408,7 @@ public class DefaultMapper implements Mapper {
         else if (value instanceof DBObject)
             mappedValue = value;
         else {
-            mappedValue = toMongoObject(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
+            mappedValue = toMongoObjectFromJavaObj(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
             if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf))
                 ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
         }
