@@ -15,6 +15,7 @@ import java.util.Map;
  * <p/>
  * Implementations should be thread-safe.
  */
+@SuppressWarnings("rawtypes")
 public interface Mapper {
     /**
      * The @{@link com.github.jmkgreen.morphia.annotations.Id} field name that is stored with mongodb.
@@ -77,4 +78,11 @@ public interface Mapper {
     String updateKind(Key key);
 
     Class<?> getClassFromKind(String kind);
+    
+    boolean isCached(Class<?> clazz);
+    
+    Object cacheClass(Class<?> clazz, Object instance);
+    
+    Object getCachedClass(Class<?> clazz);
+    
 }

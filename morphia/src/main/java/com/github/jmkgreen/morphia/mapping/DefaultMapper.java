@@ -11,6 +11,24 @@
 
 package com.github.jmkgreen.morphia.mapping;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.regex.Pattern;
+
+import org.bson.BSONEncoder;
+import org.bson.BasicBSONEncoder;
+
 import com.github.jmkgreen.morphia.EntityInterceptor;
 import com.github.jmkgreen.morphia.Key;
 import com.github.jmkgreen.morphia.annotations.Converters;
@@ -32,8 +50,6 @@ import com.github.jmkgreen.morphia.logging.MorphiaLoggerFactory;
 import com.github.jmkgreen.morphia.mapping.cache.DefaultEntityCache;
 import com.github.jmkgreen.morphia.mapping.cache.EntityCache;
 import com.github.jmkgreen.morphia.mapping.lazy.DatastoreProvider;
-import com.github.jmkgreen.morphia.mapping.lazy.DefaultDatastoreProvider;
-import com.github.jmkgreen.morphia.mapping.lazy.LazyFeatureDependencies;
 import com.github.jmkgreen.morphia.mapping.lazy.LazyProxyFactory;
 import com.github.jmkgreen.morphia.mapping.lazy.proxy.ProxiedEntityReference;
 import com.github.jmkgreen.morphia.mapping.lazy.proxy.ProxyHelper;
@@ -43,22 +59,6 @@ import com.github.jmkgreen.morphia.utils.ReflectionUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.regex.Pattern;
-import org.bson.BSONEncoder;
-import org.bson.BasicBSONEncoder;
 
 /**
  * <p>This is the heart of Morphia and takes care of mapping from/to POJOs/DBObjects<p>
@@ -69,34 +69,36 @@ import org.bson.BasicBSONEncoder;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultMapper implements Mapper {
-    private static final Logr log = MorphiaLoggerFactory.get(DefaultMapper.class);
+    protected static final Logr log = MorphiaLoggerFactory.get(DefaultMapper.class);
 
     /**
      * Set of classes that registered by this mapper
      */
-    private final Map<String, MappedClass> mappedClasses = new ConcurrentHashMap<String, MappedClass>();
-    private final ConcurrentHashMap<String, Set<MappedClass>> mappedClassesByCollection = new ConcurrentHashMap<String, Set<MappedClass>>();
+    protected final Map<String, MappedClass> mappedClasses = new ConcurrentHashMap<String, MappedClass>();
+    protected final ConcurrentHashMap<String, Set<MappedClass>> mappedClassesByCollection = new ConcurrentHashMap<String, Set<MappedClass>>();
 
     //EntityInterceptors; these are called before EntityListeners and lifecycle methods on an Entity, for all Entities
-    private final List<EntityInterceptor> interceptors = new LinkedList<EntityInterceptor>();
+    protected final List<EntityInterceptor> interceptors = new LinkedList<EntityInterceptor>();
 
     //A general cache of instances of classes; used by MappedClass for EntityListener(s)
     final Map<Class, Object> instanceCache = new ConcurrentHashMap();
 
-    private MapperOptions opts = new MapperOptions();
+    protected MapperOptions opts;
 
-    // TODO: make these configurable
-    LazyProxyFactory proxyFactory = LazyFeatureDependencies.createDefaultProxyFactory();
-    DatastoreProvider datastoreProvider = new DefaultDatastoreProvider();
-    DefaultConverters converters = new DefaultConverters();
+    LazyProxyFactory proxyFactory;
+    DatastoreProvider datastoreProvider;
+    DefaultConverters converters;
 
     public DefaultMapper() {
-        converters.setMapper(this);
+    	this(new MapperOptions());
     }
 
     public DefaultMapper(MapperOptions opts) {
-        this();
         this.opts = opts;
+        this.proxyFactory = opts.proxyFactory;
+        this.datastoreProvider = opts.datastoreProvider;
+        this.converters = opts.converters;
+    	converters.setMapper(this);
     }
 
     /**
@@ -148,7 +150,7 @@ public class DefaultMapper implements Mapper {
     /**
      * Add MappedClass to internal cache, possibly validating first.
      */
-    private MappedClass addMappedClass(MappedClass mc, boolean validate) {
+    protected MappedClass addMappedClass(MappedClass mc, boolean validate) {
         if (validate)
             mc.validate();
 
@@ -539,7 +541,7 @@ public class DefaultMapper implements Mapper {
         return entity;
     }
 
-    private void readMappedField(DBObject dbObject, MappedField mf, Object entity, EntityCache cache) {
+    protected void readMappedField(DBObject dbObject, MappedField mf, Object entity, EntityCache cache) {
         if (mf.hasAnnotation(Property.class) || mf.hasAnnotation(Serialized.class)
                 || mf.isTypeMongoCompatible() || converters.hasSimpleValueConverter(mf))
             opts.valueMapper.fromDBObject(dbObject, mf, entity, cache, this);
@@ -552,7 +554,7 @@ public class DefaultMapper implements Mapper {
         }
     }
 
-    private void writeMappedField(DBObject dbObject, MappedField mf, Object entity, Map<Object, DBObject> involvedObjects) {
+    protected void writeMappedField(DBObject dbObject, MappedField mf, Object entity, Map<Object, DBObject> involvedObjects) {
         Class<? extends Annotation> annType = null;
 
         //skip not saved fields.
@@ -710,7 +712,7 @@ public class DefaultMapper implements Mapper {
     /**
      * Return the first {@link StackTraceElement} not in our code (package).
      */
-    private static StackTraceElement getFirstClientLine(Throwable t) {
+    public static StackTraceElement getFirstClientLine(Throwable t) {
         for (StackTraceElement ste : t.getStackTrace())
             if (!ste.getClassName().startsWith("com.github.jmkgreen.morphia") &&
                     !ste.getClassName().startsWith("sun.reflect") &&
@@ -725,7 +727,7 @@ public class DefaultMapper implements Mapper {
     /**
      * Returns if the MappedField is a Reference or Serialized
      */
-    private static boolean canQueryPast(MappedField mf) {
+    public static boolean canQueryPast(MappedField mf) {
         return !(mf.hasAnnotation(Reference.class) || mf.hasAnnotation(Serialized.class));
     }
 
@@ -766,5 +768,14 @@ public class DefaultMapper implements Mapper {
             if (log.isInfoEnabled())
                 log.info("Found more than one class mapped to collection '" + kind + "'" + mcs);
         return mcs.iterator().next().getClazz();
+    }
+    public boolean isCached(Class<?> clazz) {
+    	return instanceCache.containsKey(clazz);
+    }
+    public Object cacheClass(Class<?> clazz, Object instance) {
+    	return instanceCache.put(clazz, instance);
+    }
+    public Object getCachedClass(Class<?> clazz) {
+    	return instanceCache.get(clazz);
     }
 }

@@ -112,12 +112,12 @@ public class MappedClass {
      * the type we are mapping to/from
      */
     private Class<?> clazz;
-    DefaultMapper mapr;
+    Mapper mapr;
 
     /**
      * constructor
      */
-    public MappedClass(Class<?> clazz, DefaultMapper mapr) {
+    public MappedClass(Class<?> clazz, Mapper mapr) {
         this.mapr = mapr;
         this.clazz = clazz;
 
@@ -395,11 +395,11 @@ public class MappedClass {
     }
 
     private Object getOrCreateInstance(Class<?> clazz) {
-        if (mapr.instanceCache.containsKey(clazz))
-            return mapr.instanceCache.get(clazz);
+        if (mapr.isCached(clazz))
+            return mapr.getCachedClass(clazz);
 
         Object o = mapr.getOptions().objectFactory.createInstance(clazz);
-        Object nullO = mapr.instanceCache.put(clazz, o);
+        Object nullO = mapr.cacheClass(clazz, o);
         if (nullO != null)
             if (log.isErrorEnabled())
                 log.error("Race-condition, created duplicate class: " + clazz);
