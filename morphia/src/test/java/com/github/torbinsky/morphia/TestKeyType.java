@@ -26,7 +26,6 @@ import com.github.torbinsky.morphia.testmodel.Rectangle;
  *
  * @author Scott Hernandez
  */
-@SuppressWarnings({"unused"})
 public class TestKeyType extends TestBase {
 	@Test
     public void testKeyComparisons() throws Exception {

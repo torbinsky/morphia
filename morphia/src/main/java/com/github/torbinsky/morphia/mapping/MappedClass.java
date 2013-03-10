@@ -3,6 +3,22 @@
  */
 package com.github.torbinsky.morphia.mapping;
 
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.torbinsky.morphia.EntityInterceptor;
 import com.github.torbinsky.morphia.annotations.Converters;
 import com.github.torbinsky.morphia.annotations.Embedded;
@@ -21,23 +37,9 @@ import com.github.torbinsky.morphia.annotations.Reference;
 import com.github.torbinsky.morphia.annotations.Serialized;
 import com.github.torbinsky.morphia.annotations.Transient;
 import com.github.torbinsky.morphia.annotations.Version;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.github.torbinsky.morphia.mapping.validation.MappingValidator;
 import com.github.torbinsky.morphia.utils.ReflectionUtils;
 import com.mongodb.DBObject;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Represents a mapped class between the MongoDB DBObject and the java POJO.
@@ -48,7 +50,7 @@ import java.util.Map;
  */
 @SuppressWarnings("unchecked")
 public class MappedClass {
-    private static final Logr log = MorphiaLoggerFactory.get(MappedClass.class);
+	static Logger log = LoggerFactory.getLogger(MappedClass.class);
 
     private static class ClassMethodPair {
         Class<?> clazz;
@@ -205,8 +207,8 @@ public class MappedClass {
             } else {
                 if (mapr.getOptions().defaultMapper != null)
                     persistenceFields.add(new MappedField(field, clazz));
-                else if (log.isWarningEnabled())
-                    log.warning("Ignoring (will not persist) field: " + clazz.getName() + "." + field.getName() + " [type:" + field.getType().getName() + "]");
+                else if (log.isWarnEnabled())
+                    log.warn("Ignoring (will not persist) field: " + clazz.getName() + "." + field.getName() + " [type:" + field.getType().getName() + "]");
             }
         }
     }

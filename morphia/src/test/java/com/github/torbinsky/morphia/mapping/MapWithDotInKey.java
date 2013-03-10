@@ -5,9 +5,8 @@ package com.github.torbinsky.morphia.mapping;
 
 import java.io.Serializable;
 
-import org.junit.Assert;
-
 import org.bson.types.ObjectId;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.torbinsky.morphia.TestBase;
@@ -31,7 +30,6 @@ public class MapWithDotInKey extends TestBase{
 	}
 
 	private static class E {
-		@SuppressWarnings("unused")
 		@Id ObjectId id;
 
 		@Embedded

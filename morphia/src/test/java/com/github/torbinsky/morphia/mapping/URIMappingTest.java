@@ -7,19 +7,17 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import org.bson.types.ObjectId;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.torbinsky.morphia.TestBase;
 import com.github.torbinsky.morphia.annotations.Id;
-import org.junit.Assert;
 
 /**
  * @author ScottHernandez
  *
  */
-@SuppressWarnings("unused")
 public class URIMappingTest extends TestBase {
 
 	private static class ContainsURI {

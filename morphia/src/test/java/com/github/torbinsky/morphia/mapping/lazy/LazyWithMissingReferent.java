@@ -12,7 +12,6 @@ import com.github.torbinsky.morphia.mapping.MappingException;
 import com.github.torbinsky.morphia.testutil.AssertedFailure;
 import com.github.torbinsky.morphia.testutil.TestEntity;
 
-@SuppressWarnings("unused")
 public class LazyWithMissingReferent extends TestBase {
 	
 	static class E {

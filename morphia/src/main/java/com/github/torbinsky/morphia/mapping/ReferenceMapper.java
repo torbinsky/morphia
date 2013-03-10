@@ -3,11 +3,17 @@
  */
 package com.github.torbinsky.morphia.mapping;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.torbinsky.morphia.Datastore;
 import com.github.torbinsky.morphia.Key;
 import com.github.torbinsky.morphia.annotations.Reference;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.github.torbinsky.morphia.mapping.cache.EntityCache;
 import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedEntityReference;
@@ -21,14 +27,10 @@ import com.github.torbinsky.morphia.utils.ReflectionUtils;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 class ReferenceMapper implements CustomMapper {
-    public static final Logr log = MorphiaLoggerFactory.get(ReferenceMapper.class);
+	static Logger log = LoggerFactory.getLogger(ReferenceMapper.class);
 
     public void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, DefaultMapper mapr) {
         String name = mf.getNameToStore();
@@ -214,7 +216,7 @@ class ReferenceMapper implements CustomMapper {
                         if (!refAnn.ignoreMissing())
                             throw new MappingException(msg);
                         else
-                            log.warning(msg);
+                            log.warn(msg);
                     }
 
                     referencesAsProxy.__addAll(keys);
@@ -226,7 +228,7 @@ class ReferenceMapper implements CustomMapper {
                         if (!refAnn.ignoreMissing())
                             throw new MappingException(msg);
                         else
-                            log.warning(msg);
+                            log.warn(msg);
                     } else {
                         referencesAsProxy.__add(mapr.refToKey(dbRef));
                     }
@@ -241,7 +243,7 @@ class ReferenceMapper implements CustomMapper {
                     DBRef dbRef = (DBRef) val;
                     Object ent = resolveObject(dbRef, mf, cache, mapr);
                     if (ent == null)
-                        log.warning("Null reference found when retrieving value for " + mf.getFullName());
+                        log.warn("Null reference found when retrieving value for " + mf.getFullName());
                     else
                         refs.add(ent);
                 }
@@ -265,7 +267,7 @@ class ReferenceMapper implements CustomMapper {
 
         DBCollection dbColl = dsi.getCollection(c);
         if (!dbColl.getName().equals(dbRef.getRef()))
-            log.warning("Class " + c.getName() + " is stored in the '" + dbColl.getName()
+            log.warn("Class " + c.getName() + " is stored in the '" + dbColl.getName()
                     + "' collection but a reference was found for this type to another collection, '" + dbRef.getRef()
                     + "'. The reference will be loaded using the class anyway. " + dbRef);
         boolean exists = (dsi.find(dbRef.getRef(), c).disableValidation().filter("_id", dbRef.getId()).asKeyList()

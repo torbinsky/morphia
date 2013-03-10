@@ -10,7 +10,7 @@ import com.github.torbinsky.morphia.mapping.MappingException;
  * @author Uwe Schaefer, (us@thomas-daily.de)
  * @author scotthernandez
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"rawtypes"})
 public class BooleanConverter extends TypeConverter implements SimpleValueConverter {
 
     public BooleanConverter() {

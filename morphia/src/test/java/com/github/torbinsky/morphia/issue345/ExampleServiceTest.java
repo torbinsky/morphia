@@ -23,7 +23,6 @@ import com.github.torbinsky.morphia.annotations.Entity;
 import com.github.torbinsky.morphia.annotations.Id;
 import com.github.torbinsky.morphia.annotations.Version;
 import com.github.torbinsky.morphia.dao.BasicDAO;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -39,8 +38,7 @@ public class ExampleServiceTest extends TestCase {
 	static MongoConnectionManager mcm;
 
 	static {
-		mcm = new MongoConnectionManager("localhost", 27017);
-		MorphiaLoggerFactory.get(ExampleServiceTest.class).debug("starting ...");
+		mcm = new MongoConnectionManager("localhost", 27017);		
 	}
 
 	{

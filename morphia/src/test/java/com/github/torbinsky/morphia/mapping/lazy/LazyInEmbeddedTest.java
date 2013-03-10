@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 
 import com.github.torbinsky.morphia.TestBase;
@@ -19,7 +18,6 @@ import com.github.torbinsky.morphia.testutil.TestEntity;
 /**
  * @author josephpachod
  */
-@SuppressWarnings("unused")
 public class LazyInEmbeddedTest extends TestBase
 {
     public enum SomeEnum {
@@ -46,7 +44,6 @@ public class LazyInEmbeddedTest extends TestBase
         @Property(value = "some")
         private SomeEnum someEnum;
 
-        @SuppressWarnings("unused")
 		protected OtherEntity()
         {
         }

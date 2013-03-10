@@ -3,11 +3,6 @@
  */
 package com.github.torbinsky.morphia.mapping;
 
-import com.github.torbinsky.morphia.ObjectFactory;
-import com.github.torbinsky.morphia.annotations.ConstructorArgs;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
-import com.mongodb.DBObject;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,12 +11,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.torbinsky.morphia.ObjectFactory;
+import com.github.torbinsky.morphia.annotations.ConstructorArgs;
+import com.mongodb.DBObject;
+
 /**
  * @author ScottHernandez
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultCreator implements ObjectFactory {
-    private static final Logr log = MorphiaLoggerFactory.get(DefaultCreator.class);
+	static Logger log = LoggerFactory.getLogger(DefaultCreator.class);
 
     /* (non-Javadoc)
       * @see com.github.torbinsky.morphia.ObjectFactory#createInstance(java.lang.Class)
@@ -82,8 +84,7 @@ public class DefaultCreator implements ObjectFactory {
             try {
                 c = Class.forName(className, true, getClassLoaderForClass(className, dbObj));
             } catch (ClassNotFoundException e) {
-                if (log.isWarningEnabled())
-                    log.warning("Class not found defined in dbObj: ", e);
+                log.warn("Class not found defined in dbObj: ", e);
             }
         }
         return c;

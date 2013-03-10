@@ -3,19 +3,21 @@
  */
 package com.github.torbinsky.morphia.converters;
 
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.torbinsky.morphia.mapping.MappedField;
 import com.github.torbinsky.morphia.mapping.Mapper;
 import com.github.torbinsky.morphia.mapping.MapperOptions;
 import com.github.torbinsky.morphia.mapping.MappingException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Default encoders
@@ -23,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Uwe Schaefer, (us@thomas-daily.de)
  * @author scotthernandez
  */
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"rawtypes"})
 public class DefaultConverters {
-    private static final Logr log = MorphiaLoggerFactory.get(DefaultConverters.class);
+	static Logger log = LoggerFactory.getLogger(DefaultConverters.class);
 
     private List<TypeConverter> untypedTypeEncoders = new LinkedList<TypeConverter>();
     private Map<Class, List<TypeConverter>> tcMap = new ConcurrentHashMap<Class, List<TypeConverter>>();
@@ -114,7 +116,7 @@ public class DefaultConverters {
     private void addTypedConverter(Class type, TypeConverter tc) {
         if (tcMap.containsKey(type)) {
             tcMap.get(type).add(0, tc);
-            log.warning("Added duplicate converter for " + type + " ; " + tcMap.get(type));
+            log.warn("Added duplicate converter for " + type + " ; " + tcMap.get(type));
         } else {
             ArrayList<TypeConverter> vals = new ArrayList<TypeConverter>();
             vals.add(tc);
@@ -158,7 +160,7 @@ public class DefaultConverters {
 
         if (tcs != null) {
             if (tcs.size() > 1)
-                log.warning("Duplicate converter for " + mf.getType() + ", returning first one from " + tcs);
+                log.warn("Duplicate converter for " + mf.getType() + ", returning first one from " + tcs);
             return tcs.get(0);
         }
 
@@ -174,7 +176,7 @@ public class DefaultConverters {
         List<TypeConverter> tcs = tcMap.get(c);
         if (tcs != null) {
             if (tcs.size() > 1)
-                log.warning("Duplicate converter for " + c + ", returning first one from " + tcs);
+                log.warn("Duplicate converter for " + c + ", returning first one from " + tcs);
             return tcs.get(0);
         }
 

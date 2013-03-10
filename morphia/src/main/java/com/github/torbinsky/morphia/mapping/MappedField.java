@@ -1,19 +1,5 @@
 package com.github.torbinsky.morphia.mapping;
 
-import com.github.torbinsky.morphia.annotations.AlsoLoad;
-import com.github.torbinsky.morphia.annotations.ConstructorArgs;
-import com.github.torbinsky.morphia.annotations.Embedded;
-import com.github.torbinsky.morphia.annotations.Id;
-import com.github.torbinsky.morphia.annotations.Indexed;
-import com.github.torbinsky.morphia.annotations.NotSaved;
-import com.github.torbinsky.morphia.annotations.Property;
-import com.github.torbinsky.morphia.annotations.Reference;
-import com.github.torbinsky.morphia.annotations.Serialized;
-import com.github.torbinsky.morphia.annotations.Version;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
-import com.github.torbinsky.morphia.utils.ReflectionUtils;
-import com.mongodb.DBObject;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -31,6 +17,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.torbinsky.morphia.annotations.AlsoLoad;
+import com.github.torbinsky.morphia.annotations.ConstructorArgs;
+import com.github.torbinsky.morphia.annotations.Embedded;
+import com.github.torbinsky.morphia.annotations.Id;
+import com.github.torbinsky.morphia.annotations.Indexed;
+import com.github.torbinsky.morphia.annotations.NotSaved;
+import com.github.torbinsky.morphia.annotations.Property;
+import com.github.torbinsky.morphia.annotations.Reference;
+import com.github.torbinsky.morphia.annotations.Serialized;
+import com.github.torbinsky.morphia.annotations.Version;
+import com.github.torbinsky.morphia.utils.ReflectionUtils;
+import com.mongodb.DBObject;
+
 /**
  * Represents the mapping of this field to/from mongodb (name, list<annotation>)
  *
@@ -38,7 +40,7 @@ import java.util.Set;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class MappedField {
-    private static final Logr log = MorphiaLoggerFactory.get(MappedField.class);
+	static Logger log = LoggerFactory.getLogger(MappedField.class);
     // The Annotations to look for when reflecting on the field (stored in the mappingAnnotations)
     public static List<Class<? extends Annotation>> interestingAnnotations = new ArrayList<Class<? extends Annotation>>(Arrays.asList(
             Serialized.class,
@@ -105,10 +107,10 @@ public class MappedField {
             isMongoType = ReflectionUtils.isPropertyType(subType);
 
         if (!isMongoType && !isSingleValue && (subType == null || subType.equals(Object.class))) {
-            if (log.isWarningEnabled())
-                log.warning("The multi-valued field '"
+            if (log.isWarnEnabled())
+                log.warn("The multi-valued field '"
                         + getFullName()
-                        + "' is a possible heterogenous collection. It cannot be verified. Please declare a valid type to get rid of this warning. " + subType);
+                        + "' is a possible heterogenous collection. It cannot be verified. Please declare a valid type to get rid of this warn. " + subType);
             isMongoType = true;
         }
     }
@@ -159,8 +161,8 @@ public class MappedField {
         }
 
         if (Object.class.equals(realType) && (tv != null || pt != null))
-            if (log.isWarningEnabled())
-                log.warning("Parameterized types are treated as untyped Objects. See field '" + field.getName() + "' on " + field.getDeclaringClass());
+            if (log.isWarnEnabled())
+                log.warn("Parameterized types are treated as untyped Objects. See field '" + field.getName() + "' on " + field.getDeclaringClass());
 
         if (type == null)
             throw new MappingException("A type could not be found for " + this.field);
@@ -184,11 +186,11 @@ public class MappedField {
             } catch (NoSuchMethodException e) {
                 // do nothing
             } catch (IllegalArgumentException e) {
-                if (log.isWarningEnabled())
-                    log.warning("There should not be an argument", e);
+                if (log.isWarnEnabled())
+                    log.warn("There should not be an argument", e);
             } catch (Exception e) {
-                if (log.isWarningEnabled())
-                    log.warning("", e);
+                if (log.isWarnEnabled())
+                    log.warn("", e);
             }
         }
 
@@ -198,8 +200,8 @@ public class MappedField {
                 returnCtor.setAccessible(true);
             } catch (NoSuchMethodException e) {
                 if (!hasAnnotation(ConstructorArgs.class))
-                    if (log.isWarningEnabled())
-                        log.warning("No usable constructor for " + ctorType.getName(), e);
+                    if (log.isWarnEnabled())
+                        log.warn("No usable constructor for " + ctorType.getName(), e);
             }
         else {
             // see if we can create instances of the type used for declaration

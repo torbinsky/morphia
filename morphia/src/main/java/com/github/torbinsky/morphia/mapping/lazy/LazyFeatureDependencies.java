@@ -3,15 +3,15 @@
  */
 package com.github.torbinsky.morphia.mapping.lazy;
 
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Uwe Schaefer, (us@thomas-daily.de)
  */
 public class LazyFeatureDependencies {
 
-    private static final Logr logger = MorphiaLoggerFactory.get(LazyFeatureDependencies.class);
+	static Logger log = LoggerFactory.getLogger(LazyFeatureDependencies.class);
     private static Boolean fullFilled;
 
     private LazyFeatureDependencies() {
@@ -20,7 +20,7 @@ public class LazyFeatureDependencies {
     public static boolean assertDependencyFullFilled() {
         boolean fullfilled = testDependencyFullFilled();
         if (!fullfilled)
-            logger.warning("Lazy loading impossible due to missing dependencies.");
+            log.warn("Lazy loading impossible due to missing dependencies.");
         return fullfilled;
     }
 
@@ -45,7 +45,7 @@ public class LazyFeatureDependencies {
             try {
                 return (LazyProxyFactory) Class.forName(factoryClassName).newInstance();
             } catch (Exception e) {
-                logger.error("While instanciating " + factoryClassName, e);
+                log.error("While instanciating " + factoryClassName, e);
             }
         }
         return null;

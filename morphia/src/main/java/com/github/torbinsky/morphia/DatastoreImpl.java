@@ -1,5 +1,19 @@
 package com.github.torbinsky.morphia;
 
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.torbinsky.morphia.annotations.CappedAt;
 import com.github.torbinsky.morphia.annotations.Entity;
 import com.github.torbinsky.morphia.annotations.Index;
@@ -10,8 +24,6 @@ import com.github.torbinsky.morphia.annotations.PostPersist;
 import com.github.torbinsky.morphia.annotations.Reference;
 import com.github.torbinsky.morphia.annotations.Serialized;
 import com.github.torbinsky.morphia.annotations.Version;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.github.torbinsky.morphia.mapping.MappedClass;
 import com.github.torbinsky.morphia.mapping.MappedField;
 import com.github.torbinsky.morphia.mapping.Mapper;
@@ -44,16 +56,6 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A generic (type-safe) wrapper around mongodb collections.
@@ -62,11 +64,8 @@ import java.util.Map;
  */
 @SuppressWarnings({"unchecked", "deprecation"})
 public class DatastoreImpl implements Datastore, AdvancedDatastore {
-    /**
-     *
-     */
-    private static final Logr log = MorphiaLoggerFactory.get(DatastoreImpl.class);
-
+    
+	static Logger log = LoggerFactory.getLogger(DatastoreImpl.class);
     //	final protected Morphia morphia;
     /**
      *
@@ -603,9 +602,9 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
                     DBObject dbResult = db.command(BasicDBObjectBuilder.start("collstats", collName).get());
                     if (dbResult.containsField("capped")) {
                         // TODO: check the cap options.
-                        log.warning("DBCollection already exists is cap'd already; doing nothing. " + dbResult);
+                        log.warn("DBCollection already exists is cap'd already; doing nothing. " + dbResult);
                     } else {
-                        log.warning("DBCollection already exists with same name(" + collName
+                        log.warn("DBCollection already exists with same name(" + collName
                                 + ") and is not cap'd; not creating cap'd version!");
                     }
                 } else {

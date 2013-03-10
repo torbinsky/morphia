@@ -3,6 +3,7 @@ package com.github.torbinsky.morphia;
 /**
  * @author Scott Hernnadez
  */
+@SuppressWarnings("deprecation")
 public class DatastoreService {
     /**
      *
@@ -33,7 +34,7 @@ public class DatastoreService {
      *
      * @param dbName
      */
-    public static void setDatabase(String dbName) {
+	public static void setDatabase(String dbName) {
         if (!ds.getDB().getName().equals(dbName))
             ds = mor.createDatastore(dbName);
     }
@@ -42,8 +43,7 @@ public class DatastoreService {
      *
      * @param c
      */
-    @SuppressWarnings("unchecked")
-    public static void mapClass(Class c) {
+    public static void mapClass(Class<?> c) {
         mor.map(c);
     }
 
@@ -51,9 +51,8 @@ public class DatastoreService {
      *
      * @param classes
      */
-    @SuppressWarnings("unchecked")
-    public static void mapClasses(Class[] classes) {
-        for (Class c : classes)
+    public static void mapClasses(Class<?>[] classes) {
+        for (Class<?> c : classes)
             mapClass(c);
     }
 

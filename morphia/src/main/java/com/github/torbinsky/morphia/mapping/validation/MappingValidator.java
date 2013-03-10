@@ -4,12 +4,21 @@ package com.github.torbinsky.morphia.mapping.validation;
  *
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.torbinsky.morphia.annotations.Embedded;
 import com.github.torbinsky.morphia.annotations.Property;
 import com.github.torbinsky.morphia.annotations.Reference;
 import com.github.torbinsky.morphia.annotations.Serialized;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.github.torbinsky.morphia.mapping.MappedClass;
 import com.github.torbinsky.morphia.mapping.validation.ConstraintViolation.Level;
 import com.github.torbinsky.morphia.mapping.validation.classrules.DuplicatedAttributeNames;
@@ -28,20 +37,13 @@ import com.github.torbinsky.morphia.mapping.validation.fieldrules.MapNotSerializ
 import com.github.torbinsky.morphia.mapping.validation.fieldrules.MisplacedProperty;
 import com.github.torbinsky.morphia.mapping.validation.fieldrules.ReferenceToUnidentifiable;
 import com.github.torbinsky.morphia.mapping.validation.fieldrules.VersionMisuse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * @author Uwe Schaefer, (us@thomas-daily.de)
  */
 public class MappingValidator {
 
-    private static final Logr logger = MorphiaLoggerFactory.get(MappingValidator.class);
+	static Logger log = LoggerFactory.getLogger(MappingValidator.class);
 
     public void validate(List<MappedClass> classes) {
         Set<ConstraintViolation> ve = new TreeSet<ConstraintViolation>(new Comparator<ConstraintViolation>() {
@@ -73,7 +75,7 @@ public class MappingValidator {
             Collections.sort(l);
 
             for (LogLine line : l) {
-                line.log(MappingValidator.logger);
+                line.log(MappingValidator.log);
             }
         }
     }
@@ -122,12 +124,12 @@ public class MappingValidator {
             this.v = v;
         }
 
-        void log(Logr logger) {
+        void log(Logger logger) {
             switch (v.getLevel()) {
                 case SEVERE:
                     logger.error(v.render());
                 case WARNING:
-                    logger.warning(v.render());
+                    logger.warn(v.render());
                 case INFO:
                     logger.info(v.render());
                     break;

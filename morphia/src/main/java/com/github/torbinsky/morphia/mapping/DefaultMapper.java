@@ -11,6 +11,26 @@
 
 package com.github.torbinsky.morphia.mapping;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.regex.Pattern;
+
+import org.bson.BSONEncoder;
+import org.bson.BasicBSONEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.torbinsky.morphia.EntityInterceptor;
 import com.github.torbinsky.morphia.Key;
 import com.github.torbinsky.morphia.annotations.Converters;
@@ -27,8 +47,6 @@ import com.github.torbinsky.morphia.annotations.Reference;
 import com.github.torbinsky.morphia.annotations.Serialized;
 import com.github.torbinsky.morphia.converters.DefaultConverters;
 import com.github.torbinsky.morphia.converters.TypeConverter;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.github.torbinsky.morphia.mapping.cache.DefaultEntityCache;
 import com.github.torbinsky.morphia.mapping.cache.EntityCache;
 import com.github.torbinsky.morphia.mapping.lazy.DatastoreProvider;
@@ -43,22 +61,6 @@ import com.github.torbinsky.morphia.utils.ReflectionUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.regex.Pattern;
-import org.bson.BSONEncoder;
-import org.bson.BasicBSONEncoder;
 
 /**
  * <p>This is the heart of Morphia and takes care of mapping from/to POJOs/DBObjects<p>
@@ -69,7 +71,7 @@ import org.bson.BasicBSONEncoder;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultMapper implements Mapper {
-    private static final Logr log = MorphiaLoggerFactory.get(DefaultMapper.class);
+	static Logger log = LoggerFactory.getLogger(DefaultMapper.class);
 
     /**
      * Set of classes that registered by this mapper
@@ -294,7 +296,7 @@ public class DefaultMapper implements Mapper {
 
         Object newObj = converters.encode(origClass, javaObj);
         if (newObj == null) {
-            log.warning("converted " + javaObj + " to null");
+            log.warn("converted " + javaObj + " to null");
             return newObj;
         }
         Class type = newObj.getClass();
@@ -692,15 +694,15 @@ public class DefaultMapper implements Mapper {
                         ((mf.isMultipleValues() && !(isCompatibleForOperator(mf.getSubClass(), op, val) || isCompatibleForOperator(mf.getType(), op, val))))) {
 
 
-                    if (log.isWarningEnabled()) {
+                    if (log.isWarnEnabled()) {
                         Throwable t = new Throwable();
                         StackTraceElement ste = getFirstClientLine(t);
-                        log.warning("The type(s) for the query/update may be inconsistent; using an instance of type '"
+                        log.warn("The type(s) for the query/update may be inconsistent; using an instance of type '"
                                 + val.getClass().getName() + "' for the field '" + mf.getDeclaringClass().getName() + "." + mf.getJavaFieldName()
                                 + "' which is declared as '" + mf.getType().getName() + (ste == null ? "'" : "'\r\n --@--" + ste));
 
                         if (log.isDebugEnabled())
-                            log.debug("Location of warning:\r\n", t);
+                            log.debug("Location of warn:\r\n", t);
                     }
                 }
         }

@@ -23,7 +23,7 @@ import com.github.torbinsky.morphia.annotations.Id;
 public class NestedMapOrCollTest extends TestBase{
 	
 
-	@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static class HasMapOfMap {
 		@Id ObjectId id;
 
@@ -31,7 +31,7 @@ public class NestedMapOrCollTest extends TestBase{
 		Map<String, Map<String, String>> mom = new HashMap();
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static class HasMapOfList {
 		@Id ObjectId id;
 
@@ -39,7 +39,7 @@ public class NestedMapOrCollTest extends TestBase{
 		Map<String, List<String>> mol = new HashMap();
 	}
 
-	@SuppressWarnings({"rawtypes", "unchecked", "unused"})
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	private static class HasMapOfListOfMapMap {
 		@Id ObjectId id;
 

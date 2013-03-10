@@ -1,14 +1,16 @@
 package com.github.torbinsky.morphia.query;
 
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
-import com.github.torbinsky.morphia.utils.Assert;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.torbinsky.morphia.utils.Assert;
+
 public class FieldEndImpl<T extends CriteriaContainerImpl> implements FieldEnd<T> {
-    private static final Logr log = MorphiaLoggerFactory.get(FieldEndImpl.class);
+	static Logger log = LoggerFactory.getLogger(FieldEndImpl.class);
 
     private QueryImpl<?> query;
     private String field;
@@ -115,9 +117,9 @@ public class FieldEndImpl<T extends CriteriaContainerImpl> implements FieldEnd<T
     public T hasAnyOf(Iterable<?> vals) {
         Assert.parametersNotNull("vals", vals);
 //		Assert.parameterNotEmpty(vals,"vals"); //it is valid but will never return any results.
-        if (log.isWarningEnabled()) {
+        if (log.isWarnEnabled()) {
             if (!vals.iterator().hasNext())
-                log.warning("Specified an empty list/collection with the '" + field + "' criteria");
+                log.warn("Specified an empty list/collection with the '" + field + "' criteria");
         }
         return addCrit(FilterOperator.IN, vals);
     }

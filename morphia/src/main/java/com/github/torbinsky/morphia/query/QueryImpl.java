@@ -1,10 +1,20 @@
 package com.github.torbinsky.morphia.query;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.bson.BSONObject;
+import org.bson.types.CodeWScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.torbinsky.morphia.Datastore;
 import com.github.torbinsky.morphia.Key;
 import com.github.torbinsky.morphia.annotations.Entity;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
 import com.github.torbinsky.morphia.mapping.DefaultMapper;
 import com.github.torbinsky.morphia.mapping.MappedClass;
 import com.github.torbinsky.morphia.mapping.MappedField;
@@ -17,14 +27,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.ReadPreference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import org.bson.BSONObject;
-import org.bson.types.CodeWScope;
 
 /**
  * <p>Implementation of Query</p>
@@ -33,7 +35,7 @@ import org.bson.types.CodeWScope;
  * @author Scott Hernandez
  */
 public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Criteria {
-    private static final Logr log = MorphiaLoggerFactory.get(QueryImpl.class);
+	static Logger log = LoggerFactory.getLogger(QueryImpl.class);
 
     private EntityCache cache;
     private boolean validateName = true;
@@ -218,11 +220,11 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 
         //Check for bad options.
         if (snapshotted && (sort != null || indexHint != null))
-            log.warning("Snapshotted query should not have hint/sort.");
+            log.warn("Snapshotted query should not have hint/sort.");
 
         if (tail && (sort != null)) {
-            // i don´t think that just warning is enough here, i´d favor a RTE, agree?
-            log.warning("Sorting on tail is not allowed.");
+            // i don´t think that just warn is enough here, i´d favor a RTE, agree?
+            log.warn("Sorting on tail is not allowed.");
         }
 
         return cursor;

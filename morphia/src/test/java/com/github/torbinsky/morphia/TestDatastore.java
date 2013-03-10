@@ -16,21 +16,36 @@
 
 package com.github.torbinsky.morphia;
 
-import com.github.torbinsky.morphia.annotations.*;
-import com.github.torbinsky.morphia.mapping.Mapper;
-import com.github.torbinsky.morphia.testmodel.Address;
-import com.github.torbinsky.morphia.testmodel.Hotel;
-import com.github.torbinsky.morphia.testmodel.Rectangle;
-import com.github.torbinsky.morphia.testutil.AssertedFailure;
-import com.mongodb.*;
-import org.bson.types.ObjectId;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.bson.types.ObjectId;
+import org.junit.Test;
+
+import com.github.torbinsky.morphia.annotations.Entity;
+import com.github.torbinsky.morphia.annotations.EntityListeners;
+import com.github.torbinsky.morphia.annotations.Id;
+import com.github.torbinsky.morphia.annotations.PostLoad;
+import com.github.torbinsky.morphia.annotations.PostPersist;
+import com.github.torbinsky.morphia.annotations.PreLoad;
+import com.github.torbinsky.morphia.annotations.PrePersist;
+import com.github.torbinsky.morphia.annotations.Transient;
+import com.github.torbinsky.morphia.mapping.Mapper;
+import com.github.torbinsky.morphia.testmodel.Address;
+import com.github.torbinsky.morphia.testmodel.Hotel;
+import com.github.torbinsky.morphia.testmodel.Rectangle;
+import com.github.torbinsky.morphia.testutil.AssertedFailure;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBDecoderFactory;
+import com.mongodb.DBObject;
+import com.mongodb.LazyDBDecoder;
+import com.mongodb.LazyWriteableDBDecoder;
 
 /**
  *
@@ -99,7 +114,6 @@ public class TestDatastore  extends TestBase {
 //			return retObj;
 		}
 		
-		@SuppressWarnings("unused")
 		@PostPersist
 		private void PostPersistPersist() {
 			if (postPersist == true)
@@ -128,7 +142,6 @@ public class TestDatastore  extends TestBase {
 			dbObj.put("preLoadWithParam", true);
 		}
 		
-		@SuppressWarnings("rawtypes")
 		@PreLoad
 		DBObject PreLoadWithParamAndReturn(DBObject dbObj) {
 			BasicDBObject retObj = new BasicDBObject();

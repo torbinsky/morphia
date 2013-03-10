@@ -31,7 +31,6 @@ import com.github.torbinsky.morphia.annotations.Id;
  */
 public class TestConstructorArgs  extends TestBase {
 
-	@SuppressWarnings("unused")
 	private static class Normal {
 		@Id ObjectId id = new ObjectId();
 		@ConstructorArgs("_id")

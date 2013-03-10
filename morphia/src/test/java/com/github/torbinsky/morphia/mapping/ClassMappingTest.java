@@ -21,12 +21,13 @@ import com.github.torbinsky.morphia.annotations.Property;
 public class ClassMappingTest extends TestBase
 {
 
-    @SuppressWarnings("unchecked")
     public static class E {
 		@Id ObjectId id;
 
-        @Property Class<? extends Collection> testClass;
-        Class<? extends Collection> testClass2;
+        @SuppressWarnings("rawtypes")
+		@Property Class<? extends Collection> testClass;
+        @SuppressWarnings("rawtypes")
+		Class<? extends Collection> testClass2;
     }
 
     @Test

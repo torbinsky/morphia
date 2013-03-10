@@ -13,7 +13,8 @@ public class MorphiaConfiguration {
     /**
      *
      */
-    private void assertBeforeInit() {
+    @SuppressWarnings("unused")
+	private void assertBeforeInit() {
         if (afterInitialization) {
             throw new IllegalStateException("You cannot change this setting after starting Morphia.");
         }

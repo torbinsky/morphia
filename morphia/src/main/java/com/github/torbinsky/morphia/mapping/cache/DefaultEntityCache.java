@@ -1,18 +1,21 @@
 package com.github.torbinsky.morphia.mapping.cache;
 
-import com.github.torbinsky.morphia.Key;
-import com.github.torbinsky.morphia.logging.Logr;
-import com.github.torbinsky.morphia.logging.MorphiaLoggerFactory;
-import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
-import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxyHelper;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import relocated.morphia.org.apache.commons.collections.ReferenceMap;
+
+import com.github.torbinsky.morphia.Key;
+import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
+import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxyHelper;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DefaultEntityCache implements EntityCache {
 
-    private static final Logr log = MorphiaLoggerFactory.get(DefaultEntityCache.class);
+	static Logger log = LoggerFactory.getLogger(DefaultEntityCache.class);
 
     private final Map<Key, Object> entityMap = new ReferenceMap(ReferenceMap.HARD, ReferenceMap.WEAK);
     private final Map<Key, Object> proxyMap = new ReferenceMap(ReferenceMap.WEAK, ReferenceMap.WEAK);
