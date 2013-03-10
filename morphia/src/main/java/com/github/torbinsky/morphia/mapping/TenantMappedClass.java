@@ -16,8 +16,11 @@ public class TenantMappedClass extends MappedClass {
 	private Provider<IsTenant> tenantProvider;
 
 	public TenantMappedClass(Provider<IsTenant> tenant, Class<?> clazz, DefaultMapper mapr) {
-		super(clazz, mapr);
+		super();
+		this.clazz = clazz;
+		this.mapr = mapr;
 		this.tenantProvider = tenant;
+		super.init();
 	}
 
 	@Override
@@ -32,6 +35,11 @@ public class TenantMappedClass extends MappedClass {
 		String collectionSuffix = tenantProvider.get().getCollectionSuffix();
 		
 		return collectionBaseName + "_" + collectionSuffix;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString();
 	}
 
 	@Override

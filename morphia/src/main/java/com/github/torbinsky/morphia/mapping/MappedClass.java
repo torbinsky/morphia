@@ -113,16 +113,23 @@ public class MappedClass {
     /**
      * the type we are mapping to/from
      */
-    private Class<?> clazz;
+    protected Class<?> clazz;
     DefaultMapper mapr;
 
+    protected MappedClass(){
+    	
+    }
+    
     /**
      * constructor
      */
     public MappedClass(Class<?> clazz, DefaultMapper mapr) {
         this.mapr = mapr;
         this.clazz = clazz;
-
+        init();
+    }
+    
+    protected void init(){
         if (log.isTraceEnabled())
             log.trace("Creating MappedClass for " + clazz);
 
