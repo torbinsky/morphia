@@ -17,6 +17,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -772,8 +773,11 @@ public class DefaultMapper implements Mapper {
     public boolean isCached(Class<?> clazz) {
     	return instanceCache.containsKey(clazz);
     }
-    public Object cacheClass(Class<?> clazz, Object instance) {
-    	return instanceCache.put(clazz, instance);
+    public void cacheClass(Class<?> clazz, Object instance) throws ConcurrentModificationException {
+    	Object previousKey = instanceCache.put(clazz, instance);
+    	if (previousKey != null) {
+    		throw new ConcurrentModificationException("Duplicate class created "+clazz);
+    	}
     }
     public Object getCachedClass(Class<?> clazz) {
     	return instanceCache.get(clazz);

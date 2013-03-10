@@ -7,6 +7,7 @@ import com.github.jmkgreen.morphia.mapping.cache.EntityCache;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.Map;
 
 /**
@@ -81,7 +82,7 @@ public interface Mapper {
     
     boolean isCached(Class<?> clazz);
     
-    Object cacheClass(Class<?> clazz, Object instance);
+    void cacheClass(Class<?> clazz, Object instance) throws ConcurrentModificationException;
     
     Object getCachedClass(Class<?> clazz);
     

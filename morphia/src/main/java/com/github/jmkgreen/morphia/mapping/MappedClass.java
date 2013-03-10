@@ -35,6 +35,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -399,11 +400,12 @@ public class MappedClass {
             return mapr.getCachedClass(clazz);
 
         Object o = mapr.getOptions().objectFactory.createInstance(clazz);
-        Object nullO = mapr.cacheClass(clazz, o);
-        if (nullO != null)
+        try {
+        	mapr.cacheClass(clazz, o);
+        } catch (ConcurrentModificationException duplicate) {
             if (log.isErrorEnabled())
-                log.error("Race-condition, created duplicate class: " + clazz);
-
+                log.error("Race-condition",duplicate);        	
+        }
         return o;
 
     }
