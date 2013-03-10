@@ -2,17 +2,17 @@
 <metadata modelVersion="1.1.0">
   <groupId>com.github.torbinsky.morphia</groupId>
   <artifactId>morphia-parent</artifactId>
-  <version>1.2.5-SNAPSHOT</version>
+  <version>1.2.6-SNAPSHOT</version>
   <versioning>
     <snapshot>
       <localCopy>true</localCopy>
     </snapshot>
-    <lastUpdated>20130310005151</lastUpdated>
+    <lastUpdated>20130310021439</lastUpdated>
     <snapshotVersions>
       <snapshotVersion>
         <extension>pom</extension>
-        <value>1.2.5-SNAPSHOT</value>
-        <updated>20130310005151</updated>
+        <value>1.2.6-SNAPSHOT</value>
+        <updated>20130310021439</updated>
       </snapshotVersion>
     </snapshotVersions>
   </versioning>

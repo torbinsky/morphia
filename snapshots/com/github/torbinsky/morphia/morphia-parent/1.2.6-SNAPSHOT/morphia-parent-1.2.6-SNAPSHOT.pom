@@ -5,7 +5,7 @@
 
     <groupId>com.github.torbinsky.morphia</groupId>
     <artifactId>morphia-parent</artifactId>
-    <version>1.2.3-SNAPSHOT</version>
+    <version>1.2.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Morphia Build</name>
@@ -58,32 +58,14 @@
         <mongo-java-driver.version>2.10.1</mongo-java-driver.version>
         <proxytoys.version>1.0</proxytoys.version>
         <cglib-nodep.version>2.2.2</cglib-nodep.version>
-        <slf4j.version>1.7.2</slf4j.version>
-        <validation-api.version>1.0.0.GA</validation-api.version>
-        <hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
-        <javarebel.version>2.0.2</javarebel.version>
         <guice.version>3.0</guice.version>
         <reflections.version>0.9.8</reflections.version>
         <guava.version>13.0.1</guava.version>
-        <scannotation.version>1.0.2</scannotation.version>
-        <gwt.version>2.5.0</gwt.version>
         <junit.version>4.11</junit.version>
     </properties>
 
-<distributionManagement>
-        <site>
-            <id>stage</id>
-            <url>file:///home/twerner/dev/projects/morphrepo</url>
-        </site>
-    </distributionManagement>
-
     <dependencyManagement>
         <dependencies>
-		<dependency>
-    <groupId>commons-digester</groupId>
-    <artifactId>commons-digester</artifactId>
-    <version>2.1</version>
-</dependency>
             <dependency>
                 <groupId>com.github.torbinsky.morphia</groupId>
                 <artifactId>morphia</artifactId>
@@ -104,78 +86,23 @@
             </dependency>
 
             <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib-nodep</artifactId>
-                <version>${cglib-nodep.version}</version>
-                <optional>true</optional>
-            </dependency>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>${validation-api.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>${hibernate-validator.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.zeroturnaround</groupId>
-                <artifactId>javarebel-sdk</artifactId>
-                <version>${javarebel.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.zeroturnaround</groupId>
-                <artifactId>javarebel-utils</artifactId>
-                <version>${javarebel.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>${guice.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>${reflections.version}</version>
-            </dependency>
-
+			
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
+			<dependency>
+	<groupId>ch.qos.logback</groupId>
+	<artifactId>logback-core</artifactId>
+	<version>1.0.9</version>
+</dependency>
+            
 
-            <dependency>
-                <groupId>net.sf.scannotation</groupId>
-                <artifactId>scannotation</artifactId>
-                <version>${scannotation.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.gwt</groupId>
-                <artifactId>gwt-user</artifactId>
-                <version>${gwt.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.gwt</groupId>
-                <artifactId>gwt-dev</artifactId>
-                <version>${gwt.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -211,13 +138,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <configuration>
-                    <header>src/etc/header.txt</header>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -260,13 +180,7 @@
             </plugin>
 	</plugins>
         <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>com.mycila.maven-license-plugin</groupId>
-                    <artifactId>maven-license-plugin</artifactId>
-                    <version>1.9.0</version>
-                </plugin>
-
+	<plugins>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.7</version>
@@ -348,13 +262,6 @@
 
     <modules>
         <module>morphia</module>
-        <module>no-proxy-deps-tests</module>
-        <module>validation</module>
-        <module>logging-slf4j</module>
-        <module>jrebel-plug</module>
-        <module>guice-plug</module>
-        <module>entityscanner-plug</module>
-        <!--<module>gwt</module>-->
     </modules>
 
 </project>
