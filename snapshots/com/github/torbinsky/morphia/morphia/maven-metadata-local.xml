@@ -2,12 +2,10 @@
 <metadata>
   <groupId>com.github.torbinsky.morphia</groupId>
   <artifactId>morphia</artifactId>
-  <version>1.2.3-SNAPSHOT</version>
   <versioning>
     <versions>
-      <version>1.2.3-SNAPSHOT</version>
-      <version>1.2.4-SNAPSHOT</version>
+      <version>1.2.5-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20130309010526</lastUpdated>
+    <lastUpdated>20130310005328</lastUpdated>
   </versioning>
 </metadata>
