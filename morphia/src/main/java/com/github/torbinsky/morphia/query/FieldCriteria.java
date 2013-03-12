@@ -46,7 +46,15 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
 			log.debug("Error during mapping of filter criteria: ", e);
 		}
 
-		Object mappedValue = mapr.toMongoObject(mf, mc, value);
+		Object mappedValue = null;
+		switch(op){
+		case EXISTS:
+			mappedValue = mapr.toMongoObject(mf, mc, value, true);
+			break;
+		default:
+			mappedValue = mapr.toMongoObject(mf, mc, value, false);
+			break;
+		}
 
 		Class<?> type = (mappedValue == null) ? null : mappedValue.getClass();
 

@@ -55,7 +55,7 @@ public interface Mapper {
 
     Object fromDBObject(Class entityClass, DBObject dbObject, EntityCache cache);
 
-    Object toMongoObject(MappedField mf, MappedClass mc, Object value);
+    Object toMongoObject(MappedField mf, MappedClass mc, Object value, boolean ignoreRefs);
 
     Object getId(Object entity);
 
@@ -77,4 +77,5 @@ public interface Mapper {
     String updateKind(Key key);
 
     Class<?> getClassFromKind(String kind);
+
 }

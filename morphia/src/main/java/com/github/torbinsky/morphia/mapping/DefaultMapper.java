@@ -363,11 +363,12 @@ public class DefaultMapper implements Mapper {
      * Used (mainly) by query/update operations
      * </p>
      */
-    public Object toMongoObject(MappedField mf, MappedClass mc, Object value) {
+    public Object toMongoObject(MappedField mf, MappedClass mc, Object value, boolean ignoreRefs) {
         Object mappedValue = value;
 
         //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
-        if ((mf != null && (mf.hasAnnotation(Reference.class) ||
+        if (	!ignoreRefs && (
+        		(mf != null && (mf.hasAnnotation(Reference.class) ||
                 mf.getType().isAssignableFrom(Key.class) ||
                 mf.getType().isAssignableFrom(DBRef.class) ||
                 //Collection/Array/???
@@ -375,7 +376,7 @@ public class DefaultMapper implements Mapper {
                         mf.getSubClass().isAssignableFrom(Key.class) ||
                                 mf.getSubClass().isAssignableFrom(DBRef.class))
                 )
-        )) || (mc != null && mc.getEntityAnnotation() != null)) {
+        )) || (mc != null && mc.getEntityAnnotation() != null))) {
             try {
                 if (value instanceof Iterable) {
                     ArrayList<DBRef> refs = new ArrayList<DBRef>();
@@ -396,7 +397,7 @@ public class DefaultMapper implements Mapper {
                         throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
                 }
             } catch (Exception e) {
-                log.error("Error converting value(" + value + ") to reference.", e);
+                log.warn("Error converting value(" + value + ") to reference.", e);
                 mappedValue = toMongoObjectFromJavaObj(value, false);
             }
         }//serialized
@@ -694,15 +695,15 @@ public class DefaultMapper implements Mapper {
                         ((mf.isMultipleValues() && !(isCompatibleForOperator(mf.getSubClass(), op, val) || isCompatibleForOperator(mf.getType(), op, val))))) {
 
 
-                    if (log.isWarnEnabled()) {
+                    if (log.isDebugEnabled()) {
                         Throwable t = new Throwable();
                         StackTraceElement ste = getFirstClientLine(t);
-                        log.warn("The type(s) for the query/update may be inconsistent; using an instance of type '"
+                        log.debug("The type(s) for the query/update may be inconsistent; using an instance of type '"
                                 + val.getClass().getName() + "' for the field '" + mf.getDeclaringClass().getName() + "." + mf.getJavaFieldName()
                                 + "' which is declared as '" + mf.getType().getName() + (ste == null ? "'" : "'\r\n --@--" + ste));
 
-                        if (log.isDebugEnabled())
-                            log.debug("Location of warn:\r\n", t);
+                        if (log.isTraceEnabled())
+                            log.trace("Location of warn:\r\n", t);
                     }
                 }
         }

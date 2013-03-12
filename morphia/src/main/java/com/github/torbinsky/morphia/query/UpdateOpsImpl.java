@@ -152,7 +152,7 @@ public class UpdateOpsImpl<T> implements UpdateOperations<T> {
     protected List<Object> toDBObjList(MappedField mf, List<?> values) {
         ArrayList<Object> vals = new ArrayList<Object>((int) (values.size() * 1.3));
         for (Object obj : values)
-            vals.add(mapr.toMongoObject(mf, null, obj));
+            vals.add(mapr.toMongoObject(mf, null, obj, false));
 
         return vals;
     }
@@ -170,11 +170,13 @@ public class UpdateOpsImpl<T> implements UpdateOperations<T> {
             f = sb.toString();
         }
 
-        if (convert)
-            if (UpdateOperator.PULL_ALL.equals(op) && value instanceof List)
+        if (convert){
+            if (UpdateOperator.PULL_ALL.equals(op) && value instanceof List){
                 val = toDBObjList(mf, (List<?>) value);
-            else
-                val = mapr.toMongoObject(mf, null, value);
+            }else{
+                val = mapr.toMongoObject(mf, null, value, false);
+            }
+        }
 
 
         if (UpdateOperator.ADD_TO_SET_EACH.equals(op))
