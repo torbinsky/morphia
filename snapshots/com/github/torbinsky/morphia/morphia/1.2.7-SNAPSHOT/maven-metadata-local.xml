@@ -4,12 +4,9 @@
   <artifactId>morphia</artifactId>
   <version>1.2.7-SNAPSHOT</version>
   <versioning>
-    <versions>
-      <version>1.2.3-SNAPSHOT</version>
-      <version>1.2.4-SNAPSHOT</version>
-      <version>1.2.6-SNAPSHOT</version>
-      <version>1.2.7-SNAPSHOT</version>
-    </versions>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
     <lastUpdated>20130312164727</lastUpdated>
   </versioning>
 </metadata>
