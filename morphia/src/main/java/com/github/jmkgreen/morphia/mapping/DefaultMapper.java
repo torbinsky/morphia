@@ -365,32 +365,18 @@ public class DefaultMapper implements Mapper {
      * </p>
      */
     public Object toMongoObject(MappedField mf, MappedClass mc, Object value) {
+        if (value == null) {
+            return null;
+        }
+
         Object mappedValue = value;
 
         //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
-        if ((mf != null && (mf.hasAnnotation(Reference.class) ||
-                mf.getType().isAssignableFrom(Key.class) ||
-                mf.getType().isAssignableFrom(DBRef.class) ||
-                //Collection/Array/???
-                (value instanceof Iterable && mf.isMultipleValues() && (
-                        mf.getSubClass().isAssignableFrom(Key.class) ||
-                                mf.getSubClass().isAssignableFrom(DBRef.class))
-                )
-        )) || (mc != null && mc.getEntityAnnotation() != null)) {
+        if (isAnAssignableField(mf, value) || isAnEntity(mc)) {
             try {
                 if (value instanceof Iterable) {
-                    ArrayList<DBRef> refs = new ArrayList<DBRef>();
-                    Iterable it = (Iterable) value;
-                    for (Object o : it) {
-                        Key<?> k = (o instanceof Key) ? (Key<?>) o : getKey(o);
-                        DBRef dbref = keyToRef(k);
-                        refs.add(dbref);
-                    }
-                    mappedValue = refs;
+                    return getDbRefs((Iterable) value);
                 } else {
-                    if (value == null) {
-                        mappedValue = null;
-                    }
 
                     Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
                     mappedValue = keyToRef(k);
@@ -422,6 +408,39 @@ public class DefaultMapper implements Mapper {
         return mappedValue;
     }
 
+    private boolean isAnAssignableField(MappedField mf, Object value) {
+        if (mf == null) {
+            return false;
+        }
+
+        return (mf.hasAnnotation(Reference.class) ||
+                mf.getType().isAssignableFrom(Key.class) ||
+                mf.getType().isAssignableFrom(DBRef.class) ||
+                //Collection/Array/???
+                isValueIterableAndTargetCompatible(mf, value)
+        );
+    }
+
+    private boolean isValueIterableAndTargetCompatible(MappedField mf, Object value) {
+        return (value instanceof Iterable && mf.isMultipleValues() && (
+                mf.getSubClass().isAssignableFrom(Key.class) ||
+                        mf.getSubClass().isAssignableFrom(DBRef.class))
+        );
+    }
+
+    private boolean isAnEntity(MappedClass mc) {
+        return (mc != null && mc.getEntityAnnotation() != null);
+    }
+
+    private ArrayList<DBRef> getDbRefs(Iterable value) {
+        ArrayList<DBRef> refs = new ArrayList<DBRef>();
+        for (Object o : value) {
+            Key<?> k = (o instanceof Key) ? (Key<?>) o : getKey(o);
+            refs.add(keyToRef(k));
+        }
+        return refs;
+    }
+
     public Object getId(Object entity) {
         if (entity == null) return null;
         entity = ProxyHelper.unwrap(entity);
@@ -444,8 +463,7 @@ public class DefaultMapper implements Mapper {
             throw new MappingException("getKey has been passed a null entity");
 
         if (entity instanceof ProxiedEntityReference) {
-            ProxiedEntityReference proxy = (ProxiedEntityReference) entity;
-            return (Key<T>) proxy.__getKey();
+            return getKey((ProxiedEntityReference) entity);
         }
 
         entity = ProxyHelper.unwrap(entity);
@@ -457,6 +475,10 @@ public class DefaultMapper implements Mapper {
             throw new MappingException("Could not get id for " + entity.getClass().getName());
 
         return new Key<T>((Class<T>) entity.getClass(), id);
+    }
+
+    private <T> Key<T> getKey(ProxiedEntityReference entity) {
+        return (Key<T>) entity.__getKey();
     }
 
     /**
