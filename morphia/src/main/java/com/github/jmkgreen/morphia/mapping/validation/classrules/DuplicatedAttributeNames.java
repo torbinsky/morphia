@@ -16,7 +16,7 @@ public class DuplicatedAttributeNames implements ClassConstraint {
     public void check(MappedClass mc, Set<ConstraintViolation> ve) {
         Set<String> foundNames = new HashSet<String>();
         Set<String> duplicates = new HashSet<String>();
-        for (MappedField mappedField : mc.getPersistenceFields()) {
+        for (MappedField mappedField : mc.getMappedFields()) {
             for (String name : mappedField.getLoadNames()) {
 //				if (duplicates.contains(name)) {
 //					continue;

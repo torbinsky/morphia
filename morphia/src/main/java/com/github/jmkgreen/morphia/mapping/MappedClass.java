@@ -107,7 +107,7 @@ public class MappedClass {
     /**
      * a list of the fields to map
      */
-    private List<MappedField> persistenceFields = new ArrayList<MappedField>();
+    private List<MappedField> mappedFields = new ArrayList<MappedField>();
 
     /**
      * the type we are mapping to/from
@@ -194,7 +194,7 @@ public class MappedClass {
                 continue;
             else if (field.isAnnotationPresent(Id.class)) {
                 MappedField mf = new MappedField(field, clazz);
-                persistenceFields.add(mf);
+                mappedFields.add(mf);
                 update();
             } else if (field.isAnnotationPresent(Property.class) ||
                     field.isAnnotationPresent(Reference.class) ||
@@ -202,10 +202,10 @@ public class MappedClass {
                     field.isAnnotationPresent(Serialized.class) ||
                     isSupportedType(field.getType()) ||
                     ReflectionUtils.implementsInterface(field.getType(), Serializable.class)) {
-                persistenceFields.add(new MappedField(field, clazz));
+                mappedFields.add(new MappedField(field, clazz));
             } else {
                 if (mapr.getOptions().defaultMapper != null)
-                    persistenceFields.add(new MappedField(field, clazz));
+                    mappedFields.add(new MappedField(field, clazz));
                 else if (log.isWarningEnabled())
                     log.warning("Ignoring (will not persist) field: " + clazz.getName() + "." + field.getName() + " [type:" + field.getType().getName() + "]");
             }
@@ -258,7 +258,7 @@ public class MappedClass {
 
     @Override
     public String toString() {
-        return "MappedClass - kind:" + this.getCollectionName() + " for " + this.getClazz().getName() + " fields:" + persistenceFields;
+        return "MappedClass - kind:" + this.getCollectionName() + " for " + this.getClazz().getName() + " fields:" + mappedFields;
     }
 
     /**
@@ -266,7 +266,7 @@ public class MappedClass {
      */
     public List<MappedField> getFieldsAnnotatedWith(Class<? extends Annotation> clazz) {
         List<MappedField> results = new ArrayList<MappedField>();
-        for (MappedField mf : persistenceFields) {
+        for (MappedField mf : mappedFields) {
             if (mf.foundAnnotations.containsKey(clazz))
                 results.add(mf);
         }
@@ -277,7 +277,7 @@ public class MappedClass {
      * Returns the MappedField by the name that it will stored in mongodb as
      */
     public MappedField getMappedField(String storedName) {
-        for (MappedField mf : persistenceFields)
+        for (MappedField mf : mappedFields)
             for (String n : mf.getLoadNames())
                 if (storedName.equals(n))
                     return mf;
@@ -296,7 +296,7 @@ public class MappedClass {
      * Returns MappedField for a given java field name on the this MappedClass
      */
     public MappedField getMappedFieldByJavaField(String name) {
-        for (MappedField mf : persistenceFields)
+        for (MappedField mf : mappedFields)
             if (name.equals(mf.getJavaFieldName())) return mf;
 
         return null;
@@ -409,7 +409,7 @@ public class MappedClass {
         	mapr.cacheClass(clazz, o);
         } catch (ConcurrentModificationException duplicate) {
             if (log.isErrorEnabled())
-                log.error("Race-condition",duplicate);        	
+                log.error("Race-condition",duplicate);
         }
         return o;
 
@@ -492,11 +492,16 @@ public class MappedClass {
         return found;
     }
 
+    public List<MappedField> getMappedFields() {
+        return mappedFields;
+    }
+
     /**
-     * @return the persistenceFields
+     * @return the mappedFields
+     * @deprecated Use {@link #getMappedFields()} instead.
      */
     public List<MappedField> getPersistenceFields() {
-        return persistenceFields;
+        return mappedFields;
     }
 
     /**

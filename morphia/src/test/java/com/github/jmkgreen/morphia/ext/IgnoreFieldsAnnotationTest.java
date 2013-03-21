@@ -41,14 +41,14 @@ public class IgnoreFieldsAnnotationTest extends TestBase {
 	public IgnoreFieldsAnnotationTest () {
 		super();
 	}
-	
+
 	Transient transAnn;
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.TYPE})
 	static @interface IgnoreFields {
 		String value();
 	}
-	
+
 	@Entity
 	@IgnoreFields("ignored")
 	static class User {
@@ -64,7 +64,7 @@ public class IgnoreFieldsAnnotationTest extends TestBase {
 		this.morphia.map(User.class);
 		processIgnoreFieldsAnnotations();
 	}
-	
+
 	//remove any MappedField specified in @IngoreFields on the class.
 	void processIgnoreFieldsAnnotations(){
 		for(MappedClass mc : ds.getMapper().getMappedClasses()) {
@@ -72,7 +72,7 @@ public class IgnoreFieldsAnnotationTest extends TestBase {
 			if (ignores != null) {
 				for(String field : ignores.value().split(",")) {
 					MappedField mf = mc.getMappedFieldByJavaField(field);
-					mc.getPersistenceFields().remove(mf);
+					mc.getMappedFields().remove(mf);
 				}
 			}
 		}
@@ -83,7 +83,7 @@ public class IgnoreFieldsAnnotationTest extends TestBase {
 		u.email = "ScottHernandez@gmail.com";
 		u.ignored = "test";
 		ds.save(u);
-		
+
 		User uLoaded = ds.find(User.class).get();
 		Assert.assertEquals("never, never", uLoaded.ignored);
 	}

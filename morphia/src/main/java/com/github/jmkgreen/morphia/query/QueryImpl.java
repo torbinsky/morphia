@@ -516,8 +516,8 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 
     public Query<T> retrieveKnownFields() {
         MappedClass mc = this.ds.getMapper().getMappedClass(clazz);
-        ArrayList<String> fields = new ArrayList<String>(mc.getPersistenceFields().size() + 1);
-        for (MappedField mf : mc.getPersistenceFields()) {
+        ArrayList<String> fields = new ArrayList<String>(mc.getMappedFields().size() + 1);
+        for (MappedField mf : mc.getMappedFields()) {
             fields.add(mf.getNameToStore());
         }
         retrievedFields(true, (String[]) fields.toArray());

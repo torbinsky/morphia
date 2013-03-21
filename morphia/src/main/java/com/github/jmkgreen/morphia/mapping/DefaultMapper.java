@@ -488,7 +488,7 @@ public class DefaultMapper implements Mapper {
         if (lifecycle)
             dbObject = (DBObject) mc.callLifecycleMethods(PrePersist.class, entity, dbObject, this);
 
-        for (MappedField mf : mc.getPersistenceFields()) {
+        for (MappedField mf : mc.getMappedFields()) {
             try {
                 writeMappedField(dbObject, mf, entity, involvedObjects);
             } catch (Exception e) {
@@ -527,7 +527,7 @@ public class DefaultMapper implements Mapper {
 
         dbObject = (DBObject) mc.callLifecycleMethods(PreLoad.class, entity, dbObject, this);
         try {
-            for (MappedField mf : mc.getPersistenceFields()) {
+            for (MappedField mf : mc.getMappedFields()) {
                 readMappedField(dbObject, mf, entity, cache);
             }
         } catch (Exception e) {

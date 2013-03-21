@@ -44,6 +44,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,7 +95,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     protected DBDecoderFactory decoderFactory = null;
 
     /**
-     *
      * @param mapr
      * @param mongo
      * @param dbName
@@ -109,7 +109,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param morphia
      * @param mongo
      */
@@ -118,7 +117,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param morphia
      * @param mongo
      * @param dbName
@@ -136,7 +134,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param morphia
      * @param mongo
      * @param dbName
@@ -146,7 +143,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param db
      * @return
      */
@@ -155,7 +151,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param id
      * @param <T>
@@ -169,7 +164,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -183,7 +177,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @return
      */
@@ -193,7 +186,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -204,7 +196,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param id
      * @param <T>
@@ -218,7 +209,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param clazz
      * @param id
@@ -231,7 +221,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param id
      * @param wc
@@ -244,7 +233,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param id
      * @param <T>
@@ -256,7 +244,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param ids
      * @param <T>
@@ -269,7 +256,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -279,7 +265,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param wc
      * @param <T>
@@ -299,7 +284,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param <T>
      * @return
@@ -309,7 +293,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param wc
      * @param <T>
@@ -344,7 +327,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param type
      * @param fields
      * @param <T>
@@ -354,7 +336,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param name
      * @param defs
@@ -367,7 +348,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param name
      * @param fields
@@ -380,7 +360,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param name
      * @param fields
@@ -394,7 +373,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param name
      * @param fields
@@ -433,7 +411,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param name
      * @param defs
@@ -455,7 +432,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param type
      * @param name
      * @param dir
@@ -466,7 +442,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param type
      * @param fields
      * @param <T>
@@ -476,7 +451,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param type
      * @param background
      * @param fields
@@ -487,7 +461,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param mc
      * @param background
      */
@@ -496,7 +469,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param mc
      * @param background
      * @param parentMCs
@@ -510,19 +482,20 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
         if (mc.getEmbeddedAnnotation() != null && (parentMCs == null || parentMCs.isEmpty()))
             return;
 
-        //Ensure indexes from class annotation
-        ArrayList<Annotation> idxs = mc.getAnnotations(Indexes.class);
-        if (idxs != null)
-            for (Annotation ann : idxs) {
-                Indexes idx = (Indexes) ann;
-                if (idx != null && idx.value() != null && idx.value().length > 0)
-                    for (Index index : idx.value()) {
-                        BasicDBObject fields = QueryImpl.parseFieldsString(index.value(), mc.getClazz(), mapr, !index.disableValidation());
-                        ensureIndex(mc.getClazz(), index.name(), fields, index.unique(), index.dropDups(), index.background() ? index.background() : background, index.sparse() ? index.sparse() : false);
-                    }
-            }
-        //Ensure indexes from field annotations, and embedded entities
-        for (MappedField mf : mc.getPersistenceFields()) {
+        ensureIndexesFromClassAnnotation(mc, background);
+
+        ensureIndexesFromFieldsAndEmbeddedEntities(mc, background, parentMCs, parentMFs);
+    }
+
+    /**
+     * Ensure indexes from field annotations, and embedded entities.
+     * @param mc
+     * @param background
+     * @param parentMCs
+     * @param parentMFs
+     */
+    private void ensureIndexesFromFieldsAndEmbeddedEntities(MappedClass mc, boolean background, ArrayList<MappedClass> parentMCs, ArrayList<MappedField> parentMFs) {
+        for (MappedField mf : mc.getMappedFields()) {
             if (mf.hasAnnotation(Indexed.class)) {
                 Indexed index = mf.getAnnotation(Indexed.class);
                 StringBuilder field = new StringBuilder();
@@ -547,7 +520,24 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
+     * Ensure indexes from class annotation
+     * @param mc
+     * @param background
+     */
+    private void ensureIndexesFromClassAnnotation(MappedClass mc, boolean background) {
+        ArrayList<Annotation> idxs = mc.getAnnotations(Indexes.class);
+        if (idxs != null)
+            for (Annotation ann : idxs) {
+                Indexes idx = (Indexes) ann;
+                if (idx != null && idx.value() != null && idx.value().length > 0)
+                    for (Index index : idx.value()) {
+                        BasicDBObject fields = QueryImpl.parseFieldsString(index.value(), mc.getClazz(), mapr, !index.disableValidation());
+                        ensureIndex(mc.getClazz(), index.name(), fields, index.unique(), index.dropDups(), index.background() ? index.background() : background, index.sparse() ? index.sparse() : false);
+                    }
+            }
+    }
+
+    /**
      * @param clazz
      * @param <T>
      */
@@ -556,7 +546,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param background
      * @param <T>
@@ -574,12 +563,11 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
+     * Proxy to {@link #ensureIndexes(MappedClass, boolean)} for each mapped class.
      *
      * @param background
      */
     public void ensureIndexes(boolean background) {
-        // loops over mappedClasses and call ensureIndex for each @Entity object
-        // (for now)
         for (MappedClass mc : mapr.getMappedClasses()) {
             ensureIndexes(mc, background);
         }
@@ -616,7 +604,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param ex
      * @param <T>
      * @return
@@ -626,7 +613,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param ex
      * @param <T>
@@ -637,7 +623,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param coll
      * @param example
      * @param <T>
@@ -650,7 +635,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param <T>
      * @return
@@ -660,7 +644,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param q
      * @param <T>
@@ -671,7 +654,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param clazz
      * @param q
@@ -683,7 +665,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param clazz
      * @param <T>
@@ -694,7 +675,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param clazz
      * @param <T>
@@ -705,7 +685,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param <T>
      * @return
@@ -715,7 +694,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param property
      * @param value
@@ -729,7 +707,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param clazz
      * @param property
@@ -745,7 +722,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param clazz
      * @param property
@@ -768,7 +744,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param property
      * @param value
@@ -786,7 +761,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param ref
      * @param <T>
@@ -797,7 +771,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param ids
      * @param <T>
@@ -842,7 +815,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param keys
      * @param <T>
      * @return
@@ -852,7 +824,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param keys
      * @param <T>
@@ -863,15 +834,15 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
 
         Map<String, List<Key>> kindMap = new HashMap<String, List<Key>>();
         List<T> entities = new ArrayList<T>();
-        String clazzKind = (clazz==null) ? null :
+        String clazzKind = (clazz == null) ? null :
                 getMapper().getCollectionName(clazz);
         for (Key<?> key : keys) {
             mapr.updateKind(key);
 
             if (clazzKind != null && !key.getKind().equals(clazzKind))
-            throw new IllegalArgumentException("Types are not equal (" +
-            clazz + "!=" + key.getKindClass() +
-            ") for key and method parameter clazz");
+                throw new IllegalArgumentException("Types are not equal (" +
+                        clazz + "!=" + key.getKindClass() +
+                        ") for key and method parameter clazz");
 
             if (kindMap.containsKey(key.getKind()))
                 kindMap.get(key.getKind()).add(key);
@@ -881,7 +852,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
         for (String kind : kindMap.keySet()) {
             List<Object> objIds = new ArrayList<Object>();
             List<Key> kindKeys = kindMap.get(kind);
-            Class<T> kindClass = clazz==null?kindKeys.get(0).getKindClass():clazz;
+            Class<T> kindClass = clazz == null ? kindKeys.get(0).getKindClass() : clazz;
             for (Key key : kindKeys) {
                 objIds.add(key.getId());
             }
@@ -894,7 +865,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param clazz
      * @param id
@@ -910,7 +880,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param id
      * @param <T>
@@ -922,7 +891,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param key
      * @param <T>
@@ -938,7 +906,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -952,7 +919,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entityOrKey
      * @return
      */
@@ -971,7 +937,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @return
      */
@@ -983,7 +948,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param obj
      * @return
      */
@@ -993,7 +957,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @return
      */
@@ -1003,7 +966,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -1014,7 +976,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param <T>
      * @return
@@ -1024,7 +985,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @return
      */
@@ -1033,7 +993,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param <T>
      * @return
@@ -1043,7 +1002,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @return
      */
     public Mongo getMongo() {
@@ -1051,7 +1009,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @return
      */
     public DB getDB() {
@@ -1059,7 +1016,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @return
      */
     public Mapper getMapper() {
@@ -1067,7 +1023,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entities
      * @param <T>
      * @return
@@ -1079,7 +1034,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param entities
      * @param wc
@@ -1092,7 +1046,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param entities
      * @param <T>
@@ -1103,7 +1056,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entities
      * @param wc
      * @param <T>
@@ -1116,7 +1068,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param dbColl
      * @param entities
      * @param wc
@@ -1155,7 +1106,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entities
      * @param <T>
      * @return
@@ -1165,7 +1115,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -1175,7 +1124,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param wc
      * @param <T>
@@ -1188,7 +1136,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param entity
      * @param <T>
@@ -1201,7 +1148,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param entity
      * @param wc
@@ -1215,7 +1161,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param dbColl
      * @param entity
      * @param wc
@@ -1238,7 +1183,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param involvedObjects
      * @return
@@ -1264,7 +1208,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entities
      * @param <T>
      * @return
@@ -1280,7 +1223,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entities
      * @param wc
      * @param <T>
@@ -1295,7 +1237,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entities
      * @param <T>
      * @return
@@ -1308,7 +1249,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param dbColl
      * @param entity
      * @param wc
@@ -1340,7 +1280,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param dbColl
      * @param entity
      * @param dbObj
@@ -1386,7 +1325,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param wc
      * @param wr
      */
@@ -1399,7 +1337,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param entity
      * @param <T>
@@ -1412,7 +1349,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -1422,7 +1358,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param wc
      * @param <T>
@@ -1435,7 +1370,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param clazz
      * @param <T>
      * @return
@@ -1445,7 +1379,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param kind
      * @param ops
      * @param <T>
@@ -1458,7 +1391,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param createIfMissing
@@ -1470,7 +1402,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param createIfMissing
@@ -1483,7 +1414,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param ent
      * @param ops
      * @param <T>
@@ -1508,7 +1438,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param key
      * @param ops
      * @param <T>
@@ -1522,7 +1451,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param <T>
@@ -1533,7 +1461,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param <T>
@@ -1544,7 +1471,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param createIfMissing
@@ -1557,7 +1483,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param createIfMissing
@@ -1570,7 +1495,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param entity
      * @param createIfMissing
@@ -1593,7 +1517,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param <T>
      * @return
@@ -1603,7 +1526,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param wc
      * @param <T>
@@ -1648,7 +1570,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param entity
      * @param dbObj
      * @param involvedObjects
@@ -1667,7 +1588,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param createIfMissing
@@ -1688,7 +1608,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param createIfMissing
@@ -1702,7 +1621,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param u
      * @param createIfMissing
@@ -1745,7 +1663,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param <T>
      * @return
@@ -1773,7 +1690,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param q
      * @param ops
      * @param <T>
@@ -1784,7 +1700,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param oldVersion indicated the old version of the Entity should be returned
@@ -1796,7 +1711,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param query
      * @param ops
      * @param oldVersion      indicated the old version of the Entity should be returned
@@ -1834,7 +1748,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param type        MapreduceType
      * @param q           The query (only the criteria, limit and sort will be used)
      * @param outputType  The type of resulting data; inline is not working yet
@@ -1903,7 +1816,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param type
      * @param query
      * @param map
@@ -1976,7 +1888,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @return
      */
     private EntityCache createCache() {
@@ -1998,7 +1909,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @return
      */
     public WriteConcern getDefaultWriteConcern() {
@@ -2006,7 +1916,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param wc
      */
     public void setDefaultWriteConcern(WriteConcern wc) {
@@ -2014,7 +1923,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @param fact
      * @return
      */
@@ -2023,7 +1931,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     *
      * @return
      */
     public DBDecoderFactory getDecoderFact() {
