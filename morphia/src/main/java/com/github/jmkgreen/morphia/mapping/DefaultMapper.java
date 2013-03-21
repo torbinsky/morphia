@@ -388,32 +388,35 @@ public class DefaultMapper implements Mapper {
                     }
                     mappedValue = refs;
                 } else {
-                    if (value == null)
+                    if (value == null) {
                         mappedValue = null;
+                    }
 
                     Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
                     mappedValue = keyToRef(k);
-                    if (mappedValue == value)
+                    if (mappedValue == value) {
                         throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
+                    }
                 }
             } catch (Exception e) {
                 log.error("Error converting value(" + value + ") to reference.", e);
                 mappedValue = toMongoObject(value, false);
             }
         }//serialized
-        else if (mf != null && mf.hasAnnotation(Serialized.class))
+        else if (mf != null && mf.hasAnnotation(Serialized.class)) {
             try {
                 mappedValue = Serializer.serialize(value, !mf.getAnnotation(Serialized.class).disableCompression());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
             //pass-through
-        else if (value instanceof DBObject)
+        } else if (value instanceof DBObject) {
             mappedValue = value;
-        else {
+        } else {
             mappedValue = toMongoObject(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
-            if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf))
+            if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf)) {
                 ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
+            }
         }
 
         return mappedValue;
