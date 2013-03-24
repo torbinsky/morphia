@@ -356,7 +356,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      * @param <T>
      */
     public <T> void ensureIndex(Class<T> clazz, String name, String fields, boolean unique, boolean dropDupsOnCreate) {
-        ensureIndex(clazz, name, QueryImpl.parseFieldsString(fields, clazz, mapr, true), unique, dropDupsOnCreate, false, false);
+        ensureIndex(clazz, name, QueryImpl.parseFieldsString(fields, clazz, mapr, true), unique, dropDupsOnCreate, false, false, -1);
     }
 
     /**
@@ -369,20 +369,21 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      * @param <T>
      */
     public <T> void ensureIndex(Class<T> clazz, String name, String fields, boolean unique, boolean dropDupsOnCreate, boolean background) {
-        ensureIndex(clazz, name, QueryImpl.parseFieldsString(fields, clazz, mapr, true), unique, dropDupsOnCreate, background, false);
+        ensureIndex(clazz, name, QueryImpl.parseFieldsString(fields, clazz, mapr, true), unique, dropDupsOnCreate, background, false, -1);
     }
 
     /**
-     * @param clazz
-     * @param name
+     * This method actually adds indexes to the selected collection.
+     *
+     * @param clazz The class/collection to index
+     * @param name Optional index name
      * @param fields
      * @param unique
      * @param dropDupsOnCreate
      * @param background
      * @param sparse
-     * @param <T>
      */
-    protected <T> void ensureIndex(Class<T> clazz, String name, BasicDBObject fields, boolean unique, boolean dropDupsOnCreate, boolean background, boolean sparse) {
+    protected <T> void ensureIndex(Class<T> clazz, String name, BasicDBObject fields, boolean unique, boolean dropDupsOnCreate, boolean background, boolean sparse, int expireAfterSeconds) {
         BasicDBObjectBuilder keyOpts = new BasicDBObjectBuilder();
         if (name != null && name.length() > 0) {
             keyOpts.add("name", name);
@@ -397,6 +398,9 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
             keyOpts.add("background", true);
         if (sparse)
             keyOpts.add("sparse", true);
+        if (expireAfterSeconds > -1) {
+            keyOpts.add("expireAfterSeconds", expireAfterSeconds);
+        }
 
         DBCollection dbColl = getCollection(clazz);
 
@@ -428,7 +432,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
             keys.add(fieldName, dir.toIndexValue());
         }
 
-        ensureIndex(clazz, name, (BasicDBObject) keys.get(), unique, dropDupsOnCreate, background, false);
+        ensureIndex(clazz, name, (BasicDBObject) keys.get(), unique, dropDupsOnCreate, background, false, -1);
     }
 
     /**
@@ -461,8 +465,48 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     * @param mc
+     * Causes a (foreground, blocking) index creation across mapped classes.
+     * A proxy to {@link #ensureIndexes(boolean)} passing false in.
+     */
+    public void ensureIndexes() {
+        ensureIndexes(false);
+    }
+
+    /**
+     * Proxy to {@link #ensureIndexes(Class, boolean)} running the task in the foreground.
+     *
+     * @param clazz The class to index.
+     */
+    public <T> void ensureIndexes(Class<T> clazz) {
+        ensureIndexes(clazz, false);
+    }
+
+    /**
+     * @param clazz
      * @param background
+     * @param <T>
+     */
+    public <T> void ensureIndexes(Class<T> clazz, boolean background) {
+        MappedClass mc = mapr.getMappedClass(clazz);
+        ensureIndexes(mc, background);
+    }
+
+    /**
+     * Proxy to {@link #ensureIndexes(MappedClass, boolean)} for each mapped class.
+     *
+     * @param background If true, run the indexing in the background; otherwise it's a foreground task.
+     */
+    public void ensureIndexes(boolean background) {
+        for (MappedClass mc : mapr.getMappedClasses()) {
+            ensureIndexes(mc, background);
+        }
+    }
+
+    /**
+     * Runs the indexing process for the given mapped class.
+     *
+     * @param mc The mapped class to index
+     * @param background In the background?
      */
     protected void ensureIndexes(MappedClass mc, boolean background) {
         ensureIndexes(mc, background, new ArrayList<MappedClass>(), new ArrayList<MappedField>());
@@ -479,12 +523,30 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
             return;
 
         //skip embedded types
-        if (mc.getEmbeddedAnnotation() != null && (parentMCs == null || parentMCs.isEmpty()))
+        if (mc.getEmbeddedAnnotation() != null && parentMCs.isEmpty())
             return;
 
         ensureIndexesFromClassAnnotation(mc, background);
 
         ensureIndexesFromFieldsAndEmbeddedEntities(mc, background, parentMCs, parentMFs);
+    }
+
+    /**
+     * Ensure indexes from class annotation
+     * @param mc
+     * @param background
+     */
+    private void ensureIndexesFromClassAnnotation(MappedClass mc, boolean background) {
+        ArrayList<Annotation> idxs = mc.getAnnotations(Indexes.class);
+        if (idxs != null)
+            for (Annotation ann : idxs) {
+                Indexes idx = (Indexes) ann;
+                if (idx != null && idx.value() != null && idx.value().length > 0)
+                    for (Index index : idx.value()) {
+                        BasicDBObject fields = QueryImpl.parseFieldsString(index.value(), mc.getClazz(), mapr, !index.disableValidation());
+                        ensureIndex(mc.getClazz(), index.name(), fields, index.unique(), index.dropDups(), index.background() ? index.background() : background, index.sparse() ? index.sparse() : false, index.expireAfterSeconds());
+                    }
+            }
     }
 
     /**
@@ -506,7 +568,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
 
                 field.append(mf.getNameToStore());
 
-                ensureIndex(indexedClass, index.name(), new BasicDBObject(field.toString(), index.value().toIndexValue()), index.unique(), index.dropDups(), index.background() ? index.background() : background, index.sparse() ? index.sparse() : false);
+                ensureIndex(indexedClass, index.name(), new BasicDBObject(field.toString(), index.value().toIndexValue()), index.unique(), index.dropDups(), index.background() ? index.background() : background, index.sparse() ? index.sparse() : false, index.expireAfterSeconds());
             }
 
             if (!mf.isTypeMongoCompatible() && !mf.hasAnnotation(Reference.class) && !mf.hasAnnotation(Serialized.class)) {
@@ -516,60 +578,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
                 newParents.add(mf);
                 ensureIndexes(mapr.getMappedClass(mf.isSingleValue() ? mf.getType() : mf.getSubClass()), background, newParentClasses, newParents);
             }
-        }
-    }
-
-    /**
-     * Ensure indexes from class annotation
-     * @param mc
-     * @param background
-     */
-    private void ensureIndexesFromClassAnnotation(MappedClass mc, boolean background) {
-        ArrayList<Annotation> idxs = mc.getAnnotations(Indexes.class);
-        if (idxs != null)
-            for (Annotation ann : idxs) {
-                Indexes idx = (Indexes) ann;
-                if (idx != null && idx.value() != null && idx.value().length > 0)
-                    for (Index index : idx.value()) {
-                        BasicDBObject fields = QueryImpl.parseFieldsString(index.value(), mc.getClazz(), mapr, !index.disableValidation());
-                        ensureIndex(mc.getClazz(), index.name(), fields, index.unique(), index.dropDups(), index.background() ? index.background() : background, index.sparse() ? index.sparse() : false);
-                    }
-            }
-    }
-
-    /**
-     * @param clazz
-     * @param <T>
-     */
-    public <T> void ensureIndexes(Class<T> clazz) {
-        ensureIndexes(clazz, false);
-    }
-
-    /**
-     * @param clazz
-     * @param background
-     * @param <T>
-     */
-    public <T> void ensureIndexes(Class<T> clazz, boolean background) {
-        MappedClass mc = mapr.getMappedClass(clazz);
-        ensureIndexes(mc, background);
-    }
-
-    /**
-     *
-     */
-    public void ensureIndexes() {
-        ensureIndexes(false);
-    }
-
-    /**
-     * Proxy to {@link #ensureIndexes(MappedClass, boolean)} for each mapped class.
-     *
-     * @param background
-     */
-    public void ensureIndexes(boolean background) {
-        for (MappedClass mc : mapr.getMappedClasses()) {
-            ensureIndexes(mc, background);
         }
     }
 
