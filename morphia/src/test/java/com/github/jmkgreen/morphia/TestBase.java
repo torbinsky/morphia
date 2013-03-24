@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia;
 
@@ -12,6 +12,7 @@ import com.mongodb.Mongo;
 
 public abstract class TestBase
 {
+    public static final String DB_NAME = "morphia_test";
     protected Mongo mongo;
     protected DB db;
     protected Datastore ds;
@@ -25,24 +26,24 @@ public abstract class TestBase
 			throw new RuntimeException(e);
 		}
     }
-    
+
     @Before
     public void setUp()
     {
-        this.db = this.mongo.getDB("morphia_test");
+        this.db = this.mongo.getDB(DB_NAME);
         this.ds = this.morphia.createDatastore(this.mongo, this.db.getName());
         this.ads = (AdvancedDatastore) ds;
         //ads.setDecoderFact(LazyDBDecoder.FACTORY);
     }
-	
+
     protected void cleanup() {
         //this.mongo.dropDatabase("morphia_test");
 		for(MappedClass mc : morphia.getMapper().getMappedClasses())
 //			if( mc.getEntityAnnotation() != null )
 				db.getCollection(mc.getCollectionName()).drop();
-    	
+
     }
-    
+
 	@After
 	public void tearDown() {
     	cleanup();
