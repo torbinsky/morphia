@@ -1,15 +1,7 @@
 package com.github.jmkgreen.morphia;
 
-import com.github.jmkgreen.morphia.annotations.CappedAt;
-import com.github.jmkgreen.morphia.annotations.Entity;
-import com.github.jmkgreen.morphia.annotations.Index;
-import com.github.jmkgreen.morphia.annotations.Indexed;
-import com.github.jmkgreen.morphia.annotations.Indexes;
-import com.github.jmkgreen.morphia.annotations.NotSaved;
-import com.github.jmkgreen.morphia.annotations.PostPersist;
-import com.github.jmkgreen.morphia.annotations.Reference;
-import com.github.jmkgreen.morphia.annotations.Serialized;
-import com.github.jmkgreen.morphia.annotations.Version;
+import com.github.jmkgreen.morphia.annotations.*;
+import com.github.jmkgreen.morphia.indexing.TextIndexCommand;
 import com.github.jmkgreen.morphia.logging.Logr;
 import com.github.jmkgreen.morphia.logging.MorphiaLoggerFactory;
 import com.github.jmkgreen.morphia.mapping.MappedClass;
@@ -558,17 +550,16 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      */
     private void ensureIndexesFromFieldsAndEmbeddedEntities(MappedClass mc, boolean background, ArrayList<MappedClass> parentMCs, ArrayList<MappedField> parentMFs) {
         for (MappedField mf : mc.getMappedFields()) {
+            Class<?> indexedClass = (parentMCs.isEmpty() ? mc : parentMCs.get(0)).getClazz();
+            String field = getFullFieldName(parentMCs, parentMFs, mf);
             if (mf.hasAnnotation(Indexed.class)) {
                 Indexed index = mf.getAnnotation(Indexed.class);
-                StringBuilder field = new StringBuilder();
-                Class<?> indexedClass = (parentMCs.isEmpty() ? mc : parentMCs.get(0)).getClazz();
-                if (!parentMCs.isEmpty())
-                    for (MappedField pmf : parentMFs)
-                        field.append(pmf.getNameToStore()).append(".");
-
-                field.append(mf.getNameToStore());
 
                 ensureIndex(indexedClass, index.name(), new BasicDBObject(field.toString(), index.value().toIndexValue()), index.unique(), index.dropDups(), index.background() ? index.background() : background, index.sparse() ? index.sparse() : false, index.expireAfterSeconds());
+            }
+
+            if (mf.hasAnnotation(SimpleTextIndex.class)) {
+                createTextIndex(mf, indexedClass, field);
             }
 
             if (!mf.isTypeMongoCompatible() && !mf.hasAnnotation(Reference.class) && !mf.hasAnnotation(Serialized.class)) {
@@ -578,7 +569,37 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
                 newParents.add(mf);
                 ensureIndexes(mapr.getMappedClass(mf.isSingleValue() ? mf.getType() : mf.getSubClass()), background, newParentClasses, newParents);
             }
+
         }
+    }
+
+    private void createTextIndex(MappedField mf, Class<?> indexedClass, String field) {
+        SimpleTextIndex txtIndex = mf.getAnnotation(SimpleTextIndex.class);
+        TextIndexCommand cmd = new TextIndexCommand();
+        cmd.setName(field);
+        if (!txtIndex.name().isEmpty()) {
+            cmd.setName(txtIndex.name());
+        }
+        cmd.setDefaultLanguage(txtIndex.defaultLanguage());
+        List<String> fields = new ArrayList();
+        fields.add(field);
+        cmd.setFields(fields);
+        createTextIndex(indexedClass, cmd);
+    }
+
+    private void createTextIndex(Class<?> indexedClass, TextIndexCommand cmd) {
+        DBCollection col = getCollection(indexedClass);
+        col.ensureIndex(cmd.getKeys(), cmd.getOptions());
+    }
+
+    private String getFullFieldName(ArrayList<MappedClass> parentMCs, ArrayList<MappedField> parentMFs, MappedField mf) {
+        StringBuilder field = new StringBuilder();
+        if (!parentMCs.isEmpty())
+            for (MappedField pmf : parentMFs)
+                field.append(pmf.getNameToStore()).append(".");
+
+        field.append(mf.getNameToStore());
+        return field.toString();
     }
 
     /**

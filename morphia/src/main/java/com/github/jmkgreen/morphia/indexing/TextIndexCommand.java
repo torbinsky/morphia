@@ -1,11 +1,10 @@
 package com.github.jmkgreen.morphia.indexing;
 
-import com.mongodb.DBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBObject;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Convenient way to build text index commands.
@@ -17,7 +16,6 @@ public class TextIndexCommand {
     private static final String WILDCARD = "$**";
     private static final String DEFAULT_LANGUAGE = "default_language";
     private static final String LANGUAGE_OVERRIDE = "language_override";
-    private static final String LANGUAGE = "language";
     private static final String WEIGHTS = "weights";
 
     private List<String> fields;
@@ -47,8 +45,12 @@ public class TextIndexCommand {
         this.languageOverride = languageOverride;
     }
 
-    public void setIndexAllFields(boolean indexAllFields) {
-        this.indexAllFields = indexAllFields;
+    public void setIndexAllFields() {
+        this.indexAllFields = true;
+    }
+
+    public void setIndexSpecificFields() {
+        this.indexAllFields = false;
     }
 
     public DBObject getKeys() {
@@ -85,6 +87,10 @@ public class TextIndexCommand {
     }
 
     private void addFieldsTo(final BasicDBObjectBuilder builder) {
+        if (fields == null) {
+            throw new IllegalArgumentException("No fields specified for creating index on");
+        }
+
         for (String field : fields) {
             builder.add(field, CMD);
         }

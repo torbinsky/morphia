@@ -1,15 +1,6 @@
 package com.github.jmkgreen.morphia.mapping;
 
-import com.github.jmkgreen.morphia.annotations.AlsoLoad;
-import com.github.jmkgreen.morphia.annotations.ConstructorArgs;
-import com.github.jmkgreen.morphia.annotations.Embedded;
-import com.github.jmkgreen.morphia.annotations.Id;
-import com.github.jmkgreen.morphia.annotations.Indexed;
-import com.github.jmkgreen.morphia.annotations.NotSaved;
-import com.github.jmkgreen.morphia.annotations.Property;
-import com.github.jmkgreen.morphia.annotations.Reference;
-import com.github.jmkgreen.morphia.annotations.Serialized;
-import com.github.jmkgreen.morphia.annotations.Version;
+import com.github.jmkgreen.morphia.annotations.*;
 import com.github.jmkgreen.morphia.logging.Logr;
 import com.github.jmkgreen.morphia.logging.MorphiaLoggerFactory;
 import com.github.jmkgreen.morphia.utils.ReflectionUtils;
@@ -39,10 +30,13 @@ import java.util.Set;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class MappedField {
     private static final Logr log = MorphiaLoggerFactory.get(MappedField.class);
-    // The Annotations to look for when reflecting on the field (stored in the mappingAnnotations)
+    /**
+     * The Annotations to look for when reflecting on the field (stored in the mappingAnnotations).
+      */
     public static List<Class<? extends Annotation>> interestingAnnotations = new ArrayList<Class<? extends Annotation>>(Arrays.asList(
             Serialized.class,
             Indexed.class,
+            SimpleTextIndex.class,
             Property.class,
             Reference.class,
             Embedded.class,
@@ -53,23 +47,54 @@ public class MappedField {
             NotSaved.class));
 
     protected Class persistedClass;
-    protected Field field; // the field :)
-    protected Class realType; // the real type
-    protected Constructor ctor; // the constructor for the type
-    // Annotations that have been found relevant to mapping
+    /**
+     * The field :).
+     */
+    protected Field field;
+    /**
+     * The real type.
+     */
+    protected Class realType;
+    /**
+     * The constructor for the type.
+     */
+    protected Constructor ctor;
+    /**
+     * Annotations that have been found relevant to mapping.
+     */
     protected Map<Class<? extends Annotation>, Annotation> foundAnnotations = new HashMap<Class<? extends Annotation>, Annotation>();
-    protected Type subType = null; // the type (T) for the Collection<T>/T[]/Map<?,T>
-    protected Type mapKeyType = null; // the type (T) for the Map<T,?>
-    protected boolean isSingleValue = true; // indicates the field is a single value
-    protected boolean isMongoType = false; // indicated the type is a mongo compatible type (our version of value-type)
-    protected boolean isMap = false; // indicated if it implements Map interface
-    protected boolean isSet = false; // indicated if the collection is a set
-    //for debugging
-    protected boolean isArray = false; // indicated if it is an Array
-    protected boolean isCollection = false; // indicated if the collection is a list)
+    /**
+     * The type (T) for the Collection<T>/T[]/Map<?,T>
+     */
+    protected Type subType = null;
+    /**
+     * The type (T) for the Map<T,?>.
+     */
+    protected Type mapKeyType = null;
+    protected boolean isSingleValue = true;
+    /**
+     * Indicates the type is a mongo compatible type (our version of value-type).
+     */
+    protected boolean isMongoType = false;
+    /**
+     * Indicates if it implements Map interface.
+     */
+    protected boolean isMap = false;
+    /**
+     * Indicates if the collection is a set.
+     */
+    protected boolean isSet = false;
+    /**
+     * Indicates if it is an Array.
+     */
+    protected boolean isArray = false;
+    /**
+     * Indicates if the collection is a list).
+     */
+    protected boolean isCollection = false;
 
     /**
-     * the constructor
+     * The constructor.
      */
     MappedField(Field f, Class<?> clazz) {
         f.setAccessible(true);
@@ -79,7 +104,7 @@ public class MappedField {
     }
 
     /**
-     * the constructor
+     * The constructor.
      */
     protected MappedField() {
     }
@@ -218,7 +243,7 @@ public class MappedField {
     }
 
     /**
-     * Returns the name of the field's (key)name for mongodb
+     * Returns the name of the field's (key)name for mongodb.
      */
     public String getNameToStore() {
         return getMappedFieldName();
@@ -263,14 +288,14 @@ public class MappedField {
     }
 
     /**
-     * Returns the name of the java field, as declared on the class
+     * Returns the name of the java field, as declared on the class.
      */
     public String getJavaFieldName() {
         return field.getName();
     }
 
     /**
-     * returns the annotation instance if it exists on this field
+     * Returns the annotation instance if it exists on this field.
      */
     public <T extends Annotation> T getAnnotation(Class<T> clazz) {
         return (T) foundAnnotations.get(clazz);
@@ -281,7 +306,8 @@ public class MappedField {
     }
 
     /**
-     * Indicates whether the annotation is present in the mapping (does not check the java field annotations, just the ones discovered)
+     * Indicates whether the annotation is present in the mapping.
+     * Does not check the java field annotations, just the ones discovered.
      */
     public boolean hasAnnotation(Class ann) {
         return foundAnnotations.containsKey(ann);
@@ -310,14 +336,14 @@ public class MappedField {
     }
 
     /**
-     * returns the full name of the class plus java field name
+     * Returns the full name of the class plus java field name.
      */
     public String getFullName() {
         return field.getDeclaringClass().getName() + "." + field.getName();
     }
 
     /**
-     * Returns the name of the field's key-name for mongodb
+     * Returns the name of the field's key-name for mongodb.
      */
     private String getMappedFieldName() {
         if (hasAnnotation(Id.class))
@@ -383,21 +409,21 @@ public class MappedField {
     }
 
     /**
-     * returns the type of the underlying java field
+     * Returns the type of the underlying java field.
      */
     public Class getType() {
         return realType;
     }
 
     /**
-     * returns the declaring class of the java field
+     * Returns the declaring class of the java field.
      */
     public Class getDeclaringClass() {
         return field.getDeclaringClass();
     }
 
     /**
-     * If the underlying java type is a map then it returns T from Map<T,V>
+     * If the underlying java type is a map then it returns T from Map<T,V>.
      */
     public Class getMapKeyClass() {
         return toClass(mapKeyType);
@@ -418,7 +444,7 @@ public class MappedField {
     }
 
     /**
-     * If the java field is a list/array/map then the sub-type T is returned (ex. List<T>, T[], Map<?,T>
+     * If the java field is a list/array/map then the sub-type T is returned (ex. List<T>, T[], Map<?,T>).
      */
     public Class getSubClass() {
         return toClass(subType);
@@ -428,6 +454,9 @@ public class MappedField {
         return subType;
     }
 
+    /**
+     * Indicates the field is a single value.
+     */
     public boolean isSingleValue() {
         if (!isSingleValue && !isMap && !isSet && !isArray && !isCollection)
             throw new RuntimeException("Not single, but none of the types that are not-single.");
@@ -451,14 +480,14 @@ public class MappedField {
     }
 
     /**
-     * returns a constructor for the type represented by the field
+     * Returns a constructor for the type represented by the field.
      */
     public Constructor getCTor() {
         return ctor;
     }
 
     /**
-     * Returns the value stored in the java field
+     * Returns the value stored in the java field.
      */
     public Object getFieldValue(Object classInst) throws IllegalArgumentException {
         try {
@@ -470,7 +499,7 @@ public class MappedField {
     }
 
     /**
-     * Sets the value for the java field
+     * Sets the value for the java field.
      */
     public void setFieldValue(Object classInst, Object value) throws IllegalArgumentException {
         try {
@@ -482,7 +511,7 @@ public class MappedField {
     }
 
     /**
-     * returned the underlying java field
+     * Returned the underlying java field.
      */
     public Field getField() {
         return field;

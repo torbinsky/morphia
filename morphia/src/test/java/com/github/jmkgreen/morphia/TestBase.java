@@ -37,7 +37,7 @@ public abstract class TestBase
     }
 
     protected void cleanup() {
-        //this.mongo.dropDatabase("morphia_test");
+//        this.mongo.dropDatabase("morphia_test");
 		for(MappedClass mc : morphia.getMapper().getMappedClasses())
 //			if( mc.getEntityAnnotation() != null )
 				db.getCollection(mc.getCollectionName()).drop();
