@@ -1,5 +1,6 @@
 package com.github.jmkgreen.morphia.query;
 
+import com.github.jmkgreen.morphia.annotations.Embedded;
 import com.github.jmkgreen.morphia.logging.Logr;
 import com.github.jmkgreen.morphia.logging.MorphiaLoggerFactory;
 import com.github.jmkgreen.morphia.mapping.DefaultMapper;
@@ -9,9 +10,8 @@ import com.github.jmkgreen.morphia.mapping.Mapper;
 import com.github.jmkgreen.morphia.utils.ReflectionUtils;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
 
 public class FieldCriteria extends AbstractCriteria implements Criteria {
     private static final Logr log = MorphiaLoggerFactory.get(FieldCriteria.class);
@@ -57,6 +57,19 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
         //TODO: investigate and/or add option to control this.
         if (op == FilterOperator.ELEMENT_MATCH && mappedValue instanceof DBObject)
             ((DBObject) mappedValue).removeField(Mapper.ID_KEY);
+
+        if (mf != null && mf.hasAnnotation(Embedded.class)) {
+            if (mappedValue instanceof ArrayList) {
+                for (Object elem : (ArrayList) mappedValue) {
+                    if (elem instanceof DBObject) {
+                        ((DBObject) elem).removeField(Mapper.CLASS_NAME_FIELDNAME);
+                    }
+                }
+            }
+            if (mappedValue instanceof DBObject) {
+                ((DBObject) mappedValue).removeField(Mapper.CLASS_NAME_FIELDNAME);
+            }
+        }
 
         this.field = field;
         this.operator = op;

@@ -76,6 +76,7 @@ public class MappedField {
      * Indicates the type is a mongo compatible type (our version of value-type).
      */
     protected boolean isMongoType = false;
+    protected boolean isList = false;
     /**
      * Indicates if it implements Map interface.
      */
@@ -145,6 +146,7 @@ public class MappedField {
 
             isSingleValue = false;
 
+            isList = List.class.isAssignableFrom(realType);
             isMap = Map.class.isAssignableFrom(realType);
             isSet = Set.class.isAssignableFrom(realType);
             //for debugging
@@ -471,12 +473,24 @@ public class MappedField {
         return isMongoType;
     }
 
+    public boolean isList() {
+        return isList;
+    }
+
     public boolean isMap() {
         return isMap;
     }
 
     public boolean isSet() {
         return isSet;
+    }
+
+    public boolean isArray() {
+        return isArray;
+    }
+
+    public boolean isCollection() {
+        return isCollection;
     }
 
     /**
