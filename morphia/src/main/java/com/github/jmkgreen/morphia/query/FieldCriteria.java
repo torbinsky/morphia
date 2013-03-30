@@ -58,18 +58,10 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
         if (op == FilterOperator.ELEMENT_MATCH && mappedValue instanceof DBObject)
             ((DBObject) mappedValue).removeField(Mapper.ID_KEY);
 
-        if (mf != null && mf.hasAnnotation(Embedded.class)) {
-            if (mappedValue instanceof ArrayList) {
-                for (Object elem : (ArrayList) mappedValue) {
-                    if (elem instanceof DBObject) {
-                        ((DBObject) elem).removeField(Mapper.CLASS_NAME_FIELDNAME);
-                    }
-                }
-            }
-            if (mappedValue instanceof DBObject) {
-                ((DBObject) mappedValue).removeField(Mapper.CLASS_NAME_FIELDNAME);
-            }
+        if (mf != null) {
+            removeClassNameFromEmbeddedEntity(mf, mappedValue);
         }
+
 
         this.field = field;
         this.operator = op;
@@ -105,4 +97,29 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
     public String toString() {
         return this.field + " " + this.operator.val() + " " + this.value;
     }
+
+    /**
+     * Remove the className field from the query if the clause concerns an embedded entity.
+     *
+     * See https://github.com/jmkgreen/morphia/issues/31
+     *
+     * @param mf
+     * @param mappedValue
+     */
+    private void removeClassNameFromEmbeddedEntity(MappedField mf, Object mappedValue) {
+        if (!mf.hasAnnotation(Embedded.class)) {
+            return;
+        }
+        if (mappedValue instanceof ArrayList) {
+            for (Object elem : (ArrayList) mappedValue) {
+                if (elem instanceof DBObject) {
+                    ((DBObject) elem).removeField(Mapper.CLASS_NAME_FIELDNAME);
+                }
+            }
+        }
+        if (mappedValue instanceof DBObject) {
+            ((DBObject) mappedValue).removeField(Mapper.CLASS_NAME_FIELDNAME);
+        }
+    }
+
 }
