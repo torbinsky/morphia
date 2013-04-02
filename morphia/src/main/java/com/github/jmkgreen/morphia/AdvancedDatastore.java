@@ -89,6 +89,8 @@ public interface AdvancedDatastore extends Datastore {
      */
     <T> Key<T> save(String kind, T entity);
 
+    <T> Iterable<Key<T>> save(Iterable<T> entities, WriteConcern wc);
+
     /**
      * No validation or conversion is done to the id.
      */
@@ -105,6 +107,10 @@ public interface AdvancedDatastore extends Datastore {
      * @return
      */
     <T, V> WriteResult delete(String kind, Class<T> clazz, V id);
+
+    <T> WriteResult delete(T entity, WriteConcern wc);
+
+    <T> WriteResult delete(Query<T> query, WriteConcern wc);
 
     /**
      *
