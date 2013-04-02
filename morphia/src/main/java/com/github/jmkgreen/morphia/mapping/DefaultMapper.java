@@ -286,6 +286,71 @@ public class DefaultMapper implements Mapper {
      * Used (mainly) by query/update operations
      * </p>
      */
+    public Object toMongoObject(MappedField mf, MappedClass mc, Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        Object mappedValue = value;
+
+        //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
+        if (isAnAssignableField(mf, value) || isAnEntity(mc)) {
+            try {
+                if (value instanceof Iterable) {
+                    return getDbRefs((Iterable) value);
+                }
+
+                if (value.getClass().isAssignableFrom(Boolean.class)) {
+                    return toMongoObject(value, false);
+                }
+                if (value.getClass().isAssignableFrom(Integer.class)) {
+                    return toMongoObject(value, false);
+                }
+
+                Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
+                mappedValue = keyToRef(k);
+                if (mappedValue == value) {
+                    throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
+                }
+                return mappedValue;
+            } catch (Exception e) {
+                log.error("Error converting value(" + value + ") to reference.", e);
+                return toMongoObject(value, false);
+            }
+        }
+
+        //serialized
+        if (mf != null && mf.hasAnnotation(Serialized.class)) {
+            try {
+                return Serializer.serialize(value, !mf.getAnnotation(Serialized.class).disableCompression());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        //pass-through
+        if (value instanceof DBObject) {
+            return value;
+        }
+
+        mappedValue = toMongoObject(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
+        if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf)) {
+            ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
+        }
+
+        return mappedValue;
+    }
+
+    /**
+     * <p>
+     * Converts a java object to a mongo-compatible object (possibly a DBObject
+     * for complex mappings). Very similar to {@link DefaultMapper#toDBObject}
+     * </p>
+     * <p>
+     * Used (mainly) by query/update operations
+     * </p>
+     */
     Object toMongoObject(Object javaObj, boolean includeClassName) {
         if (javaObj == null)
             return null;
@@ -307,105 +372,56 @@ public class DefaultMapper implements Mapper {
         //Even if the converter changed it, should it still be processed?
         if (!bSameType && !(Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)))
             return newObj;
-        else { //The converter ran, and produced another type, or it is a list/map
 
-            boolean isSingleValue = true;
-            boolean isMap = false;
-            Class subType = null;
+        //The converter ran, and produced another type, or it is a list/map
+        boolean isSingleValue = true;
+        boolean isMap = false;
+        Class subType = null;
 
-            if (type.isArray() || Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)) {
-                isSingleValue = false;
-                isMap = ReflectionUtils.implementsInterface(type, Map.class);
-                // subtype of Long[], List<Long> is Long
-                subType = (type.isArray()) ? type.getComponentType() : ReflectionUtils.getParameterizedClass(type, (isMap) ? 1 : 0);
-            }
-
-            if (isSingleValue && !ReflectionUtils.isPropertyType(type)) {
-                DBObject dbObj = toDBObject(newObj);
-                if (!includeClassName)
-                    dbObj.removeField(CLASS_NAME_FIELDNAME);
-                return dbObj;
-            } else if (newObj instanceof DBObject) {
-                return newObj;
-            } else if (isMap) {
-                if (ReflectionUtils.isPropertyType(subType))
-                    return toDBObject(newObj);
-                else {
-                    HashMap m = new HashMap();
-                    for (Map.Entry e : (Iterable<Map.Entry>) ((Map) newObj).entrySet())
-                        m.put(e.getKey(), toMongoObject(e.getValue(), includeClassName));
-
-                    return m;
-                }
-                //Set/List but needs elements converted
-            } else if (!isSingleValue && !ReflectionUtils.isPropertyType(subType)) {
-                ArrayList<Object> vals = new ArrayList<Object>();
-                if (type.isArray())
-                    for (Object obj : (Object[]) newObj)
-                        vals.add(toMongoObject(obj, includeClassName));
-                else
-                    for (Object obj : (Iterable) newObj)
-                        vals.add(toMongoObject(obj, includeClassName));
-
-                return vals;
-            } else {
-                return newObj;
-            }
-        }
-    }
-
-
-    /**
-     * <p>
-     * Converts a java object to a mongo-compatible object (possibly a DBObject
-     * for complex mappings). Very similar to {@link DefaultMapper#toDBObject}
-     * </p>
-     * <p>
-     * Used (mainly) by query/update operations
-     * </p>
-     */
-    public Object toMongoObject(MappedField mf, MappedClass mc, Object value) {
-        if (value == null) {
-            return null;
+        if (type.isArray() || Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)) {
+            isSingleValue = false;
+            isMap = ReflectionUtils.implementsInterface(type, Map.class);
+            // subtype of Long[], List<Long> is Long
+            subType = (type.isArray()) ? type.getComponentType() : ReflectionUtils.getParameterizedClass(type, (isMap) ? 1 : 0);
         }
 
-        Object mappedValue = value;
+        if (isSingleValue && !ReflectionUtils.isPropertyType(type)) {
+            DBObject dbObj = toDBObject(newObj);
 
-        //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
-        if (isAnAssignableField(mf, value) || isAnEntity(mc)) {
-            try {
-                if (value instanceof Iterable) {
-                    return getDbRefs((Iterable) value);
-                } else {
+            if (!includeClassName)
+                dbObj.removeField(CLASS_NAME_FIELDNAME);
 
-                    Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
-                    mappedValue = keyToRef(k);
-                    if (mappedValue == value) {
-                        throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
-                    }
-                }
-            } catch (Exception e) {
-                log.error("Error converting value(" + value + ") to reference.", e);
-                mappedValue = toMongoObject(value, false);
-            }
-        }//serialized
-        else if (mf != null && mf.hasAnnotation(Serialized.class)) {
-            try {
-                mappedValue = Serializer.serialize(value, !mf.getAnnotation(Serialized.class).disableCompression());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            //pass-through
-        } else if (value instanceof DBObject) {
-            mappedValue = value;
-        } else {
-            mappedValue = toMongoObject(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
-            if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf)) {
-                ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
-            }
+            return dbObj;
+        }
+        if (newObj instanceof DBObject) {
+            return newObj;
         }
 
-        return mappedValue;
+        if (isMap) {
+            if (ReflectionUtils.isPropertyType(subType))
+                return toDBObject(newObj);
+
+            HashMap m = new HashMap();
+            for (Map.Entry e : (Iterable<Map.Entry>) ((Map) newObj).entrySet())
+                m.put(e.getKey(), toMongoObject(e.getValue(), includeClassName));
+
+            return m;
+            //Set/List but needs elements converted
+        }
+
+        if (!isSingleValue && !ReflectionUtils.isPropertyType(subType)) {
+            ArrayList<Object> vals = new ArrayList<Object>();
+            if (type.isArray())
+                for (Object obj : (Object[]) newObj)
+                    vals.add(toMongoObject(obj, includeClassName));
+            else
+                for (Object obj : (Iterable) newObj)
+                    vals.add(toMongoObject(obj, includeClassName));
+
+            return vals;
+        }
+
+        return newObj;
     }
 
     private boolean isAnAssignableField(MappedField mf, Object value) {

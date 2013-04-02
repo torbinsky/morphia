@@ -71,7 +71,7 @@ public class QueryInForReferencedList extends TestBase {
 				.in(hr.refs.subList(1, 3)).asList();
 		Assert.assertEquals(1, res.size());
 	}
-	
+
 	@Test
 	public void testInQuery2() throws Exception {
 		Doc doc = new Doc();
@@ -86,6 +86,18 @@ public class QueryInForReferencedList extends TestBase {
 		// this causes an NPE
 		List<Doc> docs2 = ds.find(Doc.class).field("_id").in(idList).asList();
 
-	}	
+    }
+
+    @Test
+    public void testReferenceDoesNotExist() {
+        HasRefs hr = new HasRefs();
+        ds.save(hr);
+
+        Query<HasRefs> q = ds.createQuery(HasRefs.class);
+        q.field("refs").doesNotExist();
+//        List<HasRefs> found = q.asList();
+//        Assert.assertNotNull(found);
+//        Assert.assertEquals(1, found.size());
+    }
 
 }
