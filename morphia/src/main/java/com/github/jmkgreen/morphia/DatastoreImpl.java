@@ -60,7 +60,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      */
     private static final Logr log = MorphiaLoggerFactory.get(DatastoreImpl.class);
 
-    //	final protected Morphia morphia;
     /**
      *
      */
