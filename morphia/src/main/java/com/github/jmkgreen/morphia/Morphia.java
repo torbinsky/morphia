@@ -50,6 +50,8 @@ import java.util.Set;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class Morphia {
     private final Mapper mapper;
+    private DatastoreFactory datastoreFactory = new DefaultDatastoreFactory();
+    private AdvancedDatastoreFactory advancedDatastoreFactory = new DefaultAdvancedDatastoreFactory();
 
     /**
      * Construct a new instance with an empty set of mappings.
@@ -128,8 +130,8 @@ public class Morphia {
             for (Class c : ReflectionUtils.getClasses(packageName)) {
                 try {
                     Embedded embeddedAnn = ReflectionUtils.getClassEmbeddedAnnotation(c);
-                    Entity enityAnn = ReflectionUtils.getClassEntityAnnotation(c);
-                    if (enityAnn != null || embeddedAnn != null) {
+                    Entity classEntityAnnotation = ReflectionUtils.getClassEntityAnnotation(c);
+                    if (classEntityAnnotation != null || embeddedAnn != null) {
                         map(c);
                     }
                 } catch (MappingException ex) {
@@ -234,7 +236,7 @@ public class Morphia {
      * It is best to use a Mongo singleton instance here
      */
     public Datastore createDatastore(Mongo mon, String dbName, String user, char[] pw) {
-        return new DatastoreImpl(this, mon, dbName, user, pw);
+        return datastoreFactory.create(this, mon, dbName, user, pw);
     }
 
     /**
@@ -244,4 +246,40 @@ public class Morphia {
         return createDatastore(mongo, dbName, null, null);
     }
 
+    public AdvancedDatastore createAdvancedDatastore(Mongo mon, String dbName) {
+        return createAdvancedDatastore(mon,  dbName,  null, null);
+    }
+    /**
+     * Create a new {@link AdvancedDatastore} instance via an {@link AdvancedDatastoreFactory}.
+     *
+     * @since 1.2.4
+     * @param mon
+     * @param dbName
+     * @param user
+     * @param pw
+     * @return
+     */
+    public AdvancedDatastore createAdvancedDatastore(Mongo mon, String dbName, String user, char[] pw) {
+        return advancedDatastoreFactory.create(this, mon,  dbName,  user,  pw);
+    }
+
+    /**
+     * Override the default datastore factory.
+     *
+     * @since 1.2.4
+     * @param datastoreFactory
+     */
+    public void setDatastoreFactory(DatastoreFactory datastoreFactory) {
+        this.datastoreFactory = datastoreFactory;
+    }
+
+    /**
+     * Override the default advanced datastore factory.
+     *
+     * @since 1.2.4
+     * @param advancedDatastoreFactory
+     */
+    public void setAdvancedDatastoreFactory(AdvancedDatastoreFactory advancedDatastoreFactory) {
+        this.advancedDatastoreFactory = advancedDatastoreFactory;
+    }
 }
