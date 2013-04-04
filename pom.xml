@@ -25,6 +25,16 @@
         <version>7</version>
     </parent>
 
+    <issueManagement>
+        <url>https://github.com/jmkgreen/morphia/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>http://travis-ci.org/#!/jmkgreen/morphia</url>
+    </ciManagement>
+
     <scm>
         <connection>scm:git:git@github.com:jmkgreen/morphia.git</connection>
         <developerConnection>scm:git:git@github.com:jmkgreen/morphia.git</developerConnection>
