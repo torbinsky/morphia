@@ -35,6 +35,13 @@
         <url>http://travis-ci.org/#!/jmkgreen/morphia</url>
     </ciManagement>
 
+    <distributionManagement>
+        <site>
+            <id>gh-pages</id>
+            <url>http://jmkgreen.github.com/morphia/</url>
+        </site>
+    </distributionManagement>
+
     <scm>
         <connection>scm:git:git@github.com:jmkgreen/morphia.git</connection>
         <developerConnection>scm:git:git@github.com:jmkgreen/morphia.git</developerConnection>
