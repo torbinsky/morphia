@@ -37,8 +37,8 @@
 
     <distributionManagement>
         <site>
-            <id>gh-pages</id>
-            <url>http://jmkgreen.github.com/morphia/</url>
+            <id>github</id>
+            <url>scm:git:ssh://git@github.com/jmkgreen/morphia.git</url>
         </site>
     </distributionManagement>
 
