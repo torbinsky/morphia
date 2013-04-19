@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Pattern;
 
+import com.github.jmkgreen.morphia.mapping.cache.DefaultEntityCacheFactory;
+import com.github.jmkgreen.morphia.mapping.cache.EntityCacheFactory;
 import org.bson.BSONEncoder;
 import org.bson.BasicBSONEncoder;
 
@@ -70,6 +72,7 @@ import com.mongodb.DBRef;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultMapper implements Mapper {
+    protected EntityCacheFactory entityCacheFactory = new DefaultEntityCacheFactory();
     protected static final Logr log = MorphiaLoggerFactory.get(DefaultMapper.class);
 
     /**
@@ -86,8 +89,8 @@ public class DefaultMapper implements Mapper {
 
     protected MapperOptions opts;
 
-    LazyProxyFactory proxyFactory;
-    DatastoreProvider datastoreProvider;
+    private LazyProxyFactory proxyFactory;
+    private DatastoreProvider datastoreProvider;
     DefaultConverters converters;
 
     public DefaultMapper() {
@@ -96,10 +99,21 @@ public class DefaultMapper implements Mapper {
 
     public DefaultMapper(MapperOptions opts) {
         this.opts = opts;
-        this.proxyFactory = opts.proxyFactory;
-        this.datastoreProvider = opts.datastoreProvider;
+        this.setProxyFactory(opts.proxyFactory);
+        this.setDatastoreProvider(opts.datastoreProvider);
         this.converters = opts.converters;
     	converters.setMapper(this);
+    }
+
+    /**
+     * Enable overriding of EntityCacheFactory.
+     * @param factory
+     * @return
+     * @since 1.2.4
+     */
+    public Mapper setEntityCacheFactory(EntityCacheFactory factory) {
+        this.entityCacheFactory = factory;
+        return this;
     }
 
     /**
@@ -273,7 +287,7 @@ public class DefaultMapper implements Mapper {
 
         Object entity = null;
         entity = opts.objectFactory.createInstance(entityClass, dbObject);
-        entity = fromDb(dbObject, entity, cache);
+        entity = fromDBObject(dbObject, entity, cache);
         return entity;
     }
 
@@ -351,7 +365,7 @@ public class DefaultMapper implements Mapper {
      * Used (mainly) by query/update operations
      * </p>
      */
-    Object toMongoObject(Object javaObj, boolean includeClassName) {
+    public Object toMongoObject(Object javaObj, boolean includeClassName) {
         if (javaObj == null)
             return null;
 
@@ -545,7 +559,7 @@ public class DefaultMapper implements Mapper {
         return dbObject;
     }
 
-    Object fromDb(DBObject dbObject, Object entity, EntityCache cache) {
+    public Object fromDBObject(DBObject dbObject, Object entity, EntityCache cache) {
         //hack to bypass things and just read the value.
         if (entity instanceof MappedField) {
             readMappedField(dbObject, (MappedField) entity, entity, cache);
@@ -663,11 +677,11 @@ public class DefaultMapper implements Mapper {
         return key.getKind();
     }
 
-    <T> Key<T> createKey(Class<T> clazz, Serializable id) {
+    public <T> Key<T> createKey(Class<T> clazz, Serializable id) {
         return new Key<T>(clazz, id);
     }
 
-    <T> Key<T> createKey(Class<T> clazz, Object id) {
+    public <T> Key<T> createKey(Class<T> clazz, Object id) {
         if (id instanceof Serializable)
             return createKey(clazz, (Serializable) id);
 
@@ -822,5 +836,21 @@ public class DefaultMapper implements Mapper {
     }
     public Object getCachedClass(Class<?> clazz) {
     	return instanceCache.get(clazz);
+    }
+
+    public LazyProxyFactory getProxyFactory() {
+        return proxyFactory;
+    }
+
+    public void setProxyFactory(LazyProxyFactory proxyFactory) {
+        this.proxyFactory = proxyFactory;
+    }
+
+    public DatastoreProvider getDatastoreProvider() {
+        return datastoreProvider;
+    }
+
+    public void setDatastoreProvider(DatastoreProvider datastoreProvider) {
+        this.datastoreProvider = datastoreProvider;
     }
 }

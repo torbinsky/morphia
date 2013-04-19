@@ -1,5 +1,7 @@
 package com.github.jmkgreen.morphia.query;
 
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.ReadPreference;
 import org.bson.types.CodeWScope;
 
@@ -167,6 +169,18 @@ public interface Query<T> extends QueryResults<T>, Cloneable {
     String toString();
 
     Class<T> getEntityClass();
+
+    DBCollection getCollection();
+
+    DBObject getFieldsObject();
+
+    DBObject getSortObject();
+
+    DBObject getQueryObject();
+
+    int getLimit();
+
+    int getOffset();
 
     Query<T> clone();
 }

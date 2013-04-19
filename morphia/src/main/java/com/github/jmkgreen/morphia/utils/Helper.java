@@ -24,18 +24,15 @@ public class Helper {
     }
 
     public static DBObject getSort(Query q) {
-        QueryImpl qi = (QueryImpl) q;
-        return qi.getSortObject();
+        return q.getSortObject();
     }
 
     public static DBObject getFields(Query q) {
-        QueryImpl qi = (QueryImpl) q;
-        return qi.getFieldsObject();
+        return q.getFieldsObject();
     }
 
     public static DBCollection getCollection(Query q) {
-        QueryImpl qi = (QueryImpl) q;
-        return qi.getCollection();
+        return q.getCollection();
     }
 
     public static DBCursor getCursor(Iterable it) {
