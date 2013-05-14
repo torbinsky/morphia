@@ -2,6 +2,8 @@ package com.github.jmkgreen.morphia;
 
 import java.io.Serializable;
 
+import com.github.jmkgreen.morphia.mapping.cache.DefaultEntityCacheFactory;
+import com.github.jmkgreen.morphia.mapping.cache.NoOpEntityCacheFactory;
 import org.junit.Assert;
 
 import org.bson.types.ObjectId;
@@ -32,10 +34,6 @@ public class TestMapper extends TestBase {
 
 		@PostLoad
 		protected void postConstruct() {
-			if (A.loadCount > 1) {
-				throw new RuntimeException();
-			}
-
 			A.loadCount++;
 		}
 	}
@@ -152,7 +150,8 @@ public class TestMapper extends TestBase {
      * @throws Exception
      */
 	@Test
-	public void SingleLookup() throws Exception {
+	public void SingleLookupThanksToEntityCache() throws Exception {
+        ds.getMapper().setEntityCacheFactory(new DefaultEntityCacheFactory());
 		A.loadCount = 0;
 		A a = new A();
 		HoldsMultipleA holder = new HoldsMultipleA();
@@ -162,6 +161,7 @@ public class TestMapper extends TestBase {
 		holder = ds.get(HoldsMultipleA.class, holder.id);
 		Assert.assertEquals(1, A.loadCount);
 		Assert.assertTrue(holder.a1 == holder.a2);
+        ds.getMapper().setEntityCacheFactory(new NoOpEntityCacheFactory());
 	}
 
 	@Test

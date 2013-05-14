@@ -27,8 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Pattern;
 
-import com.github.jmkgreen.morphia.mapping.cache.DefaultEntityCacheFactory;
-import com.github.jmkgreen.morphia.mapping.cache.EntityCacheFactory;
+import com.github.jmkgreen.morphia.mapping.cache.*;
 import org.bson.BSONEncoder;
 import org.bson.BasicBSONEncoder;
 
@@ -50,8 +49,6 @@ import com.github.jmkgreen.morphia.converters.DefaultConverters;
 import com.github.jmkgreen.morphia.converters.TypeConverter;
 import com.github.jmkgreen.morphia.logging.Logr;
 import com.github.jmkgreen.morphia.logging.MorphiaLoggerFactory;
-import com.github.jmkgreen.morphia.mapping.cache.DefaultEntityCache;
-import com.github.jmkgreen.morphia.mapping.cache.EntityCache;
 import com.github.jmkgreen.morphia.mapping.lazy.DatastoreProvider;
 import com.github.jmkgreen.morphia.mapping.lazy.LazyProxyFactory;
 import com.github.jmkgreen.morphia.mapping.lazy.proxy.ProxiedEntityReference;
@@ -72,7 +69,7 @@ import com.mongodb.DBRef;
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultMapper implements Mapper {
-    protected EntityCacheFactory entityCacheFactory = new DefaultEntityCacheFactory();
+    protected EntityCacheFactory entityCacheFactory = new NoOpEntityCacheFactory();
     protected static final Logr log = MorphiaLoggerFactory.get(DefaultMapper.class);
 
     /**
@@ -650,7 +647,7 @@ public class DefaultMapper implements Mapper {
     }
 
     public EntityCache createEntityCache() {
-        return new DefaultEntityCache();// TODO choose impl
+        return entityCacheFactory.create();
     }
 
     public <T> Key<T> refToKey(DBRef ref) {
