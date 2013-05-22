@@ -146,7 +146,7 @@ public class MappedClass {
         embeddedAn = (Embedded) getAnnotation(Embedded.class);
         entityAn = (Entity) getFirstAnnotation(Entity.class);
         // polymorphicAn = (Polymorphic) getAnnotation(Polymorphic.class);
-        List<MappedField> fields = getFieldsAnnotatedWith(Id.class);
+        List<MappedField> fields = getFieldsAnnotatedWith(Id.class, javax.persistence.Id.class);
         if (fields != null && fields.size() > 0)
             idField = fields.get(0).field;
 
@@ -192,7 +192,7 @@ public class MappedClass {
                 continue;
             else if (mapr.getOptions().ignoreFinals && ((fieldMods & Modifier.FINAL) == Modifier.FINAL))
                 continue;
-            else if (field.isAnnotationPresent(Id.class)) {
+            else if (field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(javax.persistence.Id.class)) {
                 MappedField mf = new MappedField(field, clazz);
                 mappedFields.add(mf);
                 update();
@@ -264,11 +264,13 @@ public class MappedClass {
     /**
      * Returns fields annotated with the clazz
      */
-    public List<MappedField> getFieldsAnnotatedWith(Class<? extends Annotation> clazz) {
+    public List<MappedField> getFieldsAnnotatedWith(Class<? extends Annotation>... classes) {
         List<MappedField> results = new ArrayList<MappedField>();
         for (MappedField mf : mappedFields) {
-            if (mf.foundAnnotations.containsKey(clazz))
-                results.add(mf);
+            for (Class<? extends Annotation> clazz : classes) {
+                if (mf.foundAnnotations.containsKey(clazz))
+                    results.add(mf);
+            }
         }
         return results;
     }
@@ -526,7 +528,7 @@ public class MappedClass {
     }
 
     public MappedField getMappedIdField() {
-        return getFieldsAnnotatedWith(Id.class).get(0);
+        return getFieldsAnnotatedWith(Id.class, javax.persistence.Id.class).get(0);
     }
 
 }

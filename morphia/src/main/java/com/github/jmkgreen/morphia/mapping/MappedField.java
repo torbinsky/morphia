@@ -44,7 +44,9 @@ public class MappedField {
             Version.class,
             ConstructorArgs.class,
             AlsoLoad.class,
-            NotSaved.class));
+            NotSaved.class,
+            javax.persistence.Id.class
+    ));
 
     protected Class persistedClass;
     /**
@@ -311,8 +313,13 @@ public class MappedField {
      * Indicates whether the annotation is present in the mapping.
      * Does not check the java field annotations, just the ones discovered.
      */
-    public boolean hasAnnotation(Class ann) {
-        return foundAnnotations.containsKey(ann);
+    public boolean hasAnnotation(Class... ann) {
+        for (Class instance : ann) {
+            if (foundAnnotations.containsKey(instance)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -348,7 +355,7 @@ public class MappedField {
      * Returns the name of the field's key-name for mongodb.
      */
     private String getMappedFieldName() {
-        if (hasAnnotation(Id.class))
+        if (hasAnnotation(Id.class) || hasAnnotation(javax.persistence.Id.class))
             return Mapper.ID_KEY;
         else if (hasAnnotation(Property.class)) {
             Property mv = (Property) foundAnnotations.get(Property.class);

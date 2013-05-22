@@ -45,7 +45,7 @@ public class TestIdField extends TestBase {
 	@Entity
 	private static class ReferenceAsId {
 		@Id @Reference Rectangle id;
-		
+
 		protected ReferenceAsId() {}
 		public ReferenceAsId(Rectangle key) {
 			this.id = key;
@@ -55,7 +55,7 @@ public class TestIdField extends TestBase {
 	@Entity
 	private static class KeyAsId {
 		@Id Key<?> id;
-		
+
 		protected KeyAsId() {}
 		public KeyAsId(Key<?> key) {
 			this.id = key;
@@ -70,7 +70,7 @@ public class TestIdField extends TestBase {
 	@Test @Ignore("need to set the _db in the dbref for this to work... see issue 90, ")
     public void testReferenceAsId() throws Exception {
         morphia.map(ReferenceAsId.class);
-        
+
         Rectangle r = new Rectangle(1,1);
         Key<Rectangle> rKey = ds.save(r);
 
@@ -79,17 +79,17 @@ public class TestIdField extends TestBase {
         ReferenceAsId raiLoaded = ds.get(ReferenceAsId.class, rKey);
         assertNotNull(raiLoaded);
         assertEquals(raiLoaded.id.getArea(), r.getArea(), 0);
-        
+
         assertNotNull(raiKey);
 	}
 
 	@Test
     public void testKeyAsId() throws Exception {
         morphia.map(KeyAsId.class);
-        
+
         Rectangle r = new Rectangle(1,1);
 //        Rectangle r2 = new Rectangle(11,11);
-        
+
         Key<Rectangle> rKey = ds.save(r);
 //        Key<Rectangle> r2Key = ds.save(r2);
         KeyAsId kai = new KeyAsId(rKey);
@@ -102,7 +102,7 @@ public class TestIdField extends TestBase {
 	@Test
     public void testMapAsId() throws Exception {
         morphia.map(MapAsId.class);
-        
+
         MapAsId mai = new MapAsId();
         mai.id.put("test", "string");
         Key<MapAsId> maiKey = ds.save(mai);

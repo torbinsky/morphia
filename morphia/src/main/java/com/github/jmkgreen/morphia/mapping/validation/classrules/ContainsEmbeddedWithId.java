@@ -8,6 +8,8 @@ import com.github.jmkgreen.morphia.mapping.validation.ClassConstraint;
 import com.github.jmkgreen.morphia.mapping.validation.ConstraintViolation;
 import com.github.jmkgreen.morphia.mapping.validation.ConstraintViolation.Level;
 import com.github.jmkgreen.morphia.utils.ReflectionUtils;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +19,7 @@ import java.util.Set;
  */
 public class ContainsEmbeddedWithId implements ClassConstraint {
 
-    private boolean hasTypeFieldAnnotation(final Class<?> type, final Class<Id> class1) {
+    private boolean hasTypeFieldAnnotation(final Class<?> type, final Class<? extends Annotation> class1) {
         for (Field field : ReflectionUtils.getDeclaredAndInheritedFields(type, true)) {
             if (field.getAnnotation(class1) != null) {
                 return true;
@@ -29,7 +31,7 @@ public class ContainsEmbeddedWithId implements ClassConstraint {
     public void check(final MappedClass mc, final Set<ConstraintViolation> ve) {
         Set<Class<?>> classesToInspect = new HashSet<Class<?>>();
         for (Field field : ReflectionUtils.getDeclaredAndInheritedFields(mc.getClazz(), true)) {
-            if (isFieldToInspect(field) && !field.isAnnotationPresent(Id.class)) {
+            if (isFieldToInspect(field) && (!field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(javax.persistence.Id.class))) {
                 classesToInspect.add(field.getType());
             }
         }
@@ -46,7 +48,7 @@ public class ContainsEmbeddedWithId implements ClassConstraint {
             if (alreadyInspectedClasses.contains(clazz)) {
                 continue;
             }
-            if (hasTypeFieldAnnotation(clazz, Id.class)) {
+            if (hasTypeFieldAnnotation(clazz, Id.class) || hasTypeFieldAnnotation(clazz, javax.persistence.Id.class)) {
                 ve.add(new ConstraintViolation(Level.FATAL, mc, this.getClass(),
                         "You cannot use @Id on any field of an Embedded/Property object"));
             }
