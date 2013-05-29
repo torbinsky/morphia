@@ -518,7 +518,7 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
         for (MappedField mf : mc.getMappedFields()) {
             fields.add(mf.getNameToStore());
         }
-        retrievedFields(true, (String[]) fields.toArray());
+        retrievedFields(true, fields.toArray(new String[fields.size()]));
         return this;
     }
 
