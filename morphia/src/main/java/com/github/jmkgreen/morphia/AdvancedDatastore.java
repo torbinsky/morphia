@@ -2,11 +2,7 @@ package com.github.jmkgreen.morphia;
 
 import com.github.jmkgreen.morphia.query.Query;
 import com.github.jmkgreen.morphia.query.UpdateOperations;
-import com.mongodb.DBDecoderFactory;
-import com.mongodb.DBObject;
-import com.mongodb.DBRef;
-import com.mongodb.WriteConcern;
-import com.mongodb.WriteResult;
+import com.mongodb.*;
 
 /**
  * <p>
@@ -91,6 +87,28 @@ public interface AdvancedDatastore extends Datastore {
 
     <T> Iterable<Key<T>> save(Iterable<T> entities, WriteConcern wc);
 
+    /**
+     * Save the entity under a custom collection.
+     *
+     * @param entity
+     * @param collection
+     * @param <T>
+     * @return
+     * @since 1.3
+     */
+    <T> Key<T> save(T entity, DBCollection collection);
+
+    /**
+     * Save the entity under a customer collection and write concern.
+     *
+     * @param entity
+     * @param collection
+     * @param writeConcern
+     * @param <T>
+     * @return
+     * @since 1.3
+     */
+    <T> Key<T> save(T entity, DBCollection collection, WriteConcern writeConcern);
     /**
      * No validation or conversion is done to the id.
      */

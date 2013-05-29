@@ -116,6 +116,10 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
         this.baseQuery = (BasicDBObject) query;
     }
 
+    public void setDbCollection(DBCollection collection) {
+        this.dbColl = collection;
+    }
+
     public int getOffset() {
         return offset;
     }

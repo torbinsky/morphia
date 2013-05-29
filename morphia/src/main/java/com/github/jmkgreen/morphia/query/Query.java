@@ -10,6 +10,13 @@ import org.bson.types.CodeWScope;
  */
 public interface Query<T> extends QueryResults<T>, Cloneable {
     /**
+     * Override the DBCollection used in the query.
+     * @since 1.3
+     * @param collection The DBCollection to be used.
+     */
+    void setDbCollection(DBCollection collection);
+
+    /**
      * <p>Create a filter based on the specified condition and value.
      * </p><p>
      * <b>Note</b>: Property is in the form of "name op" ("age >").

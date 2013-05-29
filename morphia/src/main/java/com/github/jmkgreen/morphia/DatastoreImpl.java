@@ -1394,6 +1394,16 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
         return save(dbColl, entity, wc);
     }
 
+    public <T> Key<T> save(T entity, DBCollection collection) {
+        entity = ProxyHelper.unwrap(entity);
+        return save(collection, entity, getWriteConcern(entity));
+    }
+
+    public <T> Key<T> save(T entity, DBCollection collection, WriteConcern writeConcern) {
+        entity = ProxyHelper.unwrap(entity);
+        return save(collection, entity, writeConcern);
+    }
+
     /**
      * @param clazz
      * @param <T>
