@@ -327,18 +327,6 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     /**
      * @param clazz
      * @param name
-     * @param defs
-     * @param unique
-     * @param dropDupsOnCreate
-     * @param <T>
-     */
-    public <T> void ensureIndex(Class<T> clazz, String name, IndexFieldDef[] defs, boolean unique, boolean dropDupsOnCreate) {
-        ensureIndex(clazz, name, defs, unique, dropDupsOnCreate, false);
-    }
-
-    /**
-     * @param clazz
-     * @param name
      * @param fields
      * @param unique
      * @param dropDupsOnCreate
@@ -362,45 +350,15 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     }
 
     /**
-     * This method actually adds indexes to the selected collection.
-     *
-     * @param clazz The class/collection to index
-     * @param name Optional index name
-     * @param fields
+     * @param clazz
+     * @param name
+     * @param defs
      * @param unique
      * @param dropDupsOnCreate
-     * @param background
-     * @param sparse
+     * @param <T>
      */
-    protected <T> void ensureIndex(Class<T> clazz, String name, BasicDBObject fields, boolean unique, boolean dropDupsOnCreate, boolean background, boolean sparse, int expireAfterSeconds) {
-        BasicDBObjectBuilder keyOpts = new BasicDBObjectBuilder();
-        if (name != null && name.length() > 0) {
-            keyOpts.add("name", name);
-        }
-        if (unique) {
-            keyOpts.add("unique", true);
-            if (dropDupsOnCreate)
-                keyOpts.add("dropDups", true);
-        }
-
-        if (background)
-            keyOpts.add("background", true);
-        if (sparse)
-            keyOpts.add("sparse", true);
-        if (expireAfterSeconds > -1) {
-            keyOpts.add("expireAfterSeconds", expireAfterSeconds);
-        }
-
-        DBCollection dbColl = getCollection(clazz);
-
-        BasicDBObject opts = (BasicDBObject) keyOpts.get();
-        if (opts.isEmpty()) {
-            log.debug("Ensuring index for " + dbColl.getName() + " with keys:" + fields);
-            dbColl.ensureIndex(fields);
-        } else {
-            log.debug("Ensuring index for " + dbColl.getName() + " with keys:" + fields + " and opts:" + opts);
-            dbColl.ensureIndex(fields, opts);
-        }
+    public <T> void ensureIndex(Class<T> clazz, String name, IndexFieldDef[] defs, boolean unique, boolean dropDupsOnCreate) {
+        ensureIndex(clazz, name, defs, unique, dropDupsOnCreate, false);
     }
 
     /**
@@ -451,6 +409,48 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      */
     public <T> void ensureIndex(Class<T> type, boolean background, IndexFieldDef... fields) {
         ensureIndex(type, null, fields, false, false, background);
+    }
+
+    /**
+     * This method actually adds indexes to the selected collection.
+     *
+     * @param clazz The class/collection to index
+     * @param name Optional index name
+     * @param fields
+     * @param unique
+     * @param dropDupsOnCreate
+     * @param background
+     * @param sparse
+     */
+    protected <T> void ensureIndex(Class<T> clazz, String name, BasicDBObject fields, boolean unique, boolean dropDupsOnCreate, boolean background, boolean sparse, int expireAfterSeconds) {
+        BasicDBObjectBuilder keyOpts = new BasicDBObjectBuilder();
+        if (name != null && name.length() > 0) {
+            keyOpts.add("name", name);
+        }
+        if (unique) {
+            keyOpts.add("unique", true);
+            if (dropDupsOnCreate)
+                keyOpts.add("dropDups", true);
+        }
+
+        if (background)
+            keyOpts.add("background", true);
+        if (sparse)
+            keyOpts.add("sparse", true);
+        if (expireAfterSeconds > -1) {
+            keyOpts.add("expireAfterSeconds", expireAfterSeconds);
+        }
+
+        DBCollection dbColl = getCollection(clazz);
+
+        BasicDBObject opts = (BasicDBObject) keyOpts.get();
+        if (opts.isEmpty()) {
+            log.debug("Ensuring index for " + dbColl.getName() + " with keys:" + fields);
+            dbColl.ensureIndex(fields);
+        } else {
+            log.debug("Ensuring index for " + dbColl.getName() + " with keys:" + fields + " and opts:" + opts);
+            dbColl.ensureIndex(fields, opts);
+        }
     }
 
     /**
@@ -603,9 +603,9 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      *
      */
     public void ensureCaps() {
-        for (MappedClass mc : mapr.getMappedClasses())
-            if (mc.getEntityAnnotation() != null && mc.getEntityAnnotation().cap().value() > 0) {
-                CappedAt cap = mc.getEntityAnnotation().cap();
+        for (MappedClass mc : mapr.getMappedClasses()) {
+            CappedAt cap = mc.getCappedAt();
+            if (cap != null && cap.value() > 0) {
                 String collName = mapr.getCollectionName(mc.getClazz());
                 BasicDBObjectBuilder dbCapOpts = BasicDBObjectBuilder.start("capped", true);
                 if (cap.value() > 0)
@@ -627,6 +627,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
                     log.debug("Created cap'd DBCollection (" + collName + ") with opts " + dbCapOpts);
                 }
             }
+        }
     }
 
     /**
@@ -1293,14 +1294,14 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
         DBObject dbObj = entityToDBObj(entity, involvedObjects);
 
         //try to do an update if there is a @Version field
-        wr = tryVersionedUpdate(dbColl, entity, dbObj, wc, db, mc);
-
-        if (wr == null)
+        if (mc.hasVersioning()) {
+            wr = tryVersionedUpdate(dbColl, entity, dbObj, wc, db, mc);
+        } else {
             if (wc == null)
                 wr = dbColl.save(dbObj);
             else
                 wr = dbColl.save(dbObj, wc);
-
+        }
         throwOnError(wc, wr);
         return postSaveGetKey(entity, dbObj, dbColl, involvedObjects);
     }
@@ -1317,15 +1318,13 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      */
     protected <T> WriteResult tryVersionedUpdate(DBCollection dbColl, T entity, DBObject dbObj, WriteConcern wc, DB db, MappedClass mc) {
         WriteResult wr = null;
-        if (mc.getFieldsAnnotatedWith(Version.class).isEmpty())
-            return wr;
-
 
         MappedField mfVersion = mc.getFieldsAnnotatedWith(Version.class).get(0);
         String versionKeyName = mfVersion.getNameToStore();
         Long oldVersion = (Long) mfVersion.getFieldValue(entity);
         long newVersion = VersionHelper.nextValue(oldVersion);
         dbObj.put(versionKeyName, newVersion);
+
         if (oldVersion != null && oldVersion > 0) {
             Object idValue = dbObj.get(Mapper.ID_KEY);
 
@@ -1575,9 +1574,9 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
         DBCollection dbColl = getCollection(entity);
 
         //try to do an update if there is a @Version field
-        wr = tryVersionedUpdate(dbColl, entity, dbObj, wc, db, mc);
-
-        if (wr == null) {
+        if (mc.hasVersioning()) {
+            wr = tryVersionedUpdate(dbColl, entity, dbObj, wc, db, mc);
+        } else {
             Query<T> query = (Query<T>) createQuery(entity.getClass()).filter(Mapper.ID_KEY, id);
             wr = update(query, new BasicDBObject("$set", dbObj), false, false, wc).getWriteResult();
         }
@@ -1923,9 +1922,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     public WriteConcern getWriteConcern(Object clazzOrEntity) {
         WriteConcern wc = defConcern;
         if (clazzOrEntity != null) {
-            Entity entityAnn = getMapper().getMappedClass(clazzOrEntity).getEntityAnnotation();
-            if (entityAnn != null && !"".equals(entityAnn.concern()))
-                wc = WriteConcern.valueOf(entityAnn.concern());
+            wc = getMapper().getMappedClass(clazzOrEntity).getWriteConcern();
         }
 
         return wc;

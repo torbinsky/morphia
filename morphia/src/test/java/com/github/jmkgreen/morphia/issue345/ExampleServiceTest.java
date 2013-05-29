@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.mongodb.MongoClient;
 import junit.framework.TestCase;
 
 import org.bson.types.ObjectId;
@@ -171,7 +172,7 @@ public class ExampleServiceTest extends TestCase {
 		public static final String DB_NAME = "cal_dev";
 		public MongoConnectionManager(String host, int port) {
 			try {
-				Mongo m = new Mongo(host, port);
+				Mongo m = new MongoClient(host, port);
 				db = new Morphia().map(BookingDetail.class).createDatastore(m, DB_NAME);
 				db.ensureIndexes();
 			} catch (Exception e) {

@@ -238,7 +238,7 @@ public final class Assert {
     }
 
     public static void parameterArraysOfSameLength(final String argNames, final Object[]... objects) {
-        Assert.parametersNotNull("objects", objects);
+        Assert.parametersNotNull("objects", (Object[]) objects);
 
         Object[][] theParameter = objects;
         int length = theParameter.length;

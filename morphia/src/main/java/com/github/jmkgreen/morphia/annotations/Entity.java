@@ -55,6 +55,6 @@ public @interface Entity {
     /*
      * Any WriteConcern static string. Case insensitive. STRICT/SAFE, NORMAL, etc...
      */
-    String concern() default "";
+    String concern() default "SAFE";
 
 }

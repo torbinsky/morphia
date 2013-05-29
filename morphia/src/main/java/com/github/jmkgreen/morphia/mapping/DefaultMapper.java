@@ -534,7 +534,7 @@ public class DefaultMapper implements Mapper {
         DBObject dbObject = new BasicDBObject();
         MappedClass mc = getMappedClass(entity);
 
-        if (mc.getEntityAnnotation() == null || !mc.getEntityAnnotation().noClassnameStored())
+        if (mc.getEntityAnnotation() == null || mc.isClassNameStored())
             dbObject.put(CLASS_NAME_FIELDNAME, entity.getClass().getName());
 
         if (lifecycle)

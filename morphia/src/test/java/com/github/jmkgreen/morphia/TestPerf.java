@@ -262,7 +262,7 @@ public class TestPerf  extends TestBase{
         try {
                 Morphia morphia = new Morphia();
                 morphia.map(TestObj.class);
-                AdvancedDatastore ds = (AdvancedDatastore) morphia.createDatastore("my_database");
+                AdvancedDatastore ds = morphia.createAdvancedDatastore(mongo, "my_database");
                 //create the list
                 List<TestObj> objList = new ArrayList<TestObj>();
                 for (int i=0; i<1000; i++){
@@ -278,7 +278,7 @@ public class TestPerf  extends TestBase{
                 	ds.insert(to, WriteConcern.SAFE);
                 System.out.println("Time taken morphia: "+(System.currentTimeMillis()-start)+"ms");
 
-                Mongo mongoConn = new Mongo("localhost" , 27017 );
+                Mongo mongoConn = new MongoClient("localhost" , 27017 );
                 DB mongoDB = mongoConn.getDB("my_database");
                 List<DBObject> batchPush = new ArrayList<DBObject>();
                 for (int i=0; i<1000; i++){

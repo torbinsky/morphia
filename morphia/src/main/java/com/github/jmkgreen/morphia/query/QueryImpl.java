@@ -66,9 +66,8 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
         this.cache = this.ds.getMapper().createEntityCache();
 
         MappedClass mc = this.ds.getMapper().getMappedClass(clazz);
-        Entity entAn = mc == null ? null : mc.getEntityAnnotation();
-        if (entAn != null)
-            this.readPref = this.ds.getMapper().getMappedClass(clazz).getEntityAnnotation().queryNonPrimary() ? ReadPreference.secondaryPreferred() : null;
+        if (mc != null)
+            this.readPref = mc.getReadPreference();
     }
 
     public QueryImpl(Class<T> clazz, DBCollection coll, Datastore ds, int offset, int limit) {
@@ -405,11 +404,6 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 
     public int getBatchSize() {
         return batchSize;
-    }
-
-    public Query<T> skip(int value) {
-        this.offset = value;
-        return this;
     }
 
     public Query<T> offset(int value) {

@@ -1,10 +1,11 @@
 /**
- * 
+ *
  */
 package com.github.jmkgreen.morphia.optimisticlocks;
 
 import java.util.ConcurrentModificationException;
 
+import com.github.jmkgreen.morphia.mapping.MappedClass;
 import org.junit.Assert;
 
 import org.junit.Test;
@@ -23,25 +24,25 @@ import com.github.jmkgreen.morphia.testutil.TestEntity;
  *
  */
 public class VersionTest extends TestBase {
-	
+
 
 	public static class ALongPrimitive extends TestEntity {
 		private static final long serialVersionUID = 1L;
 
 		@Version
 		long hubba;
-		
+
 		String text;
 	}
-	
+
 	public static class ALong extends TestEntity {
 		private static final long serialVersionUID = 1L;
 		@Version("versionNameContributedByAnnotation")
 		Long v;
-		
+
 		String text;
 	}
-	
+
 	@Entity
 	static class InvalidVersionUse {
 		@Id
@@ -50,9 +51,9 @@ public class VersionTest extends TestBase {
 		long version1;
 		@Version
 		long version2;
-		
+
 	}
-	
+
 	@Test
 	public void testInvalidVersionUse() throws Exception {
 		new AssertedFailure(ConstraintViolationException.class) {
@@ -62,7 +63,15 @@ public class VersionTest extends TestBase {
 		};
 
 	}
-	
+
+    @Test
+    public void testLongPrimitiveHasVersioning() {
+        ALongPrimitive a = new ALongPrimitive();
+        MappedClass mc = morphia.map(ALongPrimitive.class).getMapper().getMappedClass(ALongPrimitive.class);
+        Assert.assertTrue(mc.hasVersioning());
+
+    }
+
 	@Test
 	public void testVersions() throws Exception {
 		ALongPrimitive a = new ALongPrimitive();
@@ -70,14 +79,14 @@ public class VersionTest extends TestBase {
 		ds.save(a);
 		Assert.assertTrue(a.hubba > 0);
 		long version1 = a.hubba;
-		
+
 		ds.save(a);
 		Assert.assertTrue(a.hubba > 0);
 		long version2 = a.hubba;
-		
+
 		Assert.assertFalse(version1 == version2);
 	}
-	
+
 	@Test
 	public void testConcurrentModDetection() throws Exception {
 		morphia.map(ALongPrimitive.class);
@@ -86,10 +95,10 @@ public class VersionTest extends TestBase {
 		Assert.assertEquals(0, a.hubba);
 		ds.save(a);
 		final ALongPrimitive a1 = a;
-		
+
 		ALongPrimitive a2 = ds.get(a);
 		ds.save(a2);
-		
+
 
 		new AssertedFailure(ConcurrentModificationException.class) {
 			public void thisMustFail() throws Throwable {
@@ -97,17 +106,17 @@ public class VersionTest extends TestBase {
 			}
 		};
 	}
-	
+
 	@Test
 	public void testConcurrentModDetectionLong() throws Exception {
 		ALong a = new ALong();
 		Assert.assertEquals(null, (Long) a.v);
 		ds.save(a);
 		final ALong a1 = a;
-		
+
 		ALong a2 = ds.get(a);
 		ds.save(a2);
-		
+
 		new AssertedFailure(ConcurrentModificationException.class) {
 			public void thisMustFail() throws Throwable {
 				ds.save(a1);
@@ -121,18 +130,18 @@ public class VersionTest extends TestBase {
         Assert.assertEquals(null, (Long) a.v);
         ds.save(a);
         final ALong a1 = a;
-        
+
         a1.text = " foosdfds ";
         ALong a2 = ds.get(a);
         ds.save(a2);
-        
+
         new AssertedFailure(ConcurrentModificationException.class) {
             public void thisMustFail() throws Throwable {
                 ds.merge(a1);
             }
         };
     }
-	
+
 	@Test
 	public void testVersionFieldNameContribution() throws Exception {
 		MappedField mappedFieldByJavaField = morphia.getMapper().getMappedClass(ALong.class).getMappedFieldByJavaField("v");

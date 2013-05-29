@@ -93,9 +93,6 @@ public interface Query<T> extends QueryResults<T>, Cloneable {
      */
     Query<T> offset(int value);
 
-    @Deprecated
-    Query<T> skip(int value);
-
     /**
      * Turns on validation (for all calls made after); by default validation is on
      */

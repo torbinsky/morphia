@@ -312,23 +312,6 @@ public interface Datastore {
      * Ensures (creating if necessary) the index and direction.
      */
     <T> void ensureIndex(Class<T> clazz, String field, IndexDirection dir);
-
-    /**
-     * Ensures (creating if necessary) the index including
-     * the field(s) + directions.
-     */
-    @Deprecated
-    <T> void ensureIndex(Class<T> clazz, IndexFieldDef... fields);
-
-    /**
-     * Ensures (creating if necessary) the index including
-     * the field(s) + directions.
-     */
-    @Deprecated
-    <T> void ensureIndex(Class<T> clazz, String name,
-                         IndexFieldDef[] fields, boolean unique,
-                         boolean dropDupsOnCreate);
-
     /**
      * Ensures (creating if necessary) the index including the
      * field(s) + directions; eg fields = "field1, -field2"

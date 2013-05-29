@@ -1,6 +1,5 @@
 package com.github.jmkgreen.morphia.utils;
 
-@Deprecated
 public class IndexFieldDef {
     String field;
     IndexDirection dir;

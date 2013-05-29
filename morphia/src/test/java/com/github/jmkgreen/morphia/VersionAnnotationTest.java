@@ -18,34 +18,47 @@ package com.github.jmkgreen.morphia;
 
 import java.util.ConcurrentModificationException;
 
+import com.github.jmkgreen.morphia.annotations.Entity;
 import org.bson.types.ObjectId;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jmkgreen.morphia.annotations.Id;
 import com.github.jmkgreen.morphia.annotations.Version;
 
 /**
- *
  * @author Scott Hernandez
  */
 
 public class VersionAnnotationTest extends TestBase {
 
-	private static class B {
-		@Id ObjectId id = new ObjectId();
-		@Version long version;
-	}
+    @Entity
+    private static class B {
+        @Id
+        ObjectId id = new ObjectId();
+        @Version
+        long version;
+    }
 
-	@Ignore @Test(expected=ConcurrentModificationException.class)
-	public void testVersion() throws Exception {
+    @Test(expected = ConcurrentModificationException.class)
+    public void testVersion() throws Exception {
 
-		B b1 = new B();
-		try {ds.save(b1); } catch (Exception e) {throw new RuntimeException(e);}
-		B b2 = new B();
-		b2.id = b1.id;
-		ds.save(b2);
-	}
+        B b1 = new B();
+        b1.version = 1;
+        ds.save(b1);
 
+        B b2 = new B();
+        b2.id = b1.id;
+        b2.version = 1;
+        ds.save(b2);
+    }
 
+    @Test
+    public void testVersionSuccess() {
+        B b1 = new B();
+        ds.save(b1);
+
+        ds.save(b1);
+        Assert.assertEquals(2, b1.version);
+    }
 }

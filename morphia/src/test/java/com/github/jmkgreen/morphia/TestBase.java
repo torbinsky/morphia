@@ -3,6 +3,7 @@
  */
 package com.github.jmkgreen.morphia;
 
+import com.mongodb.MongoClient;
 import org.junit.After;
 import org.junit.Before;
 
@@ -21,7 +22,7 @@ public abstract class TestBase
 
     protected TestBase() {
         try {
-			this.mongo = new Mongo();
+			this.mongo = new MongoClient();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
