@@ -140,16 +140,6 @@ class ReferenceMapper implements CustomMapper {
         }
     }
 
-    /**
-     * @deprecated use void fromDBObject(final DBObject dbObject, final
-     *             MappedField mf, final Object entity, EntityCache cache)
-     *             instead.
-     */
-    @Deprecated
-    void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, Mapper mapr) {
-        fromDBObject(dbObject, mf, entity, mapr.createEntityCache(), mapr);
-    }
-
     public void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, Mapper mapr) {
         Class fieldType = mf.getType();
 

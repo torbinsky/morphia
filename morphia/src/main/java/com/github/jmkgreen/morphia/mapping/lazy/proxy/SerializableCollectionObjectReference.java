@@ -83,7 +83,7 @@ public class SerializableCollectionObjectReference<T> extends AbstractReference 
 
         listOfKeys.clear();
         for (Object e : ((Collection) object)) {
-            listOfKeys.add(ds.getKey(e));
+            listOfKeys.add(ds.getMapper().getKey(e));
         }
     }
 }

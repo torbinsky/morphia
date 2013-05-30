@@ -32,11 +32,11 @@ public class TestKeyType extends TestBase {
     public void testKeyComparisons() throws Exception {
 		Rectangle r = new Rectangle(2,1);
 		Key<Rectangle> k1 = new Key<Rectangle>(Rectangle.class, r.getId());
-		Key<Rectangle> k2 = this.ds.getKey(r);
-		
+		Key<Rectangle> k2 = this.ds.getMapper().getKey(r);
+
 		Assert.assertTrue(k1.equals(k2));
 		Assert.assertTrue(k2.equals(k1));
-		
+
 	}
 
 }

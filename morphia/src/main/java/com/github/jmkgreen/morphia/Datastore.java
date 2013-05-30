@@ -23,11 +23,6 @@ import java.util.Map;
  * @author Scott Hernandez
  */
 public interface Datastore {
-    /**
-     * Creates a (type-safe) reference to the entity;
-     * if stored this will become a {@link DBRef}.
-     */
-    <T> Key<T> getKey(T entity);
 
     /**
      * Does a query to check if the keyOrEntity exists in mongodb.

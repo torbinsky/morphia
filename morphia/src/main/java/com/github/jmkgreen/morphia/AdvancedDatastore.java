@@ -109,11 +109,6 @@ public interface AdvancedDatastore extends Datastore {
      * @since 1.3
      */
     <T> Key<T> save(T entity, DBCollection collection, WriteConcern writeConcern);
-    /**
-     * No validation or conversion is done to the id.
-     */
-    @Deprecated
-    <T> WriteResult delete(String kind, T id);
 
     /**
      *

@@ -161,29 +161,10 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      */
     public <T> DBRef createRef(T entity) {
         entity = ProxyHelper.unwrap(entity);
-        Object id = getId(entity);
+        Object id = mapr.getId(entity);
         if (id == null)
             throw new MappingException("Could not get id for " + entity.getClass().getName());
         return createRef(entity.getClass(), id);
-    }
-
-    /**
-     * @param entity
-     * @return
-     */
-    @Deprecated
-    protected Object getId(Object entity) {
-        return mapr.getId(entity);
-    }
-
-    /**
-     * @param entity
-     * @param <T>
-     * @return
-     */
-    @Deprecated // use mapper instead.
-    public <T> Key<T> getKey(T entity) {
-        return mapr.getKey(entity);
     }
 
     /**
@@ -266,7 +247,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
         if (entity instanceof Class<?>)
             throw new MappingException("Did you mean to delete all documents? -- delete(ds.createQuery(???.class))");
         try {
-            Object id = getId(entity);
+            Object id = mapr.getId(entity);
             return delete(entity.getClass(), id, wc);
 
         } catch (Exception e) {
@@ -939,7 +920,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      */
     public <T> T get(T entity) {
         entity = ProxyHelper.unwrap(entity);
-        Object id = getId(entity);
+        Object id = mapr.getId(entity);
         if (id == null)
             throw new MappingException("Could not get id for " + entity.getClass().getName());
         return (T) get(entity.getClass(), id);
@@ -951,7 +932,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
      */
     public Key<?> exists(Object entityOrKey) {
         entityOrKey = ProxyHelper.unwrap(entityOrKey);
-        Key<?> key = getKey(entityOrKey);
+        Key<?> key = mapr.getKey(entityOrKey);
         Object id = key.getId();
         if (id == null)
             throw new MappingException("Could not get id for " + entityOrKey.getClass().getName());
@@ -1228,7 +1209,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
             throw new MappingException("Missing _id after save!");
 
         postSaveOperations(entity, dbObj, involvedObjects);
-        Key<T> key = new Key<T>(dbColl.getName(), getId(entity));
+        Key<T> key = new Key<T>(dbColl.getName(), mapr.getId(entity));
         key.setKindClass((Class<? extends T>) entity.getClass());
 
         return key;
@@ -1460,7 +1441,7 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
 
         MappedClass mc = mapr.getMappedClass(ent);
         Query<T> q = (Query<T>) createQuery(mc.getClazz());
-        q.disableValidation().filter(Mapper.ID_KEY, getId(ent));
+        q.disableValidation().filter(Mapper.ID_KEY, mapr.getId(ent));
 
         if (mc.getFieldsAnnotatedWith(Version.class).size() > 0) {
             MappedField versionMF = mc.getFieldsAnnotatedWith(Version.class).get(0);
@@ -1569,9 +1550,9 @@ public class DatastoreImpl implements Datastore, AdvancedDatastore {
     public <T> Key<T> merge(T entity, WriteConcern wc) {
         LinkedHashMap<Object, DBObject> involvedObjects = new LinkedHashMap<Object, DBObject>();
         DBObject dbObj = mapr.toDBObject(entity, involvedObjects);
-        Key<T> key = getKey(entity);
+        Key<T> key = mapr.getKey(entity);
         entity = ProxyHelper.unwrap(entity);
-        Object id = getId(entity);
+        Object id = mapr.getId(entity);
         if (id == null)
             throw new MappingException("Could not get id for " + entity.getClass().getName());
 
