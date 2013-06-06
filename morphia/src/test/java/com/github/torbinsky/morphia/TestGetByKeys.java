@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.junit.Test;
 
+import com.github.torbinsky.morphia.annotations.Entity;
 import com.github.torbinsky.morphia.testutil.TestEntity;
 
 /**
@@ -31,10 +31,31 @@ public class TestGetByKeys extends TestBase {
 		Assert.assertNotNull(i.next());
 		Assert.assertFalse(i.hasNext());
 	}
+
+    @Test
+    public final void testNoClassnameStoredGetByKeys() {
+        A a = new A();
+		B b = new B();
+
+		Iterable<Key<TestEntity>> keys = ds.save(a, b);
+
+        //1.2.2 throws NullPointerException here
+        List<TestEntity> reloaded = ds.getByKeys(keys);
+
+		Iterator<TestEntity> i = reloaded.iterator();
+		Assert.assertNotNull(i.next());
+		Assert.assertNotNull(i.next());
+		Assert.assertFalse(i.hasNext());
+    }
 	
 	public static class A extends TestEntity {
 		private static final long serialVersionUID = 1L;
 		String foo = "bar";
 	}
+
+    @Entity(noClassnameStored = true)
+    public static class B extends TestEntity {
+        String foo = "bar";
+    }
 
 }

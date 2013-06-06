@@ -1,13 +1,19 @@
 package com.github.torbinsky.morphia.mapping;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.ConcurrentModificationException;
+import java.util.Map;
+
 import com.github.torbinsky.morphia.EntityInterceptor;
 import com.github.torbinsky.morphia.Key;
 import com.github.torbinsky.morphia.converters.DefaultConverters;
 import com.github.torbinsky.morphia.mapping.cache.EntityCache;
+import com.github.torbinsky.morphia.mapping.cache.EntityCacheFactory;
+import com.github.torbinsky.morphia.mapping.lazy.DatastoreProvider;
+import com.github.torbinsky.morphia.mapping.lazy.LazyProxyFactory;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * Maps POJOs and MongoDB DBObjects. Holds a list of {@link EntityInterceptor}s
@@ -15,6 +21,7 @@ import java.util.Map;
  * <p/>
  * Implementations should be thread-safe.
  */
+@SuppressWarnings("rawtypes")
 public interface Mapper {
     /**
      * The @{@link com.github.torbinsky.morphia.annotations.Id} field name that is stored with mongodb.
@@ -28,6 +35,14 @@ public interface Mapper {
      * Special field used by morphia to support various possibly loading issues; will be replaced when discriminators are implemented to support polymorphism
      */
     String CLASS_NAME_FIELDNAME = "className";
+
+    /**
+     * Override the default EntityCacheFactory implementation by providing your own here. Fluent interface.
+     * @since 1.2.4
+     * @param factory
+     * @return
+     */
+    Mapper setEntityCacheFactory(EntityCacheFactory factory);
 
     void addInterceptor(EntityInterceptor ei);
 
@@ -55,11 +70,13 @@ public interface Mapper {
 
     Object fromDBObject(Class entityClass, DBObject dbObject, EntityCache cache);
 
-    Object toMongoObject(MappedField mf, MappedClass mc, Object value, boolean ignoreRefs);
+    Object fromDBObject(DBObject dbObject, Object entity, EntityCache cache);
+
+    Object toMongoObject(MappedField mf, MappedClass mc, Object value);
+
+    Object toMongoObject(Object javaObj, boolean includeClassName);
 
     Object getId(Object entity);
-
-    <T> Key<T> getKey(T entity);
 
     DBObject toDBObject(Object entity);
 
@@ -70,6 +87,12 @@ public interface Mapper {
 
     EntityCache createEntityCache();
 
+    <T> Key<T> getKey(T entity);
+
+    <T> Key<T> createKey(Class<T> clazz, Serializable id);
+
+    <T> Key<T> createKey(Class<T> clazz, Object id);
+
     <T> Key<T> refToKey(DBRef ref);
 
     DBRef keyToRef(Key key);
@@ -77,5 +100,15 @@ public interface Mapper {
     String updateKind(Key key);
 
     Class<?> getClassFromKind(String kind);
+
+    boolean isCached(Class<?> clazz);
+
+    void cacheClass(Class<?> clazz, Object instance) throws ConcurrentModificationException;
+
+    Object getCachedClass(Class<?> clazz);
+
+    LazyProxyFactory getProxyFactory();
+
+    DatastoreProvider getDatastoreProvider();
 
 }

@@ -67,8 +67,13 @@ public class MapOrCollectionMF extends MappedField {
       * @see com.github.torbinsky.morphia.mapping.MappedField#hasAnnotation(java.lang.Class)
       */
     @Override
-    public boolean hasAnnotation(Class ann) {
-        return Embedded.class.equals(ann);
+    public boolean hasAnnotation(Class... ann) {
+        for (Class instance : ann) {
+            if (Embedded.class.equals(instance)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* (non-Javadoc)

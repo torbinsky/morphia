@@ -41,7 +41,7 @@ public @interface Index {
     String value();
 
     /**
-     * The name of the index to create; default is to let the mongodb create a name (in the form of key1_1/-1_key2_1/-1...
+     * The name of the index to create; default is to let the mongodb create a name (in the form of key1_1/-1_key2_1/-1...)
      */
     String name() default "";
 
@@ -66,8 +66,13 @@ public @interface Index {
     boolean sparse() default false;
 
     /**
-     * disables validation for the field name
+     * Disables validation for the field name
      */
     boolean disableValidation() default false;
+
+    /**
+     * Maps directly to the {@code expireAfterSeconds} option in {@code ensureIndex}.
+     */
+    int expireAfterSeconds() default -1;
 
 }

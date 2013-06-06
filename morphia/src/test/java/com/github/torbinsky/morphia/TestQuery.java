@@ -24,13 +24,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.bson.types.CodeWScope;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.torbinsky.morphia.TestDatastore.FacebookUser;
@@ -107,11 +110,12 @@ public class TestQuery  extends TestBase {
         @Reference(lazy=true)
 		Pic lazyPic;
     }
+
     @Entity
     public static class Pic {
         @Id ObjectId id;
         String name;
-        
+
         String getName() { return name; }
         ObjectId getId() { return id; }
     }
@@ -129,10 +133,10 @@ public class TestQuery  extends TestBase {
         ds.save(new ContainsRenamedFields());
 
         ContainsRenamedFields ent = null;
-        
+
         ent = ds.find(ContainsRenamedFields.class).field("firstName").equal("Scott").get();
         assertNotNull(ent);
-        
+
         ent = ds.find(ContainsRenamedFields.class).field("first_name").equal("Scott").get();
         assertNotNull(ent);
     }
@@ -144,7 +148,7 @@ public class TestQuery  extends TestBase {
         assertNotNull(p);
         p = ds.find(Photo.class).field("keywords").startsWith("notareal").get();
         assertNull(p);
-        
+
     }
 
     @Test
@@ -157,7 +161,7 @@ public class TestQuery  extends TestBase {
         assertNotNull(ds.find(ContainsPhotoKey.class, "photo", p).get());
         assertNotNull(ds.find(ContainsPhotoKey.class, "photo", cpk.photo).get());
         assertNull(ds.find(ContainsPhotoKey.class, "photo", 1).get());
-        
+
         try {
             ds.find(ContainsPhotoKey.class, "photo.keywords","foo").get();
             assertNull("um, query validation should have thrown");
@@ -173,7 +177,7 @@ public class TestQuery  extends TestBase {
         Pic p = new Pic();
         ds.save(p);
 		cpk.pic = p;
-        
+
 		ds.save(cpk);
 
         Query<ContainsPic> query = ds.createQuery(ContainsPic.class);
@@ -230,14 +234,14 @@ public class TestQuery  extends TestBase {
 		}
 
     }
-    
+
     @Test
     public void testRegexQuery() throws Exception {
         ds.save(new PhotoWithKeywords());
         assertNotNull(ds.find(PhotoWithKeywords.class).disableValidation().filter("keywords.keyword", Pattern.compile("california")).get());
         assertNull(ds.find(PhotoWithKeywords.class, "keywords.keyword",  Pattern.compile("blah")).get());
     }
-    
+
     @Test
     public void testRegexInsensitiveQuery() throws Exception {
         ds.save(new PhotoWithKeywords());
@@ -266,7 +270,7 @@ public class TestQuery  extends TestBase {
     	ds.save(new PhotoWithKeywords("scott", "hernandez"), new PhotoWithKeywords("scott", "hernandez"), new PhotoWithKeywords("scott", "hernandez"));
         Iterator<PhotoWithKeywords> it = ds.find(PhotoWithKeywords.class, "keywords.keyword", "scott").enableSnapshotMode().batchSize(2).iterator();
     	ds.save(new PhotoWithKeywords("1", "2"), new PhotoWithKeywords("3", "4"), new PhotoWithKeywords("5", "6"));
-    	
+
     	PhotoWithKeywords pwkLoaded = null;
     	pwkLoaded = it.next();
         assertNotNull(pwkLoaded);
@@ -274,7 +278,7 @@ public class TestQuery  extends TestBase {
         assertNotNull(pwkLoaded);
     	//okay, now we should getmore...
         assertTrue(it.hasNext());
-    	pwkLoaded = it.next();    	
+    	pwkLoaded = it.next();
         assertNotNull(pwkLoaded);
         assertTrue(!it.hasNext());
     }
@@ -285,7 +289,7 @@ public class TestQuery  extends TestBase {
     	ds.save(new PhotoWithKeywords("scott", "hernandez"), new PhotoWithKeywords("scott", "hernandez"), new PhotoWithKeywords("scott", "hernandez"));
         Iterator<PhotoWithKeywords> it = ds.find(PhotoWithKeywords.class).enableSnapshotMode().batchSize(2).iterator();
     	ds.save(new PhotoWithKeywords("1", "2"), new PhotoWithKeywords("3", "4"), new PhotoWithKeywords("5", "6"));
-        
+
     	PhotoWithKeywords pwkLoaded = null;
     	pwkLoaded = it.next();
         assertNotNull(pwkLoaded);
@@ -293,24 +297,24 @@ public class TestQuery  extends TestBase {
         assertNotNull(pwkLoaded);
     	//okay, now we should getmore...
         assertTrue(it.hasNext());
-    	pwkLoaded = it.next();    	
+    	pwkLoaded = it.next();
         assertNotNull(pwkLoaded);
         assertTrue(it.hasNext());
-    	pwkLoaded = it.next();    	
+    	pwkLoaded = it.next();
         assertNotNull(pwkLoaded);
     }
 
-    
+
     @Test
     public void testIdOnlyQuery() throws Exception {
         PhotoWithKeywords pwk = new PhotoWithKeywords("scott", "hernandez");
         ds.save(pwk);
-        
+
         PhotoWithKeywords pwkLoaded = ds.find(PhotoWithKeywords.class, "keywords.keyword", "scott").retrievedFields(true, "_id").get();
         assertNotNull(pwkLoaded);
         Assert.assertFalse(pwkLoaded.keywords.contains("scott"));
         Assert.assertEquals(3, pwkLoaded.keywords.size());
-        
+
         pwkLoaded = ds.find(PhotoWithKeywords.class, "keywords.keyword", "scott").retrievedFields(false, "keywords").get();
         assertNotNull(pwkLoaded);
         Assert.assertFalse(pwkLoaded.keywords.contains("scott"));
@@ -321,13 +325,13 @@ public class TestQuery  extends TestBase {
     public void testDBOBjectOrQuery() throws Exception {
         PhotoWithKeywords pwk = new PhotoWithKeywords("scott", "hernandez");
         ds.save(pwk);
-        
+
         AdvancedDatastore ads = (AdvancedDatastore) ds;
         List<DBObject> orList = new ArrayList<DBObject>();
         orList.add(new BasicDBObject("keywords.keyword", "scott"));
         orList.add(new BasicDBObject("keywords.keyword", "ralph"));
         BasicDBObject orQuery = new BasicDBObject("$or", orList);
-        
+
         Query<PhotoWithKeywords> q = ads.createQuery(PhotoWithKeywords.class, orQuery);
         Assert.assertEquals(1, q.countAll());
 
@@ -339,50 +343,50 @@ public class TestQuery  extends TestBase {
     public void testFluentOrQuery() throws Exception {
         PhotoWithKeywords pwk = new PhotoWithKeywords("scott", "hernandez");
         ds.save(pwk);
-        
+
         AdvancedDatastore ads = (AdvancedDatastore) ds;
         Query<PhotoWithKeywords> q = ads.createQuery(PhotoWithKeywords.class);
         q.or(
         		q.criteria("keywords.keyword").equal("scott"),
-        		q.criteria("keywords.keyword").equal("ralph")); 
+        		q.criteria("keywords.keyword").equal("ralph"));
 
         Assert.assertEquals(1, q.countAll());
     }
-    
+
     @Test
     public void testFluentAndOrQuery() throws Exception {
         PhotoWithKeywords pwk = new PhotoWithKeywords("scott", "hernandez");
         ds.save(pwk);
-        
+
         AdvancedDatastore ads = (AdvancedDatastore) ds;
         Query<PhotoWithKeywords> q = ads.createQuery(PhotoWithKeywords.class);
         q.and(
         		q.or(q.criteria("keywords.keyword").equal("scott")),
         		q.or(q.criteria("keywords.keyword").equal("hernandez")));
-    
+
         Assert.assertEquals(1, q.countAll());
         QueryImpl<PhotoWithKeywords> qi = (QueryImpl<PhotoWithKeywords>)q;
         DBObject realCriteria = qi.prepareCursor().getQuery();
         Assert.assertTrue(realCriteria.containsField("$and"));
-        
+
     }
 
     @Test
     public void testFluentAndQuery1() throws Exception {
         PhotoWithKeywords pwk = new PhotoWithKeywords("scott", "hernandez");
         ds.save(pwk);
-        
+
         AdvancedDatastore ads = (AdvancedDatastore) ds;
         Query<PhotoWithKeywords> q = ads.createQuery(PhotoWithKeywords.class);
         q.and(
         		q.criteria("keywords.keyword").hasThisOne("scott"),
         		q.criteria("keywords.keyword").hasAnyOf(Arrays.asList("scott", "hernandez")));
-        
+
         Assert.assertEquals(1, q.countAll());
         QueryImpl<PhotoWithKeywords> qi = (QueryImpl<PhotoWithKeywords>)q;
         DBObject realCriteria = qi.prepareCursor().getQuery();
         Assert.assertTrue(realCriteria.containsField("$and"));
-        
+
     }
 
 
@@ -390,20 +394,20 @@ public class TestQuery  extends TestBase {
     public void testFluentNotQuery() throws Exception {
         PhotoWithKeywords pwk = new PhotoWithKeywords("scott", "hernandez");
         ds.save(pwk);
-        
+
         AdvancedDatastore ads = (AdvancedDatastore) ds;
         Query<PhotoWithKeywords> q = ads.createQuery(PhotoWithKeywords.class);
-        q.criteria("keywords.keyword").not().startsWith("ralph"); 
+        q.criteria("keywords.keyword").not().startsWith("ralph");
 
         Assert.assertEquals(1, q.countAll());
     }
 
-    
+
     @Test
     public void testIdFieldNameQuery() throws Exception {
         PhotoWithKeywords pwk = new PhotoWithKeywords("scott", "hernandez");
         ds.save(pwk);
-                
+
         PhotoWithKeywords pwkLoaded = ds.find(PhotoWithKeywords.class, "id !=", "scott").get();
         assertNotNull(pwkLoaded);
     }
@@ -413,12 +417,12 @@ public class TestQuery  extends TestBase {
     	CustomId cId = new CustomId();
     	cId.id = new ObjectId();
     	cId.type = "banker";
-    	
+
     	UsesCustomIdObject ucio = new UsesCustomIdObject();
     	ucio.id = cId;
     	ucio.text = "hllo";
     	this.ds.save(ucio);
-                
+
     	UsesCustomIdObject ucioLoaded = ds.find(UsesCustomIdObject.class, "_id.type", "banker").get();
         assertNotNull(ucioLoaded);
     }
@@ -428,12 +432,12 @@ public class TestQuery  extends TestBase {
     	CustomId cId = new CustomId();
     	cId.id = new ObjectId();
     	cId.type = "banker";
-    	
+
     	UsesCustomIdObject ucio = new UsesCustomIdObject();
     	ucio.id = cId;
     	ucio.text = "hllo";
     	this.ds.save(ucio);
-                
+
     	UsesCustomIdObject ucioLoaded = ds.find(UsesCustomIdObject.class, "_id.t", "banker").get();
         assertNotNull(ucioLoaded);
     }
@@ -443,25 +447,25 @@ public class TestQuery  extends TestBase {
     	CustomId cId = new CustomId();
     	cId.id = new ObjectId();
     	cId.type = "banker";
-    	
+
     	UsesCustomIdObject ucio = new UsesCustomIdObject();
     	ucio.id = cId;
     	ucio.text = "hllo";
     	this.ds.save(ucio);
     	UsesCustomIdObject ucioLoaded  = null;
 
-//		Add back if/when query by example for embedded fields is supported (require dot'n each field).			
+//		Add back if/when query by example for embedded fields is supported (require dot'n each field).
 //    	CustomId exId = new CustomId();
 //    	exId.type = cId.type;
 //    	ucioLoaded = ds.find(UsesCustomIdObject.class, "_id", exId).get();
 //      assertNotNull(ucioLoaded);
-        
+
     	UsesCustomIdObject ex = new UsesCustomIdObject();
     	ex.text = ucio.text;
     	ucioLoaded = ds.queryByExample(ex).get();
         assertNotNull(ucioLoaded);
     }
-    
+
     @Test
     public void testDeepQueryWithBadArgs() throws Exception {
         ds.save(new PhotoWithKeywords());
@@ -487,7 +491,38 @@ public class TestQuery  extends TestBase {
         //		assertNotNull(pwkScottSarah);
         PhotoWithKeywords pwkBad = ds.find(PhotoWithKeywords.class).field("keywords").hasThisElement(new Keyword("Randy")).get();
         assertNull(pwkBad);
+    }
 
+    @Test
+    public void testInQuery() throws Exception {
+        Photo photo = new Photo();
+        photo.keywords = new ArrayList<String>();
+        photo.keywords.add("red");
+        photo.keywords.add("blue");
+        photo.keywords.add("green");
+        ds.save(photo);
+
+        Set<String> keywords = new HashSet<String>();
+        keywords.add("red");
+        keywords.add("yellow");
+        Photo photoFound = ds.find(Photo.class).field("keywords").in(keywords).get();
+        assertNotNull(photoFound);
+    }
+
+    @Test
+    public void testInQueryWithObjects() throws Exception {
+        PhotoWithKeywords pwk1 = new PhotoWithKeywords();
+        PhotoWithKeywords pwk2 = new PhotoWithKeywords("Scott","Joe","Sarah");
+        ds.save(pwk1, pwk2);
+
+        Set<Keyword> keywords = new HashSet<Keyword>();
+        keywords.add(new Keyword("Scott"));
+        keywords.add(new Keyword("Randy"));
+        Query<PhotoWithKeywords> q = ds.find(PhotoWithKeywords.class);
+        q.field("keywords").in(keywords);
+
+        PhotoWithKeywords pwkFound = q.get();
+        assertNotNull(pwkFound);
     }
 
     @Test
@@ -723,7 +758,7 @@ public class TestQuery  extends TestBase {
         assertEquals(1, ds.find(HasIntId.class).field("_id").greaterThan(0).field("_id").lessThan(11).countAll());
     }
 
-    	
+
     @Test
     public void testRangeQuery() throws Exception {
         Rectangle[] rects = {
@@ -761,7 +796,7 @@ public class TestQuery  extends TestBase {
         assertEquals(2, ds.getCount(ds.createQuery(Rectangle.class).filter("height >", 3).filter("height <", 8)));
         assertEquals(1, ds.getCount(ds.createQuery(Rectangle.class).filter("height >", 3).filter("height <", 8).filter("width", 10)));
     }
-    
+
     @Test
     public void testCombinationQuery() throws Exception {
         Rectangle[] rects = {
@@ -775,15 +810,15 @@ public class TestQuery  extends TestBase {
         {
             ds.save(rect);
         }
-        
+
         Query<Rectangle> q;
-        
+
         q = ds.createQuery(Rectangle.class);
         q.and(
         	q.criteria("width").equal(10),
         	q.criteria("height").equal(1)
         );
-        
+
         assertEquals(1, ds.getCount(q));
 
         q = ds.createQuery(Rectangle.class);
@@ -793,7 +828,7 @@ public class TestQuery  extends TestBase {
         );
 
         assertEquals(3, ds.getCount(q));
-        
+
         q = ds.createQuery(Rectangle.class);
         q.or(
             	q.criteria("width").equal(10),

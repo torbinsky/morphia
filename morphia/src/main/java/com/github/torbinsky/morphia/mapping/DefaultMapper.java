@@ -17,6 +17,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,11 +48,10 @@ import com.github.torbinsky.morphia.annotations.Reference;
 import com.github.torbinsky.morphia.annotations.Serialized;
 import com.github.torbinsky.morphia.converters.DefaultConverters;
 import com.github.torbinsky.morphia.converters.TypeConverter;
-import com.github.torbinsky.morphia.mapping.cache.DefaultEntityCache;
 import com.github.torbinsky.morphia.mapping.cache.EntityCache;
+import com.github.torbinsky.morphia.mapping.cache.EntityCacheFactory;
+import com.github.torbinsky.morphia.mapping.cache.NoOpEntityCacheFactory;
 import com.github.torbinsky.morphia.mapping.lazy.DatastoreProvider;
-import com.github.torbinsky.morphia.mapping.lazy.DefaultDatastoreProvider;
-import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
 import com.github.torbinsky.morphia.mapping.lazy.LazyProxyFactory;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedEntityReference;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxyHelper;
@@ -72,33 +72,48 @@ import com.mongodb.DBRef;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class DefaultMapper implements Mapper {
 	static Logger log = LoggerFactory.getLogger(DefaultMapper.class);
+    protected EntityCacheFactory entityCacheFactory = new NoOpEntityCacheFactory();
+   
 
     /**
      * Set of classes that registered by this mapper
      */
-    private final Map<String, MappedClass> mappedClasses = new ConcurrentHashMap<String, MappedClass>();
-    private final ConcurrentHashMap<String, Set<MappedClass>> mappedClassesByCollection = new ConcurrentHashMap<String, Set<MappedClass>>();
+    protected final Map<String, MappedClass> mappedClasses = new ConcurrentHashMap<String, MappedClass>();
+    protected final ConcurrentHashMap<String, Set<MappedClass>> mappedClassesByCollection = new ConcurrentHashMap<String, Set<MappedClass>>();
 
     //EntityInterceptors; these are called before EntityListeners and lifecycle methods on an Entity, for all Entities
-    private final List<EntityInterceptor> interceptors = new LinkedList<EntityInterceptor>();
+    protected final List<EntityInterceptor> interceptors = new LinkedList<EntityInterceptor>();
 
     //A general cache of instances of classes; used by MappedClass for EntityListener(s)
     final Map<Class, Object> instanceCache = new ConcurrentHashMap();
 
-    private MapperOptions opts = new MapperOptions();
+    protected MapperOptions opts;
 
-    // TODO: make these configurable
-    LazyProxyFactory proxyFactory = LazyFeatureDependencies.createDefaultProxyFactory();
-    DatastoreProvider datastoreProvider = new DefaultDatastoreProvider();
-    DefaultConverters converters = new DefaultConverters();
+    private LazyProxyFactory proxyFactory;
+    private DatastoreProvider datastoreProvider;
+    DefaultConverters converters;
 
     public DefaultMapper() {
-        converters.setMapper(this);
+    	this(new MapperOptions());
     }
 
     public DefaultMapper(MapperOptions opts) {
-        this();
         this.opts = opts;
+        this.setProxyFactory(opts.proxyFactory);
+        this.setDatastoreProvider(opts.datastoreProvider);
+        this.converters = opts.converters;
+    	converters.setMapper(this);
+    }
+
+    /**
+     * Enable overriding of EntityCacheFactory.
+     * @param factory
+     * @return
+     * @since 1.2.4
+     */
+    public Mapper setEntityCacheFactory(EntityCacheFactory factory) {
+        this.entityCacheFactory = factory;
+        return this;
     }
 
     /**
@@ -272,8 +287,73 @@ public class DefaultMapper implements Mapper {
 
         Object entity = null;
         entity = opts.objectFactory.createInstance(entityClass, dbObject);
-        entity = fromDb(dbObject, entity, cache);
+        entity = fromDBObject(dbObject, entity, cache);
         return entity;
+    }
+    
+    /**
+     * <p>
+     * Converts a java object to a mongo-compatible object (possibly a DBObject
+     * for complex mappings). Very similar to {@link DefaultMapper#toDBObject}
+     * </p>
+     * <p>
+     * Used (mainly) by query/update operations
+     * </p>
+     */
+    public Object toMongoObject(MappedField mf, MappedClass mc, Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        Object mappedValue = value;
+
+        //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
+        if (isAnAssignableField(mf, value) || isAnEntity(mc)) {
+            try {
+                if (value instanceof Iterable) {
+                    return getDbRefs((Iterable) value);
+                }
+
+                if (value.getClass().isAssignableFrom(Boolean.class)) {
+                    return toMongoObject(value, false);
+                }
+                if (value.getClass().isAssignableFrom(Integer.class)) {
+                    return toMongoObject(value, false);
+                }
+
+                Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
+                mappedValue = keyToRef(k);
+                if (mappedValue == value) {
+                    throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
+                }
+                return mappedValue;
+            } catch (Exception e) {
+                log.error("Error converting value(" + value + ") to reference.", e);
+                return toMongoObject(value, false);
+            }
+        }
+
+        //serialized
+        if (mf != null && mf.hasAnnotation(Serialized.class)) {
+            try {
+                return Serializer.serialize(value, !mf.getAnnotation(Serialized.class).disableCompression());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        //pass-through
+        if (value instanceof DBObject) {
+            return value;
+        }
+
+        mappedValue = toMongoObject(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
+        if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf)) {
+            ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
+        }
+
+        return mappedValue;
     }
 
     /**
@@ -285,7 +365,7 @@ public class DefaultMapper implements Mapper {
      * Used (mainly) by query/update operations
      * </p>
      */
-    Object toMongoObjectFromJavaObj(Object javaObj, boolean includeClassName) {
+    public Object toMongoObject(Object javaObj, boolean includeClassName) {
         if (javaObj == null)
             return null;
 
@@ -306,117 +386,352 @@ public class DefaultMapper implements Mapper {
         //Even if the converter changed it, should it still be processed?
         if (!bSameType && !(Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)))
             return newObj;
-        else { //The converter ran, and produced another type, or it is a list/map
 
-            boolean isSingleValue = true;
-            boolean isMap = false;
-            Class subType = null;
+        //The converter ran, and produced another type, or it is a list/map
+        boolean isSingleValue = true;
+        boolean isMap = false;
+        Class subType = null;
 
-            if (type.isArray() || Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)) {
-                isSingleValue = false;
-                isMap = ReflectionUtils.implementsInterface(type, Map.class);
-                // subtype of Long[], List<Long> is Long
-                subType = (type.isArray()) ? type.getComponentType() : ReflectionUtils.getParameterizedClass(type, (isMap) ? 1 : 0);
-            }
-
-            if (isSingleValue && !ReflectionUtils.isPropertyType(type)) {
-                DBObject dbObj = toDBObject(newObj);
-                if (!includeClassName)
-                    dbObj.removeField(CLASS_NAME_FIELDNAME);
-                return dbObj;
-            } else if (newObj instanceof DBObject) {
-                return newObj;
-            } else if (isMap) {
-                if (ReflectionUtils.isPropertyType(subType))
-                    return toDBObject(newObj);
-                else {
-                    HashMap m = new HashMap();
-                    for (Map.Entry e : (Iterable<Map.Entry>) ((Map) newObj).entrySet())
-                        m.put(e.getKey(), toMongoObjectFromJavaObj(e.getValue(), includeClassName));
-
-                    return m;
-                }
-                //Set/List but needs elements converted
-            } else if (!isSingleValue && !ReflectionUtils.isPropertyType(subType)) {
-                ArrayList<Object> vals = new ArrayList<Object>();
-                if (type.isArray())
-                    for (Object obj : (Object[]) newObj)
-                        vals.add(toMongoObjectFromJavaObj(obj, includeClassName));
-                else
-                    for (Object obj : (Iterable) newObj)
-                        vals.add(toMongoObjectFromJavaObj(obj, includeClassName));
-
-                return vals;
-            } else {
-                return newObj;
-            }
+        if (type.isArray() || Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)) {
+            isSingleValue = false;
+            isMap = ReflectionUtils.implementsInterface(type, Map.class);
+            // subtype of Long[], List<Long> is Long
+            subType = (type.isArray()) ? type.getComponentType() : ReflectionUtils.getParameterizedClass(type, (isMap) ? 1 : 0);
         }
+
+        if (isSingleValue && !ReflectionUtils.isPropertyType(type)) {
+            DBObject dbObj = toDBObject(newObj);
+
+            if (!includeClassName)
+                dbObj.removeField(CLASS_NAME_FIELDNAME);
+
+            return dbObj;
+        }
+        if (newObj instanceof DBObject) {
+            return newObj;
+        }
+
+        if (isMap) {
+            if (ReflectionUtils.isPropertyType(subType))
+                return toDBObject(newObj);
+
+            HashMap m = new HashMap();
+            for (Map.Entry e : (Iterable<Map.Entry>) ((Map) newObj).entrySet())
+                m.put(e.getKey(), toMongoObject(e.getValue(), includeClassName));
+
+            return m;
+            //Set/List but needs elements converted
+        }
+
+        if (!isSingleValue && !ReflectionUtils.isPropertyType(subType)) {
+            ArrayList<Object> vals = new ArrayList<Object>();
+            if (type.isArray())
+                for (Object obj : (Object[]) newObj)
+                    vals.add(toMongoObject(obj, includeClassName));
+            else
+                for (Object obj : (Iterable) newObj)
+                    vals.add(toMongoObject(obj, includeClassName));
+
+            return vals;
+        }
+
+        return newObj;
     }
+    
+//
+//    /**
+//     * <p>
+//     * Converts a java object to a mongo-compatible object (possibly a DBObject
+//     * for complex mappings). Very similar to {@link DefaultMapper#toDBObject}
+//     * </p>
+//     * <p>
+//     * Used (mainly) by query/update operations
+//     * </p>
+//     */
+//<<<<<<< HEAD:morphia/src/main/java/com/github/torbinsky/morphia/mapping/DefaultMapper.java
+//    Object toMongoObjectFromJavaObj(Object javaObj, boolean includeClassName) {
+//=======
+//    public Object toMongoObject(MappedField mf, MappedClass mc, Object value) {
+//        if (value == null) {
+//            return null;
+//        }
+//
+//        Object mappedValue = value;
+//
+//        //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
+//        if (isAnAssignableField(mf, value) || isAnEntity(mc)) {
+//            try {
+//                if (value instanceof Iterable) {
+//                    return getDbRefs((Iterable) value);
+//                }
+//
+//                if (value.getClass().isAssignableFrom(Boolean.class)) {
+//                    return toMongoObject(value, false);
+//                }
+//                if (value.getClass().isAssignableFrom(Integer.class)) {
+//                    return toMongoObject(value, false);
+//                }
+//
+//                Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
+//                mappedValue = keyToRef(k);
+//                if (mappedValue == value) {
+//                    throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
+//                }
+//                return mappedValue;
+//            } catch (Exception e) {
+//                log.error("Error converting value(" + value + ") to reference.", e);
+//                return toMongoObject(value, false);
+//            }
+//        }
+//
+//        //serialized
+//        if (mf != null && mf.hasAnnotation(Serialized.class)) {
+//            try {
+//                return Serializer.serialize(value, !mf.getAnnotation(Serialized.class).disableCompression());
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//        }
+//
+//        //pass-through
+//        if (value instanceof DBObject) {
+//            return value;
+//        }
+//
+//        mappedValue = toMongoObject(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
+//        if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf)) {
+//            ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
+//        }
+//
+//        return mappedValue;
+//    }
+//
+//    /**
+//     * <p>
+//     * Converts a java object to a mongo-compatible object (possibly a DBObject
+//     * for complex mappings). Very similar to {@link DefaultMapper#toDBObject}
+//     * </p>
+//     * <p>
+//     * Used (mainly) by query/update operations
+//     * </p>
+//     */
+//    public Object toMongoObject(Object javaObj, boolean includeClassName) {
+//>>>>>>> 0842ce80c79a1b4a4e192525f1e936c038f0c876:morphia/src/main/java/com/github/jmkgreen/morphia/mapping/DefaultMapper.java
+//        if (javaObj == null)
+//            return null;
+//
+//        Class origClass = javaObj.getClass();
+//
+//        if (origClass.isAnonymousClass() && origClass.getSuperclass().isEnum())
+//            origClass = origClass.getSuperclass();
+//
+//        Object newObj = converters.encode(origClass, javaObj);
+//        if (newObj == null) {
+//            log.warn("converted " + javaObj + " to null");
+//            return newObj;
+//        }
+//        Class type = newObj.getClass();
+//        boolean bSameType = origClass.equals(type);
+//
+//        //TODO: think about this logic a bit more.
+//        //Even if the converter changed it, should it still be processed?
+//        if (!bSameType && !(Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)))
+//            return newObj;
+//
+//        //The converter ran, and produced another type, or it is a list/map
+//        boolean isSingleValue = true;
+//        boolean isMap = false;
+//        Class subType = null;
+//
+//        if (type.isArray() || Map.class.isAssignableFrom(type) || Iterable.class.isAssignableFrom(type)) {
+//            isSingleValue = false;
+//            isMap = ReflectionUtils.implementsInterface(type, Map.class);
+//            // subtype of Long[], List<Long> is Long
+//            subType = (type.isArray()) ? type.getComponentType() : ReflectionUtils.getParameterizedClass(type, (isMap) ? 1 : 0);
+//        }
+//
+//<<<<<<< HEAD:morphia/src/main/java/com/github/torbinsky/morphia/mapping/DefaultMapper.java
+//            if (isSingleValue && !ReflectionUtils.isPropertyType(type)) {
+//                DBObject dbObj = toDBObject(newObj);
+//                if (!includeClassName)
+//                    dbObj.removeField(CLASS_NAME_FIELDNAME);
+//                return dbObj;
+//            } else if (newObj instanceof DBObject) {
+//                return newObj;
+//            } else if (isMap) {
+//                if (ReflectionUtils.isPropertyType(subType))
+//                    return toDBObject(newObj);
+//                else {
+//                    HashMap m = new HashMap();
+//                    for (Map.Entry e : (Iterable<Map.Entry>) ((Map) newObj).entrySet())
+//                        m.put(e.getKey(), toMongoObjectFromJavaObj(e.getValue(), includeClassName));
+//
+//                    return m;
+//                }
+//                //Set/List but needs elements converted
+//            } else if (!isSingleValue && !ReflectionUtils.isPropertyType(subType)) {
+//                ArrayList<Object> vals = new ArrayList<Object>();
+//                if (type.isArray())
+//                    for (Object obj : (Object[]) newObj)
+//                        vals.add(toMongoObjectFromJavaObj(obj, includeClassName));
+//                else
+//                    for (Object obj : (Iterable) newObj)
+//                        vals.add(toMongoObjectFromJavaObj(obj, includeClassName));
+//
+//                return vals;
+//            } else {
+//                return newObj;
+//            }
+//=======
+//        if (isSingleValue && !ReflectionUtils.isPropertyType(type)) {
+//            DBObject dbObj = toDBObject(newObj);
+//
+//            if (!includeClassName)
+//                dbObj.removeField(CLASS_NAME_FIELDNAME);
+//
+//            return dbObj;
+//        }
+//        if (newObj instanceof DBObject) {
+//            return newObj;
+//>>>>>>> 0842ce80c79a1b4a4e192525f1e936c038f0c876:morphia/src/main/java/com/github/jmkgreen/morphia/mapping/DefaultMapper.java
+//        }
+//
+//        if (isMap) {
+//            if (ReflectionUtils.isPropertyType(subType))
+//                return toDBObject(newObj);
+//
+//<<<<<<< HEAD:morphia/src/main/java/com/github/torbinsky/morphia/mapping/DefaultMapper.java
+//    /**
+//     * <p>
+//     * Converts a java object to a mongo-compatible object (possibly a DBObject
+//     * for complex mappings). Very similar to {@link DefaultMapper#toDBObject}
+//     * </p>
+//     * <p>
+//     * Used (mainly) by query/update operations
+//     * </p>
+//     */
+//    public Object toMongoObject(MappedField mf, MappedClass mc, Object value, boolean ignoreRefs) {
+//        Object mappedValue = value;
+//
+//        //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
+//        if (	!ignoreRefs && (
+//        		(mf != null && (mf.hasAnnotation(Reference.class) ||
+//                mf.getType().isAssignableFrom(Key.class) ||
+//                mf.getType().isAssignableFrom(DBRef.class) ||
+//                //Collection/Array/???
+//                (value instanceof Iterable && mf.isMultipleValues() && (
+//                        mf.getSubClass().isAssignableFrom(Key.class) ||
+//                                mf.getSubClass().isAssignableFrom(DBRef.class))
+//                )
+//        )) || (mc != null && mc.getEntityAnnotation() != null))) {
+//            try {
+//                if (value instanceof Iterable) {
+//                    ArrayList<DBRef> refs = new ArrayList<DBRef>();
+//                    Iterable it = (Iterable) value;
+//                    for (Object o : it) {
+//                        Key<?> k = (o instanceof Key) ? (Key<?>) o : getKey(o);
+//                        DBRef dbref = keyToRef(k);
+//                        refs.add(dbref);
+//                    }
+//                    mappedValue = refs;
+//                } else {
+//                    if (value == null)
+//                        mappedValue = null;
+//
+//                    Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
+//                    mappedValue = keyToRef(k);
+//                    if (mappedValue == value)
+//                        throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
+//                }
+//            } catch (Exception e) {
+//                log.warn("Error converting value(" + value + ") to reference.", e);
+//                mappedValue = toMongoObjectFromJavaObj(value, false);
+//            }
+//        }//serialized
+//        else if (mf != null && mf.hasAnnotation(Serialized.class))
+//            try {
+//                mappedValue = Serializer.serialize(value, !mf.getAnnotation(Serialized.class).disableCompression());
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//            //pass-through
+//        else if (value instanceof DBObject)
+//            mappedValue = value;
+//        else {
+//            mappedValue = toMongoObjectFromJavaObj(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
+//            if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf))
+//                ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
+//        }
+//=======
+//            HashMap m = new HashMap();
+//            for (Map.Entry e : (Iterable<Map.Entry>) ((Map) newObj).entrySet())
+//                m.put(e.getKey(), toMongoObject(e.getValue(), includeClassName));
+//
+//            return m;
+//            //Set/List but needs elements converted
+//        }
+//
+//        if (!isSingleValue && !ReflectionUtils.isPropertyType(subType)) {
+//            ArrayList<Object> vals = new ArrayList<Object>();
+//            if (type.isArray())
+//                for (Object obj : (Object[]) newObj)
+//                    vals.add(toMongoObject(obj, includeClassName));
+//            else
+//                for (Object obj : (Iterable) newObj)
+//                    vals.add(toMongoObject(obj, includeClassName));
+//
+//            return vals;
+//        }
+//
+//        return newObj;
+//    }
+//
+//    private boolean isAnAssignableField(MappedField mf, Object value) {
+//        if (mf == null) {
+//            return false;
+//        }
+//
+//        return (mf.hasAnnotation(Reference.class) ||
+//                mf.getType().isAssignableFrom(Key.class) ||
+//                mf.getType().isAssignableFrom(DBRef.class) ||
+//                //Collection/Array/???
+//                isValueIterableAndTargetCompatible(mf, value)
+//        );
+//    }
+//>>>>>>> 0842ce80c79a1b4a4e192525f1e936c038f0c876:morphia/src/main/java/com/github/jmkgreen/morphia/mapping/DefaultMapper.java
 
+    private boolean isAnAssignableField(MappedField mf, Object value) {
+        if (mf == null) {
+            return false;
+        }
 
-    /**
-     * <p>
-     * Converts a java object to a mongo-compatible object (possibly a DBObject
-     * for complex mappings). Very similar to {@link DefaultMapper#toDBObject}
-     * </p>
-     * <p>
-     * Used (mainly) by query/update operations
-     * </p>
-     */
-    public Object toMongoObject(MappedField mf, MappedClass mc, Object value, boolean ignoreRefs) {
-        Object mappedValue = value;
-
-        //convert the value to Key (DBRef) if the field is @Reference or type is Key/DBRef, or if the destination class is an @Entity
-        if (	!ignoreRefs && (
-        		(mf != null && (mf.hasAnnotation(Reference.class) ||
+        return (mf.hasAnnotation(Reference.class) ||
                 mf.getType().isAssignableFrom(Key.class) ||
                 mf.getType().isAssignableFrom(DBRef.class) ||
                 //Collection/Array/???
-                (value instanceof Iterable && mf.isMultipleValues() && (
-                        mf.getSubClass().isAssignableFrom(Key.class) ||
-                                mf.getSubClass().isAssignableFrom(DBRef.class))
-                )
-        )) || (mc != null && mc.getEntityAnnotation() != null))) {
-            try {
-                if (value instanceof Iterable) {
-                    ArrayList<DBRef> refs = new ArrayList<DBRef>();
-                    Iterable it = (Iterable) value;
-                    for (Object o : it) {
-                        Key<?> k = (o instanceof Key) ? (Key<?>) o : getKey(o);
-                        DBRef dbref = keyToRef(k);
-                        refs.add(dbref);
-                    }
-                    mappedValue = refs;
-                } else {
-                    if (value == null)
-                        mappedValue = null;
+                isValueIterableAndTargetCompatible(mf, value)
+        );
+    }
+    
+    private boolean isValueIterableAndTargetCompatible(MappedField mf, Object value) {
+        return (value instanceof Iterable && mf.isMultipleValues() && (
+                mf.getSubClass().isAssignableFrom(Key.class) ||
+                        mf.getSubClass().isAssignableFrom(DBRef.class))
+        );
+    }
 
-                    Key<?> k = (value instanceof Key) ? (Key<?>) value : getKey(value);
-                    mappedValue = keyToRef(k);
-                    if (mappedValue == value)
-                        throw new ValidationException("cannot map to @Reference/Key<T>/DBRef field: " + value);
-                }
-            } catch (Exception e) {
-                log.warn("Error converting value(" + value + ") to reference.", e);
-                mappedValue = toMongoObjectFromJavaObj(value, false);
-            }
-        }//serialized
-        else if (mf != null && mf.hasAnnotation(Serialized.class))
-            try {
-                mappedValue = Serializer.serialize(value, !mf.getAnnotation(Serialized.class).disableCompression());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            //pass-through
-        else if (value instanceof DBObject)
-            mappedValue = value;
-        else {
-            mappedValue = toMongoObjectFromJavaObj(value, EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf));
-            if (mappedValue instanceof DBObject && !EmbeddedMapper.shouldSaveClassName(value, mappedValue, mf))
-                ((DBObject) mappedValue).removeField(CLASS_NAME_FIELDNAME);
+    private boolean isAnEntity(MappedClass mc) {
+        return (mc != null && mc.getEntityAnnotation() != null);
+    }
+
+    private ArrayList<DBRef> getDbRefs(Iterable value) {
+        ArrayList<DBRef> refs = new ArrayList<DBRef>();
+        for (Object o : value) {
+            Key<?> k = (o instanceof Key) ? (Key<?>) o : getKey(o);
+            refs.add(keyToRef(k));
         }
-
-        return mappedValue;
+        return refs;
     }
 
     public Object getId(Object entity) {
@@ -441,8 +756,7 @@ public class DefaultMapper implements Mapper {
             throw new MappingException("getKey has been passed a null entity");
 
         if (entity instanceof ProxiedEntityReference) {
-            ProxiedEntityReference proxy = (ProxiedEntityReference) entity;
-            return (Key<T>) proxy.__getKey();
+            return getKey((ProxiedEntityReference) entity);
         }
 
         entity = ProxyHelper.unwrap(entity);
@@ -454,6 +768,10 @@ public class DefaultMapper implements Mapper {
             throw new MappingException("Could not get id for " + entity.getClass().getName());
 
         return new Key<T>((Class<T>) entity.getClass(), id);
+    }
+
+    private <T> Key<T> getKey(ProxiedEntityReference entity) {
+        return (Key<T>) entity.__getKey();
     }
 
     /**
@@ -482,13 +800,13 @@ public class DefaultMapper implements Mapper {
         DBObject dbObject = new BasicDBObject();
         MappedClass mc = getMappedClass(entity);
 
-        if (mc.getEntityAnnotation() == null || !mc.getEntityAnnotation().noClassnameStored())
+        if (mc.getEntityAnnotation() == null || mc.isClassNameStored())
             dbObject.put(CLASS_NAME_FIELDNAME, entity.getClass().getName());
 
         if (lifecycle)
             dbObject = (DBObject) mc.callLifecycleMethods(PrePersist.class, entity, dbObject, this);
 
-        for (MappedField mf : mc.getPersistenceFields()) {
+        for (MappedField mf : mc.getMappedFields()) {
             try {
                 writeMappedField(dbObject, mf, entity, involvedObjects);
             } catch (Exception e) {
@@ -504,7 +822,7 @@ public class DefaultMapper implements Mapper {
         return dbObject;
     }
 
-    Object fromDb(DBObject dbObject, Object entity, EntityCache cache) {
+    public Object fromDBObject(DBObject dbObject, Object entity, EntityCache cache) {
         //hack to bypass things and just read the value.
         if (entity instanceof MappedField) {
             readMappedField(dbObject, (MappedField) entity, entity, cache);
@@ -527,7 +845,7 @@ public class DefaultMapper implements Mapper {
 
         dbObject = (DBObject) mc.callLifecycleMethods(PreLoad.class, entity, dbObject, this);
         try {
-            for (MappedField mf : mc.getPersistenceFields()) {
+            for (MappedField mf : mc.getMappedFields()) {
                 readMappedField(dbObject, mf, entity, cache);
             }
         } catch (Exception e) {
@@ -542,7 +860,7 @@ public class DefaultMapper implements Mapper {
         return entity;
     }
 
-    private void readMappedField(DBObject dbObject, MappedField mf, Object entity, EntityCache cache) {
+    protected void readMappedField(DBObject dbObject, MappedField mf, Object entity, EntityCache cache) {
         if (mf.hasAnnotation(Property.class) || mf.hasAnnotation(Serialized.class)
                 || mf.isTypeMongoCompatible() || converters.hasSimpleValueConverter(mf))
             opts.valueMapper.fromDBObject(dbObject, mf, entity, cache, this);
@@ -555,7 +873,7 @@ public class DefaultMapper implements Mapper {
         }
     }
 
-    private void writeMappedField(DBObject dbObject, MappedField mf, Object entity, Map<Object, DBObject> involvedObjects) {
+    protected void writeMappedField(DBObject dbObject, MappedField mf, Object entity, Map<Object, DBObject> involvedObjects) {
         Class<? extends Annotation> annType = null;
 
         //skip not saved fields.
@@ -595,7 +913,7 @@ public class DefaultMapper implements Mapper {
     }
 
     public EntityCache createEntityCache() {
-        return new DefaultEntityCache();// TODO choose impl
+        return entityCacheFactory.create();
     }
 
     public <T> Key<T> refToKey(DBRef ref) {
@@ -610,7 +928,7 @@ public class DefaultMapper implements Mapper {
         if (key.getKind() == null)
             key.setKind(getCollectionName(key.getKindClass()));
 
-        return new DBRef(null, key.getKind(), key.getId());
+        return new DBRef(null, key.getKind(), toMongoObject(key.getId(), false));
     }
 
     public String updateKind(Key key) {
@@ -622,11 +940,11 @@ public class DefaultMapper implements Mapper {
         return key.getKind();
     }
 
-    <T> Key<T> createKey(Class<T> clazz, Serializable id) {
+    public <T> Key<T> createKey(Class<T> clazz, Serializable id) {
         return new Key<T>(clazz, id);
     }
 
-    <T> Key<T> createKey(Class<T> clazz, Object id) {
+    public <T> Key<T> createKey(Class<T> clazz, Object id) {
         if (id instanceof Serializable)
             return createKey(clazz, (Serializable) id);
 
@@ -713,7 +1031,7 @@ public class DefaultMapper implements Mapper {
     /**
      * Return the first {@link StackTraceElement} not in our code (package).
      */
-    private static StackTraceElement getFirstClientLine(Throwable t) {
+    public static StackTraceElement getFirstClientLine(Throwable t) {
         for (StackTraceElement ste : t.getStackTrace())
             if (!ste.getClassName().startsWith("com.github.torbinsky.morphia") &&
                     !ste.getClassName().startsWith("sun.reflect") &&
@@ -728,7 +1046,7 @@ public class DefaultMapper implements Mapper {
     /**
      * Returns if the MappedField is a Reference or Serialized
      */
-    private static boolean canQueryPast(MappedField mf) {
+    public static boolean canQueryPast(MappedField mf) {
         return !(mf.hasAnnotation(Reference.class) || mf.hasAnnotation(Serialized.class));
     }
 
@@ -769,5 +1087,33 @@ public class DefaultMapper implements Mapper {
             if (log.isInfoEnabled())
                 log.info("Found more than one class mapped to collection '" + kind + "'" + mcs);
         return mcs.iterator().next().getClazz();
+    }
+    public boolean isCached(Class<?> clazz) {
+    	return instanceCache.containsKey(clazz);
+    }
+    public void cacheClass(Class<?> clazz, Object instance) throws ConcurrentModificationException {
+    	Object previousKey = instanceCache.put(clazz, instance);
+    	if (previousKey != null) {
+    		throw new ConcurrentModificationException("Duplicate class created "+clazz);
+    	}
+    }
+    public Object getCachedClass(Class<?> clazz) {
+    	return instanceCache.get(clazz);
+    }
+
+    public LazyProxyFactory getProxyFactory() {
+        return proxyFactory;
+    }
+
+    public void setProxyFactory(LazyProxyFactory proxyFactory) {
+        this.proxyFactory = proxyFactory;
+    }
+
+    public DatastoreProvider getDatastoreProvider() {
+        return datastoreProvider;
+    }
+
+    public void setDatastoreProvider(DatastoreProvider datastoreProvider) {
+        this.datastoreProvider = datastoreProvider;
     }
 }

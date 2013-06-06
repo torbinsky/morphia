@@ -1,5 +1,7 @@
 package com.github.torbinsky.morphia.query;
 
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.ReadPreference;
 import org.bson.types.CodeWScope;
 
@@ -7,6 +9,13 @@ import org.bson.types.CodeWScope;
  * @author Scott Hernandez
  */
 public interface Query<T> extends QueryResults<T>, Cloneable {
+    /**
+     * Override the DBCollection used in the query.
+     * @since 1.3
+     * @param collection The DBCollection to be used.
+     */
+    void setDbCollection(DBCollection collection);
+
     /**
      * <p>Create a filter based on the specified condition and value.
      * </p><p>
@@ -91,9 +100,6 @@ public interface Query<T> extends QueryResults<T>, Cloneable {
      */
     Query<T> offset(int value);
 
-    @Deprecated
-    Query<T> skip(int value);
-
     /**
      * Turns on validation (for all calls made after); by default validation is on
      */
@@ -167,6 +173,18 @@ public interface Query<T> extends QueryResults<T>, Cloneable {
     String toString();
 
     Class<T> getEntityClass();
+
+    DBCollection getCollection();
+
+    DBObject getFieldsObject();
+
+    DBObject getSortObject();
+
+    DBObject getQueryObject();
+
+    int getLimit();
+
+    int getOffset();
 
     Query<T> clone();
 }

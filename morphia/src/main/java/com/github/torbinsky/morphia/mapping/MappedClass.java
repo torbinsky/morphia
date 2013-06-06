@@ -12,6 +12,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.torbinsky.morphia.EntityInterceptor;
+import com.github.torbinsky.morphia.annotations.CappedAt;
 import com.github.torbinsky.morphia.annotations.Converters;
 import com.github.torbinsky.morphia.annotations.Embedded;
 import com.github.torbinsky.morphia.annotations.Entity;
@@ -40,6 +42,8 @@ import com.github.torbinsky.morphia.annotations.Version;
 import com.github.torbinsky.morphia.mapping.validation.MappingValidator;
 import com.github.torbinsky.morphia.utils.ReflectionUtils;
 import com.mongodb.DBObject;
+import com.mongodb.ReadPreference;
+import com.mongodb.WriteConcern;
 
 /**
  * Represents a mapped class between the MongoDB DBObject and the java POJO.
@@ -108,13 +112,13 @@ public class MappedClass {
     /**
      * a list of the fields to map
      */
-    private List<MappedField> persistenceFields = new ArrayList<MappedField>();
+    private List<MappedField> mappedFields = new ArrayList<MappedField>();
 
     /**
      * the type we are mapping to/from
      */
     protected Class<?> clazz;
-    DefaultMapper mapr;
+    Mapper mapr;
 
     protected MappedClass(){
     	
@@ -123,7 +127,7 @@ public class MappedClass {
     /**
      * constructor
      */
-    public MappedClass(Class<?> clazz, DefaultMapper mapr) {
+    public MappedClass(Class<?> clazz, Mapper mapr) {
         this.mapr = mapr;
         this.clazz = clazz;
         init();
@@ -140,25 +144,196 @@ public class MappedClass {
             log.debug("MappedClass done: " + toString());
     }
 
-    protected void basicValidate() {
-        boolean isStatic = Modifier.isStatic(clazz.getModifiers());
-        if (!isStatic && clazz.isMemberClass())
-            throw new MappingException("Cannot use non-static inner class: " + clazz + ". Please make static.");
+    /**
+     * @return the idField
+     */
+    public Field getIdField() {
+        return idField;
+    }
+
+    /**
+     * @return the entityAn
+     */
+    public Entity getEntityAnnotation() {
+        return entityAn;
+    }
+
+    /**
+     * @return the embeddedAn
+     */
+    public Embedded getEmbeddedAnnotation() {
+        return embeddedAn;
+    }
+
+    /**
+     * @return the relevantAnnotations
+     */
+    public Map<Class<? extends Annotation>, ArrayList<Annotation>> getRelevantAnnotations() {
+        return foundAnnotations;
+    }
+
+    /**
+     * Returns the first found Annotation, or null.
+     *
+     * @param clazz The Annotation to find.
+     * @return First found Annotation or null of none found.
+     */
+    public Annotation getFirstAnnotation(Class<? extends Annotation> clazz) {
+        ArrayList<Annotation> found = foundAnnotations.get(clazz);
+        if (found == null || found.isEmpty()) {
+            return null;
+        }
+        return found.get(0);
+    }
+
+    /**
+     * Returns the last found Annotation instance or null.
+     *
+     * @param clazz The Annotation to find.
+     * @return the instance if it was found, if more than one was found, the last one added
+     */
+    public Annotation getAnnotation(Class<? extends Annotation> clazz) {
+        ArrayList<Annotation> found = foundAnnotations.get(clazz);
+        return (found != null && found.size() > 0) ? found.get(found.size() - 1) : null;
+    }
+
+    /**
+     * Returns all found Annotations for given Class (hierarchically).
+     *
+     * @return The ArrayList if found, else null
+     */
+    public ArrayList<Annotation> getAnnotations(Class<? extends Annotation> clazz) {
+        ArrayList<Annotation> found = foundAnnotations.get(clazz);
+        return found;
+    }
+
+    public List<MappedField> getMappedFields() {
+        return mappedFields;
+    }
+
+    /**
+     * @return the mappedFields
+     * @deprecated Use {@link #getMappedFields()} instead.
+     */
+    public List<MappedField> getPersistenceFields() {
+        return mappedFields;
+    }
+
+    /**
+     * @return the collName
+     */
+    public String getCollectionName() {
+        return (entityAn == null || entityAn.value().equals(Mapper.IGNORED_FIELDNAME)) ? clazz.getSimpleName() : entityAn.value();
+    }
+
+    /**
+     * @return the clazz
+     */
+    public Class<?> getClazz() {
+        return clazz;
+    }
+
+    /**
+     * @return the Mapper this class is bound to
+     */
+    public Mapper getMapper() {
+        return mapr;
+    }
+
+    public MappedField getMappedIdField() {
+        return getFieldsAnnotatedWith(Id.class, javax.persistence.Id.class).get(0);
+    }
+
+    /**
+     * Returns any Mongo ReadPreference stated on this class.
+     * @return
+     */
+    public ReadPreference getReadPreference() {
+        Entity entity = (Entity) getFirstAnnotation(Entity.class);
+        if (entity == null) {
+            return null;
+        }
+
+        if  (entity.queryNonPrimary()) {
+            return ReadPreference.secondaryPreferred();
+        }
+        return null;
+    }
+
+    public CappedAt getCappedAt() {
+        Entity entity = (Entity) getFirstAnnotation(Entity.class);
+        if (entity == null) {
+            return null;
+        }
+
+        return entity.cap();
+    }
+
+    /**
+     * Returns a WriteConcern for this mapped class - by default it is SAFE.
+     *
+     * @return
+     */
+    public WriteConcern getWriteConcern() {
+        WriteConcern wc = WriteConcern.SAFE;
+
+        Entity entity = (Entity) getFirstAnnotation(Entity.class);
+        if (entity == null) {
+            return wc;
+        }
+
+        if (entity.concern() != null && !entity.concern().isEmpty()) {
+            wc = WriteConcern.valueOf(entity.concern());
+        }
+
+        return wc;
+    }
+
+    /**
+     * Should a class name be stored with entities?
+     *
+     * @return
+     */
+    public boolean isClassNameStored() {
+        Entity entity = (Entity) getFirstAnnotation(Entity.class);
+        if (entity == null) {
+            return false;
+        }
+
+        return !entity.noClassnameStored();
+    }
+
+    /**
+     * Do any of the fields of this class have {@link com.github.jmkgreen.morphia.annotations.Version}?
+     * @return
+     */
+    public boolean hasVersioning() {
+        return !getFieldsAnnotatedWith(Version.class).isEmpty();
     }
 
     /*
       * Update mappings based on fields/annotations.
+      * TODO: Remove this and make these fields dynamic or auto-set some other way
       */
-    // TODO: Remove this and make these fields dynamic or auto-set some other way
     public void update() {
         embeddedAn = (Embedded) getAnnotation(Embedded.class);
         entityAn = (Entity) getFirstAnnotation(Entity.class);
         // polymorphicAn = (Polymorphic) getAnnotation(Polymorphic.class);
-        List<MappedField> fields = getFieldsAnnotatedWith(Id.class);
+        List<MappedField> fields = getFieldsAnnotatedWith(Id.class, javax.persistence.Id.class);
         if (fields != null && fields.size() > 0)
             idField = fields.get(0).field;
 
 
+    }
+
+    public List<ClassMethodPair> getLifecycleMethods(Class<Annotation> clazz) {
+        return lifecycleMethods.get(clazz);
+    }
+
+    protected void basicValidate() {
+        boolean isStatic = Modifier.isStatic(clazz.getModifiers());
+        if (!isStatic && clazz.isMemberClass())
+            throw new MappingException("Cannot use non-static inner class: " + clazz + ". Please make static.");
     }
 
     /**
@@ -200,9 +375,9 @@ public class MappedClass {
                 continue;
             else if (mapr.getOptions().ignoreFinals && ((fieldMods & Modifier.FINAL) == Modifier.FINAL))
                 continue;
-            else if (field.isAnnotationPresent(Id.class)) {
+            else if (field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(javax.persistence.Id.class)) {
                 MappedField mf = new MappedField(field, clazz);
-                persistenceFields.add(mf);
+                mappedFields.add(mf);
                 update();
             } else if (field.isAnnotationPresent(Property.class) ||
                     field.isAnnotationPresent(Reference.class) ||
@@ -210,10 +385,10 @@ public class MappedClass {
                     field.isAnnotationPresent(Serialized.class) ||
                     isSupportedType(field.getType()) ||
                     ReflectionUtils.implementsInterface(field.getType(), Serializable.class)) {
-                persistenceFields.add(new MappedField(field, clazz));
+                mappedFields.add(new MappedField(field, clazz));
             } else {
                 if (mapr.getOptions().defaultMapper != null)
-                    persistenceFields.add(new MappedField(field, clazz));
+                    mappedFields.add(new MappedField(field, clazz));
                 else if (log.isWarnEnabled())
                     log.warn("Ignoring (will not persist) field: " + clazz.getName() + "." + field.getName() + " [type:" + field.getType().getName() + "]");
             }
@@ -248,16 +423,12 @@ public class MappedClass {
         foundAnnotations.get(clazz).add(ann);
     }
 
-    public List<ClassMethodPair> getLifecycleMethods(Class<Annotation> clazz) {
-        return lifecycleMethods.get(clazz);
-    }
-
     /**
      * Adds the annotation, if it exists on the field.
      *
      * @param clazz
      */
-    private void addAnnotation(Class<? extends Annotation> clazz) {
+    public void addAnnotation(Class<? extends Annotation> clazz) {
         ArrayList<? extends Annotation> anns = ReflectionUtils.getAnnotations(getClazz(), clazz);
         for (Annotation ann : anns) {
             addAnnotation(clazz, ann);
@@ -266,17 +437,19 @@ public class MappedClass {
 
     @Override
     public String toString() {
-        return "MappedClass - kind:" + this.getCollectionName() + " for " + this.getClazz().getName() + " fields:" + persistenceFields;
+        return "MappedClass - kind:" + this.getCollectionName() + " for " + this.getClazz().getName() + " fields:" + mappedFields;
     }
 
     /**
      * Returns fields annotated with the clazz
      */
-    public List<MappedField> getFieldsAnnotatedWith(Class<? extends Annotation> clazz) {
+    public List<MappedField> getFieldsAnnotatedWith(Class<? extends Annotation>... classes) {
         List<MappedField> results = new ArrayList<MappedField>();
-        for (MappedField mf : persistenceFields) {
-            if (mf.foundAnnotations.containsKey(clazz))
-                results.add(mf);
+        for (MappedField mf : mappedFields) {
+            for (Class<? extends Annotation> clazz : classes) {
+                if (mf.foundAnnotations.containsKey(clazz))
+                    results.add(mf);
+            }
         }
         return results;
     }
@@ -285,7 +458,7 @@ public class MappedClass {
      * Returns the MappedField by the name that it will stored in mongodb as
      */
     public MappedField getMappedField(String storedName) {
-        for (MappedField mf : persistenceFields)
+        for (MappedField mf : mappedFields)
             for (String n : mf.getLoadNames())
                 if (storedName.equals(n))
                     return mf;
@@ -304,7 +477,7 @@ public class MappedClass {
      * Returns MappedField for a given java field name on the this MappedClass
      */
     public MappedField getMappedFieldByJavaField(String name) {
-        for (MappedField mf : persistenceFields)
+        for (MappedField mf : mappedFields)
             if (name.equals(mf.getJavaFieldName())) return mf;
 
         return null;
@@ -348,6 +521,11 @@ public class MappedClass {
 
     public boolean equals(Class<?> clazz) {
         return this.getClazz().equals(clazz);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getClazz().hashCode();
     }
 
     /**
@@ -404,15 +582,16 @@ public class MappedClass {
     }
 
     private Object getOrCreateInstance(Class<?> clazz) {
-        if (mapr.instanceCache.containsKey(clazz))
-            return mapr.instanceCache.get(clazz);
+        if (mapr.isCached(clazz))
+            return mapr.getCachedClass(clazz);
 
         Object o = mapr.getOptions().objectFactory.createInstance(clazz);
-        Object nullO = mapr.instanceCache.put(clazz, o);
-        if (nullO != null)
+        try {
+        	mapr.cacheClass(clazz, o);
+        } catch (ConcurrentModificationException duplicate) {
             if (log.isErrorEnabled())
-                log.error("Race-condition, created duplicate class: " + clazz);
-
+                log.error("Race-condition",duplicate);
+        }
         return o;
 
     }
@@ -431,99 +610,5 @@ public class MappedClass {
         }
     }
 
-    /**
-     * @return the idField
-     */
-    public Field getIdField() {
-        return idField;
-    }
-
-    /**
-     * @return the entityAn
-     */
-    public Entity getEntityAnnotation() {
-        return entityAn;
-    }
-
-    /**
-     * @return the embeddedAn
-     */
-    public Embedded getEmbeddedAnnotation() {
-        return embeddedAn;
-    }
-
-    /**
-     * @return the releventAnnotations
-     */
-    public Map<Class<? extends Annotation>, ArrayList<Annotation>> getReleventAnnotations() {
-        return foundAnnotations;
-    }
-
-    /**
-     * Returns the first found Annotation, or null.
-     *
-     * @param clazz The Annotation to find.
-     * @return First found Annotation or null of none found.
-     */
-    public Annotation getFirstAnnotation(Class<? extends Annotation> clazz) {
-        ArrayList<Annotation> found = foundAnnotations.get(clazz);
-        if (found == null || found.isEmpty()) {
-            return null;
-        }
-        return found.get(0);
-    }
-
-    /**
-     * Returns the last found Annotation instance or null.
-     *
-     * @param clazz The Annotation to find.
-     * @return the instance if it was found, if more than one was found, the last one added
-     */
-    public Annotation getAnnotation(Class<? extends Annotation> clazz) {
-        ArrayList<Annotation> found = foundAnnotations.get(clazz);
-        return (found != null && found.size() > 0) ? found.get(found.size() - 1) : null;
-    }
-
-    /**
-     * Returns all found Annotations for given Class (hierarchically).
-     *
-     * @return The ArrayList if found, else null
-     */
-    public ArrayList<Annotation> getAnnotations(Class<? extends Annotation> clazz) {
-        ArrayList<Annotation> found = foundAnnotations.get(clazz);
-        return found;
-    }
-
-    /**
-     * @return the persistenceFields
-     */
-    public List<MappedField> getPersistenceFields() {
-        return persistenceFields;
-    }
-
-    /**
-     * @return the collName
-     */
-    public String getCollectionName() {
-        return (entityAn == null || entityAn.value().equals(Mapper.IGNORED_FIELDNAME)) ? clazz.getSimpleName() : entityAn.value();
-    }
-
-    /**
-     * @return the clazz
-     */
-    public Class<?> getClazz() {
-        return clazz;
-    }
-
-    /**
-     * @return the Mapper this class is bound to
-     */
-    public Mapper getMapper() {
-        return mapr;
-    }
-
-    public MappedField getMappedIdField() {
-        return getFieldsAnnotatedWith(Id.class).get(0);
-    }
 
 }

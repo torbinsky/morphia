@@ -1,5 +1,6 @@
 package com.github.torbinsky.morphia.query;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.torbinsky.morphia.annotations.Embedded;
 import com.github.torbinsky.morphia.mapping.DefaultMapper;
 import com.github.torbinsky.morphia.mapping.MappedClass;
 import com.github.torbinsky.morphia.mapping.MappedField;
@@ -28,33 +30,29 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
 	}
 
 	protected FieldCriteria(QueryImpl<?> query, String field, FilterOperator op, Object value, boolean validateNames, boolean validateTypes, boolean not) {
-		StringBuffer sb = new StringBuffer(field); // validate might modify prop string to translate java field name to db field name
-		MappedField mf = DefaultMapper.validate(query.getEntityClass(), query.getDatastore().getMapper(), sb, op, value, validateNames, validateTypes);
+		StringBuffer sb = new StringBuffer(field); //validate might modify prop string to translate java field name to db field name
+		MappedField mf = DefaultMapper
+				.validate(query.getEntityClass(), query.getDatastore().getMapper(), sb, op, value, validateNames, validateTypes);
 		field = sb.toString();
 
 		Mapper mapr = query.getDatastore().getMapper();
 
 		MappedClass mc = null;
 		try {
-			if (value != null && !ReflectionUtils.isPropertyType(value.getClass()) && !ReflectionUtils.implementsInterface(value.getClass(), Iterable.class))
+			if (value != null && !ReflectionUtils.isPropertyType(value.getClass())
+					&& !ReflectionUtils.implementsInterface(value.getClass(), Iterable.class))
 				if (mf != null && !mf.isTypeMongoCompatible())
 					mc = mapr.getMappedClass((mf.isSingleValue()) ? mf.getType() : mf.getSubClass());
 				else
 					mc = mapr.getMappedClass(value);
 		} catch (Exception e) {
-			// Ignore these. It is likely they related to mapping validation that is unimportant for queries (the query will fail/return-empty anyway)
+			// Ignore these. It is likely they related to mapping validation
+			// that is unimportant for queries (the query will fail/return-empty
+			// anyway)
 			log.debug("Error during mapping of filter criteria: ", e);
 		}
 
-		Object mappedValue = null;
-		switch(op){
-		case EXISTS:
-			mappedValue = mapr.toMongoObject(mf, mc, value, true);
-			break;
-		default:
-			mappedValue = mapr.toMongoObject(mf, mc, value, false);
-			break;
-		}
+		Object mappedValue = mapr.toMongoObject(mf, mc, value);
 
 		Class<?> type = (mappedValue == null) ? null : mappedValue.getClass();
 
@@ -66,6 +64,10 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
 		// TODO: investigate and/or add option to control this.
 		if (op == FilterOperator.ELEMENT_MATCH && mappedValue instanceof DBObject)
 			((DBObject) mappedValue).removeField(Mapper.ID_KEY);
+
+		if (mf != null) {
+			removeClassNameFromEmbeddedEntity(mf, mappedValue);
+		}
 
 		this.field = field;
 		this.operator = op;
@@ -92,6 +94,30 @@ public class FieldCriteria extends AbstractCriteria implements Criteria {
 			((Map<String, Object>) inner).put(operator.val(), val);
 		}
 	}
+	
+	/**
+     * Remove the className field from the query if the clause concerns an embedded entity.
+     *
+     * See https://github.com/jmkgreen/morphia/issues/31
+     *
+     * @param mf
+     * @param mappedValue
+     */
+    private void removeClassNameFromEmbeddedEntity(MappedField mf, Object mappedValue) {
+        if (!mf.hasAnnotation(Embedded.class)) {
+            return;
+        }
+        if (mappedValue instanceof ArrayList) {
+            for (Object elem : (ArrayList<?>) mappedValue) {
+                if (elem instanceof DBObject) {
+                    ((DBObject) elem).removeField(Mapper.CLASS_NAME_FIELDNAME);
+                }
+            }
+        }
+        if (mappedValue instanceof DBObject) {
+            ((DBObject) mappedValue).removeField(Mapper.CLASS_NAME_FIELDNAME);
+        }
+    }
 
 	public String getFieldName() {
 		return field;

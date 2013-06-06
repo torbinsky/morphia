@@ -15,13 +15,6 @@
  */
 package com.github.torbinsky.morphia.utils;
 
-import com.github.torbinsky.morphia.Key;
-import com.github.torbinsky.morphia.annotations.Embedded;
-import com.github.torbinsky.morphia.annotations.Entity;
-import com.github.torbinsky.morphia.mapping.MappingException;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBRef;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,8 +43,18 @@ import java.util.UUID;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
+
 import org.bson.types.CodeWScope;
 import org.bson.types.ObjectId;
+
+import com.github.torbinsky.morphia.Key;
+import com.github.torbinsky.morphia.annotations.Embedded;
+import com.github.torbinsky.morphia.annotations.Entity;
+import com.github.torbinsky.morphia.mapping.MappingException;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.DBRef;
 
 /**
  * Various reflection utility methods, used mainly in the Mapper.
@@ -182,7 +185,7 @@ public class ReflectionUtils {
 
         return isPrimitiveLike(type) || (type == DBRef.class) || (type == Pattern.class) ||
                 (type == CodeWScope.class) || (type == ObjectId.class) || (type == Key.class) ||
-                (type == DBObject.class) || (type == BasicDBObject.class);
+                (type == DBObject.class) || (type == BasicDBObject.class) || (type == BasicDBList.class);
     }
 
     public static boolean isPrimitiveLike(final Class type) {
@@ -444,21 +447,28 @@ public class ReflectionUtils {
     public static Set<Class<?>> getFromJARFile(final String jar, final String packageName) throws IOException,
             FileNotFoundException, ClassNotFoundException {
         Set<Class<?>> classes = new HashSet<Class<?>>();
-        JarInputStream jarFile = new JarInputStream(new FileInputStream(jar));
-        JarEntry jarEntry;
-        do {
-            jarEntry = jarFile.getNextJarEntry();
-            if (jarEntry != null) {
-                String className = jarEntry.getName();
-                if (className.endsWith(".class")) {
-                    className = stripFilenameExtension(className);
-                    if (className.startsWith(packageName)) {
-                        classes.add(Class.forName(className.replace('/', '.')));
-                    }
-                }
-            }
+        JarInputStream jarFile = null;
+        try{
+        	jarFile = new JarInputStream(new FileInputStream(jar));
+	        JarEntry jarEntry;
+	        do {
+	            jarEntry = jarFile.getNextJarEntry();
+	            if (jarEntry != null) {
+	                String className = jarEntry.getName();
+	                if (className.endsWith(".class")) {
+	                    className = stripFilenameExtension(className);
+	                    if (className.startsWith(packageName)) {
+	                        classes.add(Class.forName(className.replace('/', '.')));
+	                    }
+	                }
+	            }
+	        }
+	        while (jarEntry != null);
+        }finally{
+        	if(jarFile != null){
+        		jarFile.close();
+        	}
         }
-        while (jarEntry != null);
         return classes;
     }
 

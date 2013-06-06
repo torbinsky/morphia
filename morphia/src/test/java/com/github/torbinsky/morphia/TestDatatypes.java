@@ -29,7 +29,7 @@ import com.github.torbinsky.morphia.annotations.Id;
  * @author Scott Hernandez
  */
 public class TestDatatypes  extends TestBase {
-	
+
 	public static class ContainsFloat{
 		@Id ObjectId id;
 		float val0 = 1.1F;
@@ -64,7 +64,7 @@ public class TestDatatypes  extends TestBase {
 		ContainsByte cb = new ContainsByte();
 		ds.save(cb);
 		ContainsByte loaded = ds.get(cb);
-		
+
 		assertNotNull(loaded);
 		assertTrue(loaded.val0 == cb.val0);
 		assertTrue(loaded.val1.equals(cb.val1));
@@ -74,7 +74,7 @@ public class TestDatatypes  extends TestBase {
 		ContainsShort cs = new ContainsShort();
 		ds.save(cs);
 		ContainsShort loaded = ds.get(cs);
-		
+
 		assertNotNull(loaded);
 		assertTrue(loaded.val0 == cs.val0);
 		assertTrue(loaded.val1.equals(cs.val1));
@@ -84,9 +84,19 @@ public class TestDatatypes  extends TestBase {
 		ContainsFloat cf = new ContainsFloat();
 		ds.save(cf);
 		ContainsFloat loaded = ds.get(cf);
-		
+
 		assertNotNull(loaded);
 		assertTrue(loaded.val0 == cf.val0);
 		assertTrue(loaded.val1.equals(cf.val1));
 	}
+    @Test
+    public void testDouble() throws Exception {
+        ContainsDouble cf = new ContainsDouble();
+        ds.save(cf);
+        ContainsDouble loaded = ds.get(cf);
+
+        assertNotNull(loaded);
+        assertTrue(loaded.val0 == cf.val0);
+        assertTrue(loaded.val1.equals(cf.val1));
+    }
 }

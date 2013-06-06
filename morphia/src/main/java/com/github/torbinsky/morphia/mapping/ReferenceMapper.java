@@ -32,7 +32,7 @@ import com.mongodb.DBRef;
 class ReferenceMapper implements CustomMapper {
 	static Logger log = LoggerFactory.getLogger(ReferenceMapper.class);
 
-    public void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, DefaultMapper mapr) {
+    public void toDBObject(Object entity, MappedField mf, DBObject dbObject, Map<Object, DBObject> involvedObjects, Mapper mapr) {
         String name = mf.getNameToStore();
 
         Object fieldValue = mf.getFieldValue(entity);
@@ -100,7 +100,7 @@ class ReferenceMapper implements CustomMapper {
     }
 
     private void writeMap(final MappedField mf, final DBObject dbObject, String name, Object fieldValue,
-                          DefaultMapper mapr) {
+                          Mapper mapr) {
         Map<Object, Object> map = (Map<Object, Object>) fieldValue;
         if ((map != null)) {
             Map values = mapr.getOptions().objectFactory.createMap(mf);
@@ -115,7 +115,7 @@ class ReferenceMapper implements CustomMapper {
                 }
             } else {
                 for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                    String strKey = mapr.converters.encode(entry.getKey()).toString();
+                    String strKey = mapr.getConverters().encode(entry.getKey()).toString();
                     values.put(strKey, mapr.keyToRef(getKey(entry.getValue(), mapr)));
                 }
             }
@@ -142,17 +142,7 @@ class ReferenceMapper implements CustomMapper {
         }
     }
 
-    /**
-     * @deprecated use void fromDBObject(final DBObject dbObject, final
-     *             MappedField mf, final Object entity, EntityCache cache)
-     *             instead.
-     */
-    @Deprecated
-    void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, DefaultMapper mapr) {
-        fromDBObject(dbObject, mf, entity, mapr.createEntityCache(), mapr);
-    }
-
-    public void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, DefaultMapper mapr) {
+    public void fromDBObject(final DBObject dbObject, final MappedField mf, final Object entity, EntityCache cache, Mapper mapr) {
         Class fieldType = mf.getType();
 
         Reference refAnn = mf.getAnnotation(Reference.class);
@@ -167,7 +157,7 @@ class ReferenceMapper implements CustomMapper {
     }
 
     private void readSingle(final DBObject dbObject, final MappedField mf, final Object entity, Class fieldType,
-                            Reference refAnn, EntityCache cache, DefaultMapper mapr) {
+                            Reference refAnn, EntityCache cache, Mapper mapr) {
         Class referenceObjClass = fieldType;
 
         DBRef dbRef = (DBRef) mf.getDbObjectValue(dbObject);
@@ -193,7 +183,7 @@ class ReferenceMapper implements CustomMapper {
     }
 
     private void readCollection(final DBObject dbObject, final MappedField mf, final Object entity, Reference refAnn,
-                                final EntityCache cache, final DefaultMapper mapr) {
+                                final EntityCache cache, final Mapper mapr) {
         // multiple references in a List
         Class referenceObjClass = mf.getSubClass();
         Collection references = mf.isSet() ? mapr.getOptions().objectFactory.createSet(mf) : mapr.getOptions().objectFactory.createList(mf);
@@ -201,13 +191,13 @@ class ReferenceMapper implements CustomMapper {
         if (refAnn.lazy() && LazyFeatureDependencies.assertDependencyFullFilled()) {
             Object dbVal = mf.getDbObjectValue(dbObject);
             if (dbVal != null) {
-                references = mapr.proxyFactory.createListProxy(references, referenceObjClass, refAnn.ignoreMissing(),
-                        mapr.datastoreProvider);
+                references = mapr.getProxyFactory().createListProxy(references, referenceObjClass, refAnn.ignoreMissing(),
+                        mapr.getDatastoreProvider());
                 ProxiedEntityReferenceList referencesAsProxy = (ProxiedEntityReferenceList) references;
 
                 if (dbVal instanceof List) {
                     List<DBRef> refList = (List) dbVal;
-                    Datastore dsi = mapr.datastoreProvider.get();
+                    Datastore dsi = mapr.getDatastoreProvider().get();
                     List<Key<Object>> keys = dsi.getKeysByRefs(refList);
 
                     if (keys.size() != refList.size()) {
@@ -257,13 +247,13 @@ class ReferenceMapper implements CustomMapper {
         }
     }
 
-    boolean exists(Class c, final DBRef dbRef, EntityCache cache, DefaultMapper mapr) {
+    boolean exists(Class c, final DBRef dbRef, EntityCache cache, Mapper mapr) {
         Key key = mapr.refToKey(dbRef);
         Boolean cached = cache.exists(key);
         if (cached != null)
             return cached;
 
-        Datastore dsi = mapr.datastoreProvider.get();
+        Datastore dsi = mapr.getDatastoreProvider().get();
 
         DBCollection dbColl = dsi.getCollection(c);
         if (!dbColl.getName().equals(dbRef.getRef()))
@@ -276,7 +266,7 @@ class ReferenceMapper implements CustomMapper {
         return exists;
     }
 
-    Object resolveObject(final DBRef dbRef, final MappedField mf, EntityCache cache, DefaultMapper mapr) {
+    Object resolveObject(final DBRef dbRef, final MappedField mf, EntityCache cache, Mapper mapr) {
         if (dbRef == null)
             return null;
 
@@ -291,7 +281,7 @@ class ReferenceMapper implements CustomMapper {
 
         if (refDbObject != null) {
             Object refObj = mapr.getOptions().objectFactory.createInstance(mapr, mf, refDbObject);
-            refObj = mapr.fromDb(refDbObject, refObj, cache);
+            refObj = mapr.fromDBObject(refDbObject, refObj, cache);
             cache.putEntity(key, refObj);
             return refObj;
         }
@@ -306,7 +296,7 @@ class ReferenceMapper implements CustomMapper {
     }
 
     private void readMap(final DBObject dbObject, final MappedField mf, final Object entity, final Reference refAnn,
-                         final EntityCache cache, final DefaultMapper mapr) {
+                         final EntityCache cache, final Mapper mapr) {
         Class referenceObjClass = mf.getSubClass();
         Map m = mapr.getOptions().objectFactory.createMap(mf);
 
@@ -314,8 +304,8 @@ class ReferenceMapper implements CustomMapper {
         if (dbVal != null) {
             if (refAnn.lazy() && LazyFeatureDependencies.assertDependencyFullFilled()) {
                 // replace map by proxy to it.
-                m = mapr.proxyFactory.createMapProxy(m, referenceObjClass, refAnn.ignoreMissing(),
-                        mapr.datastoreProvider);
+                m = mapr.getProxyFactory().createMapProxy(m, referenceObjClass, refAnn.ignoreMissing(),
+                        mapr.getDatastoreProvider());
             }
 
             final Map map = m;
@@ -324,7 +314,7 @@ class ReferenceMapper implements CustomMapper {
                 public void eval(Object key, Object val) {
                     DBRef dbRef = (DBRef) val;
 
-                    Object objKey = mapr.converters.decode(mf.getMapKeyClass(), key);
+                    Object objKey = mapr.getConverters().decode(mf.getMapKeyClass(), key);
 
                     if (refAnn.lazy() && LazyFeatureDependencies.assertDependencyFullFilled()) {
                         ProxiedEntityReferenceMap proxiedMap = (ProxiedEntityReferenceMap) map;
@@ -339,13 +329,13 @@ class ReferenceMapper implements CustomMapper {
         mf.setFieldValue(entity, m);
     }
 
-    private Object createOrReuseProxy(final Class referenceObjClass, final DBRef dbRef, EntityCache cache, DefaultMapper mapr) {
+    private Object createOrReuseProxy(final Class referenceObjClass, final DBRef dbRef, EntityCache cache, Mapper mapr) {
         Key key = mapr.refToKey(dbRef);
         Object proxyAlreadyCreated = cache.getProxy(key);
         if (proxyAlreadyCreated != null) {
             return proxyAlreadyCreated;
         }
-        Object newProxy = mapr.proxyFactory.createProxy(referenceObjClass, key, mapr.datastoreProvider);
+        Object newProxy = mapr.getProxyFactory().createProxy(referenceObjClass, key, mapr.getDatastoreProvider());
         cache.putProxy(key, newProxy);
         return newProxy;
     }

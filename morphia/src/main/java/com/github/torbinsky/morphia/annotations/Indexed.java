@@ -48,4 +48,6 @@ public @interface Indexed {
      * Create the index with the sparse option
      */
     boolean sparse() default false;
+
+    int expireAfterSeconds() default -1;
 }

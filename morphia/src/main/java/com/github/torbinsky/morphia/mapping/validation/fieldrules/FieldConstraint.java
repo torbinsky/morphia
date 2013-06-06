@@ -17,7 +17,7 @@ public abstract class FieldConstraint implements ClassConstraint {
     Mapper mapr;
 
     public final void check(MappedClass mc, Set<ConstraintViolation> ve) {
-        for (MappedField mf : mc.getPersistenceFields()) {
+        for (MappedField mf : mc.getMappedFields()) {
             check(mc, mf, ve);
         }
     }

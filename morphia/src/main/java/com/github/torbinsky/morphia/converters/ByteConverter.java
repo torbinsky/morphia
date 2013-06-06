@@ -5,6 +5,8 @@ package com.github.torbinsky.morphia.converters;
 
 import com.github.torbinsky.morphia.mapping.MappedField;
 import com.github.torbinsky.morphia.mapping.MappingException;
+import org.bson.types.Binary;
+
 
 /**
  * @author Uwe Schaefer, (us@thomas-daily.de)
@@ -22,7 +24,11 @@ public class ByteConverter extends TypeConverter implements SimpleValueConverter
 
         if (val instanceof Number)
             return ((Number) val).byteValue();
-
+        
+        if (val instanceof Binary) {
+        	return ((Binary)val).getData();
+        }
+        
         String sVal = val.toString();
         return Byte.parseByte(sVal);
     }

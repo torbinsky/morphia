@@ -1,5 +1,13 @@
 package com.github.torbinsky.morphia.issue241;
 
+import java.net.UnknownHostException;
+
+import org.bson.types.ObjectId;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.github.torbinsky.morphia.Datastore;
 import com.github.torbinsky.morphia.DatastoreImpl;
 import com.github.torbinsky.morphia.Morphia;
@@ -7,15 +15,9 @@ import com.github.torbinsky.morphia.annotations.Entity;
 import com.github.torbinsky.morphia.annotations.Id;
 import com.github.torbinsky.morphia.dao.BasicDAO;
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.MongoException;
-import com.mongodb.MongoURI;
-import org.junit.Assert;
-import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.net.UnknownHostException;
 
 
 /**
@@ -27,13 +29,12 @@ public class TestMapping {
 
     Mongo mongo;
     Datastore datastore;
-    MongoURI uri = new MongoURI("mongodb://127.0.0.1:27017");
 
 
     @Before
     public void setUp() {
         try {
-            mongo = new Mongo(uri);
+            mongo = new MongoClient(new MongoClientURI("mongodb://127.0.0.1:27017"));
             datastore = new DatastoreImpl(morphia, mongo, "MY_DB");
         } catch (UnknownHostException unknownHostException) {
         } catch (MongoException mongoException) {

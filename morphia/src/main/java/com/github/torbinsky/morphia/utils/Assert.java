@@ -183,14 +183,14 @@ public final class Assert {
                 + " is not part of the enum given : " + enumSetToLookIn);
     }
 
-    public static void parameterNotEmpty(final Collection obj, final String paramName) {
+    public static void parameterNotEmpty(final Collection<?> obj, final String paramName) {
         if (obj.isEmpty()) {
             Assert.raiseError("Parameter '" + paramName + "' from type '" + obj.getClass().getName()
                     + "' is expected to NOT be empty.");
         }
     }
 
-    public static void parameterNotEmpty(final Iterable obj, final String paramName) {
+    public static void parameterNotEmpty(final Iterable<?> obj, final String paramName) {
         if (!obj.iterator().hasNext()) {
             Assert.raiseError("Parameter '" + paramName + "' from type '" + obj.getClass().getName()
                     + "' is expected to NOT be empty");
@@ -238,7 +238,7 @@ public final class Assert {
     }
 
     public static void parameterArraysOfSameLength(final String argNames, final Object[]... objects) {
-        Assert.parametersNotNull("objects", objects);
+        Assert.parametersNotNull("objects", (Object[]) objects);
 
         Object[][] theParameter = objects;
         int length = theParameter.length;

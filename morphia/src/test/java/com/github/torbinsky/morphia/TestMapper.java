@@ -12,6 +12,8 @@ import com.github.torbinsky.morphia.annotations.Id;
 import com.github.torbinsky.morphia.annotations.PostLoad;
 import com.github.torbinsky.morphia.annotations.Property;
 import com.github.torbinsky.morphia.annotations.Reference;
+import com.github.torbinsky.morphia.mapping.cache.DefaultEntityCacheFactory;
+import com.github.torbinsky.morphia.mapping.cache.NoOpEntityCacheFactory;
 import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
 import org.junit.Ignore;
 
@@ -32,10 +34,6 @@ public class TestMapper extends TestBase {
 
 		@PostLoad
 		protected void postConstruct() {
-			if (A.loadCount > 1) {
-				throw new RuntimeException();
-			}
-
 			A.loadCount++;
 		}
 	}
@@ -152,7 +150,8 @@ public class TestMapper extends TestBase {
      * @throws Exception
      */
 	@Test
-	public void SingleLookup() throws Exception {
+	public void SingleLookupThanksToEntityCache() throws Exception {
+        ds.getMapper().setEntityCacheFactory(new DefaultEntityCacheFactory());
 		A.loadCount = 0;
 		A a = new A();
 		HoldsMultipleA holder = new HoldsMultipleA();
@@ -162,6 +161,7 @@ public class TestMapper extends TestBase {
 		holder = ds.get(HoldsMultipleA.class, holder.id);
 		Assert.assertEquals(1, A.loadCount);
 		Assert.assertTrue(holder.a1 == holder.a2);
+        ds.getMapper().setEntityCacheFactory(new NoOpEntityCacheFactory());
 	}
 
 	@Test
@@ -208,22 +208,27 @@ public class TestMapper extends TestBase {
      * Fix me. Referenced id field may need marshaling.
      * @throws Exception
      */
-	@Test @Ignore
+	@Test
 	public void ReferenceCustomId() throws Exception {
 		CustomId cId = new CustomId();
 		cId.id = new ObjectId();
 		cId.type = "banker";
 
-        UsesCustomIdObject objWithCustomId = new UsesCustomIdObject();
-        objWithCustomId.id = cId;
-        objWithCustomId.text = "hello world";
+		UsesCustomIdObject objWithCustomId = new UsesCustomIdObject();
+		objWithCustomId.id = cId;
+		objWithCustomId.text = "hello world";
 
 		ReferencesCustomId obj = new ReferencesCustomId();
 		obj.id = "testId";
-        obj.child = objWithCustomId;
+		obj.child = objWithCustomId;
 
 		ds.save(objWithCustomId);
 		ds.save(obj);
+
+		ReferencesCustomId reObj = ds.get(ReferencesCustomId.class, obj.id);
+
+		Assert.assertEquals(reObj.child.text, objWithCustomId.text);
+		Assert.assertEquals(reObj.child.id, objWithCustomId.id);
 	}
 
 }

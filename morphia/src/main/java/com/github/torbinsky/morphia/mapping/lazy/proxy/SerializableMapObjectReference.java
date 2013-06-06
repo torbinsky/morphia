@@ -66,7 +66,7 @@ public class SerializableMapObjectReference extends AbstractReference implements
         this.keyMap.clear();
         Map<Object, Object> map = (Map) object;
         for (Map.Entry<Object, Object> e : map.entrySet()) {
-            keyMap.put(e.getKey(), ds.getKey(e.getValue()));
+            keyMap.put(e.getKey(), ds.getMapper().getKey(e.getValue()));
         }
     }
 

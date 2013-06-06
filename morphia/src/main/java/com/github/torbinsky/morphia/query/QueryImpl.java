@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.torbinsky.morphia.Datastore;
 import com.github.torbinsky.morphia.Key;
-import com.github.torbinsky.morphia.annotations.Entity;
 import com.github.torbinsky.morphia.mapping.DefaultMapper;
 import com.github.torbinsky.morphia.mapping.MappedClass;
 import com.github.torbinsky.morphia.mapping.MappedField;
@@ -68,9 +67,8 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
         this.cache = this.ds.getMapper().createEntityCache();
 
         MappedClass mc = this.ds.getMapper().getMappedClass(clazz);
-        Entity entAn = mc == null ? null : mc.getEntityAnnotation();
-        if (entAn != null)
-            this.readPref = this.ds.getMapper().getMappedClass(clazz).getEntityAnnotation().queryNonPrimary() ? ReadPreference.secondaryPreferred() : null;
+        if (mc != null)
+            this.readPref = mc.getReadPreference();
     }
 
     public QueryImpl(Class<T> clazz, DBCollection coll, Datastore ds, int offset, int limit) {
@@ -117,6 +115,10 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 
     public void setQueryObject(DBObject query) {
         this.baseQuery = (BasicDBObject) query;
+    }
+
+    public void setDbCollection(DBCollection collection) {
+        this.dbColl = collection;
     }
 
     public int getOffset() {
@@ -409,11 +411,6 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
         return batchSize;
     }
 
-    public Query<T> skip(int value) {
-        this.offset = value;
-        return this;
-    }
-
     public Query<T> offset(int value) {
         this.offset = value;
         return this;
@@ -518,11 +515,11 @@ public class QueryImpl<T> extends CriteriaContainerImpl implements Query<T>, Cri
 
     public Query<T> retrieveKnownFields() {
         MappedClass mc = this.ds.getMapper().getMappedClass(clazz);
-        ArrayList<String> fields = new ArrayList<String>(mc.getPersistenceFields().size() + 1);
-        for (MappedField mf : mc.getPersistenceFields()) {
+        ArrayList<String> fields = new ArrayList<String>(mc.getMappedFields().size() + 1);
+        for (MappedField mf : mc.getMappedFields()) {
             fields.add(mf.getNameToStore());
         }
-        retrievedFields(true, (String[]) fields.toArray());
+        retrievedFields(true, fields.toArray(new String[fields.size()]));
         return this;
     }
 

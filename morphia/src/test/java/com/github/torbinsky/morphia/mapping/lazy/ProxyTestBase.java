@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.github.torbinsky.morphia.mapping.lazy;
 
@@ -19,15 +19,15 @@ import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedReference;
  * @author Uwe Schaefer, (us@thomas-daily.de)
  *
  */
-@Ignore
-@SuppressWarnings("unchecked")
 public class ProxyTestBase extends TestBase {
 
 	protected void assertFetched(final Object e) {
+        Assert.assertTrue(e instanceof ProxiedReference);
 		Assert.assertTrue(isFetched(e));
 	}
 
 	protected void assertNotFetched(final Object e) {
+        Assert.assertTrue("e is not a ProxiedReference, it is however a: " + e.getClass().getName(), e instanceof ProxiedReference);
 		Assert.assertFalse(isFetched(e));
 	}
 

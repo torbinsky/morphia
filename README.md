@@ -21,9 +21,18 @@ To use, add Morphia to your Java SE or EE project alongside the mongo-java-drive
 		<td>Artifact ID</td><td>morphia</td>
 	</tr>
 	<tr>
-		<td>Version</td><td>1.2.2</td>
+		<td>Version</td><td>1.2.3</td>
 	</tr>
 </table>
+
+You can paste the following into your pom.xml:
+```
+<dependency>
+    <groupId>com.github.jmkgreen.morphia</groupId>
+    <artifactId>morphia</artifactId>
+    <version>1.2.3</version>
+</dependency>
+```
 
 ### Documentation
 

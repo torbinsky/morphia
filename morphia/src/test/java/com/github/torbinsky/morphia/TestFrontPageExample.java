@@ -81,7 +81,7 @@ public class TestFrontPageExample  extends TestBase {
 
 		Employee boss = ds.find(Employee.class).field("manager").equal(null).get(); // get an employee without a manager
 		Assert.assertNotNull(boss);
-		Key<Employee> scottsKey = ds.save(new Employee("Scott", "Hernandez", ds.getKey(boss), 150*1000));
+		Key<Employee> scottsKey = ds.save(new Employee("Scott", "Hernandez", ds.getMapper().getKey(boss), 150*1000));
 		Assert.assertNotNull(scottsKey);
 
 		UpdateResults<Employee> res = ds.update(boss, ds.createUpdateOperations(Employee.class).add("underlings", scottsKey)); //add Scott as an employee of his manager

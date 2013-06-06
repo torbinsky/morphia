@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package com.github.torbinsky.morphia;
 
+import com.mongodb.MongoClient;
 import org.junit.After;
 import org.junit.Before;
 
@@ -12,6 +13,7 @@ import com.mongodb.Mongo;
 
 public abstract class TestBase
 {
+    public static final String DB_NAME = "morphia_test";
     protected Mongo mongo;
     protected DB db;
     protected Datastore ds;
@@ -20,29 +22,29 @@ public abstract class TestBase
 
     protected TestBase() {
         try {
-			this.mongo = new Mongo();
+			this.mongo = new MongoClient();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
     }
-    
+
     @Before
     public void setUp()
     {
-        this.db = this.mongo.getDB("morphia_test");
+        this.db = this.mongo.getDB(DB_NAME);
         this.ds = this.morphia.createDatastore(this.mongo, this.db.getName());
         this.ads = (AdvancedDatastore) ds;
         //ads.setDecoderFact(LazyDBDecoder.FACTORY);
     }
-	
+
     protected void cleanup() {
-        //this.mongo.dropDatabase("morphia_test");
+//        this.mongo.dropDatabase("morphia_test");
 		for(MappedClass mc : morphia.getMapper().getMappedClasses())
 //			if( mc.getEntityAnnotation() != null )
 				db.getCollection(mc.getCollectionName()).drop();
-    	
+
     }
-    
+
 	@After
 	public void tearDown() {
     	cleanup();

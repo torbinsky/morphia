@@ -2,11 +2,7 @@ package com.github.torbinsky.morphia;
 
 import com.github.torbinsky.morphia.query.Query;
 import com.github.torbinsky.morphia.query.UpdateOperations;
-import com.mongodb.DBDecoderFactory;
-import com.mongodb.DBObject;
-import com.mongodb.DBRef;
-import com.mongodb.WriteConcern;
-import com.mongodb.WriteResult;
+import com.mongodb.*;
 
 /**
  * <p>
@@ -89,11 +85,30 @@ public interface AdvancedDatastore extends Datastore {
      */
     <T> Key<T> save(String kind, T entity);
 
+    <T> Iterable<Key<T>> save(Iterable<T> entities, WriteConcern wc);
+
     /**
-     * No validation or conversion is done to the id.
+     * Save the entity under a custom collection.
+     *
+     * @param entity
+     * @param collection
+     * @param <T>
+     * @return
+     * @since 1.3
      */
-    @Deprecated
-    <T> WriteResult delete(String kind, T id);
+    <T> Key<T> save(T entity, DBCollection collection);
+
+    /**
+     * Save the entity under a customer collection and write concern.
+     *
+     * @param entity
+     * @param collection
+     * @param writeConcern
+     * @param <T>
+     * @return
+     * @since 1.3
+     */
+    <T> Key<T> save(T entity, DBCollection collection, WriteConcern writeConcern);
 
     /**
      *
@@ -105,6 +120,10 @@ public interface AdvancedDatastore extends Datastore {
      * @return
      */
     <T, V> WriteResult delete(String kind, Class<T> clazz, V id);
+
+    <T> WriteResult delete(T entity, WriteConcern wc);
+
+    <T> WriteResult delete(Query<T> query, WriteConcern wc);
 
     /**
      *
@@ -138,7 +157,7 @@ public interface AdvancedDatastore extends Datastore {
      * @param <T>
      * @return
      */
-    <T> Iterable<Key<T>> insert(T... entities);
+    <T> Iterable<Key<T>> insert(@SuppressWarnings("unchecked") T... entities);
 
     /**
      *

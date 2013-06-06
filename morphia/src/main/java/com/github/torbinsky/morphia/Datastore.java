@@ -1,11 +1,13 @@
 package com.github.torbinsky.morphia;
 
+import java.util.List;
+import java.util.Map;
+
 import com.github.torbinsky.morphia.mapping.Mapper;
 import com.github.torbinsky.morphia.query.Query;
 import com.github.torbinsky.morphia.query.UpdateOperations;
 import com.github.torbinsky.morphia.query.UpdateResults;
 import com.github.torbinsky.morphia.utils.IndexDirection;
-import com.github.torbinsky.morphia.utils.IndexFieldDef;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBDecoderFactory;
@@ -14,8 +16,6 @@ import com.mongodb.MapReduceCommand;
 import com.mongodb.Mongo;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Datastore interface to get/delete/save objects.
@@ -23,11 +23,6 @@ import java.util.Map;
  * @author Scott Hernandez
  */
 public interface Datastore {
-    /**
-     * Creates a (type-safe) reference to the entity;
-     * if stored this will become a {@link DBRef}.
-     */
-    <T> Key<T> getKey(T entity);
 
     /**
      * Does a query to check if the keyOrEntity exists in mongodb.
@@ -312,23 +307,6 @@ public interface Datastore {
      * Ensures (creating if necessary) the index and direction.
      */
     <T> void ensureIndex(Class<T> clazz, String field, IndexDirection dir);
-
-    /**
-     * Ensures (creating if necessary) the index including
-     * the field(s) + directions.
-     */
-    @Deprecated
-    <T> void ensureIndex(Class<T> clazz, IndexFieldDef... fields);
-
-    /**
-     * Ensures (creating if necessary) the index including
-     * the field(s) + directions.
-     */
-    @Deprecated
-    <T> void ensureIndex(Class<T> clazz, String name,
-                         IndexFieldDef[] fields, boolean unique,
-                         boolean dropDupsOnCreate);
-
     /**
      * Ensures (creating if necessary) the index including the
      * field(s) + directions; eg fields = "field1, -field2"
