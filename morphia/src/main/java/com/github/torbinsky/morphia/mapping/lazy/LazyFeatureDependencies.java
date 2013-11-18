@@ -25,15 +25,19 @@ public class LazyFeatureDependencies {
     }
 
     public static boolean testDependencyFullFilled() {
-        if (fullFilled != null)
+        if (fullFilled != null){
+        	log.trace("Fulfilled already set with result[" + fullFilled + "]");
             return fullFilled;
+        }
         try {
             fullFilled = Class.forName("net.sf.cglib.proxy.Enhancer") != null
                     && Class.forName("com.thoughtworks.proxy.toys.hotswap.HotSwapping") != null;
         } catch (ClassNotFoundException e) {
             fullFilled = false;
+            log.debug("Dependency wasn't fulfilled because the class wasn't found.", e);
         } catch (LinkageError e) {
             fullFilled = false;
+            log.debug("Dependency wasn't fulfilled because there was a LinkageError.", e);
         }
         return fullFilled;
     }
