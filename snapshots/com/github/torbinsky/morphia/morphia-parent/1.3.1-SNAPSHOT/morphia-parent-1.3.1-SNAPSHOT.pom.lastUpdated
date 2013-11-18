@@ -1,0 +1,4 @@
+#NOTE: This is an internal implementation file, its format can be changed without prior notice.
+#Mon Nov 18 15:38:54 PST 2013
+dec447df0b51d37d5f73bec740315bdc1e97a0e4@default-http\://corp.yupiq.com\:3080/nexus-webapp-1.7.2/content/groups/public/.lastUpdated=1384817934051
+http\://corp.yupiq.com\:3080/nexus-webapp-1.7.2/content/groups/public/.error=Could not transfer artifact com.github.torbinsky.morphia\:morphia-parent\:pom\:1.3.1-SNAPSHOT from/to yupiq-nexus (http\://corp.yupiq.com\:3080/nexus-webapp-1.7.2/content/groups/public)\: connection timed out to http\://corp.yupiq.com\:3080/nexus-webapp-1.7.2/content/groups/public/com/github/torbinsky/morphia/morphia-parent/1.3.1-SNAPSHOT/morphia-parent-1.3.1-SNAPSHOT.pom
