@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.torbinsky.morphia</groupId>
+    <artifactId>morphia-parent</artifactId>
+    <version>1.3.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Morphia Build</name>
+    <description>
+        Morphia is an Object-Document Mapper, written in Java for MongoDB.
+        Application developer authoring code in Java and using the mongo-java-driver
+        can use Morphia to map POJO classes into MongoDB documents and vice-versa.
+        Morphia provides a Datastore, Query, and DAO-style interfaces including CRUD
+        services in a type-safe manner.
+    </description>
+
+    <url>http://github.com/torbinsky/morphia/</url>
+
+    <issueManagement>
+        <url>https://github.com/jmkgreen/morphia/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>http://travis-ci.org/#!/jmkgreen/morphia</url>
+    </ciManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:torbinsky/morphia.git</connection>
+        <developerConnection>scm:git:git@github.com:torbinsky/morphia.git</developerConnection>
+        <url>https://github.com/torbinsky/morphia</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>oli.gauti</id>
+            <name>Olafur Gauti Gudmundsson</name>
+        </developer>
+        <developer>
+            <id>scotthernandez</id>
+            <name>Scott Hernandez</name>
+            <email>scotthernandez (hot/g mail)</email>
+            <timezone>-8</timezone>
+        </developer>
+        <developer>
+            <id>us@thomas-daily.de</id>
+            <name>Uwe Schäfer</name>
+        </developer>
+	<developer>
+	    <id>torbinsky</id>
+	    <name>Torben</name>
+	</developer>
+    </developers>
+
+    <properties>
+        <mongo-java-driver.version>2.11.1</mongo-java-driver.version>
+        <proxytoys.version>1.0</proxytoys.version>
+        <cglib-nodep.version>2.2.2</cglib-nodep.version>
+        <guice.version>3.0</guice.version>
+        <reflections.version>0.9.8</reflections.version>
+        <guava.version>13.0.1</guava.version>
+        <junit.version>4.11</junit.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.torbinsky.morphia</groupId>
+                <artifactId>morphia</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongo-java-driver.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.thoughtworks.proxytoys</groupId>
+                <artifactId>proxytoys</artifactId>
+                <version>${proxytoys.version}</version>
+                <optional>true</optional>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+			
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+			<dependency>
+	<groupId>ch.qos.logback</groupId>
+	<artifactId>logback-core</artifactId>
+	<version>1.0.9</version>
+</dependency>
+            
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                    <excludes>
+                        <exclude>**/emul/**/*.java</exclude>
+                    </excludes>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <show>public</show>
+                    <author>false</author>
+                    <encoding>UTF-8</encoding>
+                    <quiet>true</quiet>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javadoc</goal>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+	</plugins>
+        <pluginManagement>
+	<plugins>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.7</version>
+                </plugin>
+
+
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.6</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.6</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>2.5</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.0</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>2.9</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.12.4</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <modules>
+        <module>morphia</module>
+    </modules>
+
+</project>
