@@ -1,19 +1,17 @@
 package com.github.torbinsky.morphia.mapping;
 
-import com.github.torbinsky.morphia.annotations.Id;
-import com.github.torbinsky.morphia.annotations.Reference;
-import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
-import com.github.torbinsky.morphia.mapping.lazy.ProxyTestBase;
-import com.github.torbinsky.morphia.testutil.TestEntity;
-import org.bson.types.ObjectId;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import com.github.torbinsky.morphia.annotations.Reference;
+import com.github.torbinsky.morphia.mapping.lazy.ProxyTestBase;
+import com.github.torbinsky.morphia.testutil.TestEntity;
 
 /**
  * User: mutyonok
@@ -47,10 +45,6 @@ public class MapWithNonStringKeyAndReferenceValueTest extends ProxyTestBase {
 
     @Test
     public void testWithProxy() throws Exception {
-        if (!LazyFeatureDependencies.assertDependencyFullFilled())
-        {
-            return;
-        }
         morphia.map(ChildEntity.class, ParentEntity.class);
 
         ChildEntity ce1 = new ChildEntity();

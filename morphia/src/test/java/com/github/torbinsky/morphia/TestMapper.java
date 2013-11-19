@@ -2,9 +2,8 @@ package com.github.torbinsky.morphia;
 
 import java.io.Serializable;
 
-import org.junit.Assert;
-
 import org.bson.types.ObjectId;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.torbinsky.morphia.annotations.Entity;
@@ -14,8 +13,6 @@ import com.github.torbinsky.morphia.annotations.Property;
 import com.github.torbinsky.morphia.annotations.Reference;
 import com.github.torbinsky.morphia.mapping.cache.DefaultEntityCacheFactory;
 import com.github.torbinsky.morphia.mapping.cache.NoOpEntityCacheFactory;
-import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
-import org.junit.Ignore;
 
 /**
  * Tests mapper functions; this is tied to some of the internals.
@@ -166,12 +163,6 @@ public class TestMapper extends TestBase {
 
 	@Test
 	public void SingleProxy() throws Exception {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
 		A.loadCount = 0;
 		A a = new A();
 		HoldsMultipleALazily holder = new HoldsMultipleALazily();

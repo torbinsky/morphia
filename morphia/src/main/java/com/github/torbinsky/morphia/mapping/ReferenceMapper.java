@@ -15,7 +15,6 @@ import com.github.torbinsky.morphia.Datastore;
 import com.github.torbinsky.morphia.Key;
 import com.github.torbinsky.morphia.annotations.Reference;
 import com.github.torbinsky.morphia.mapping.cache.EntityCache;
-import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedEntityReference;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedEntityReferenceList;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedEntityReferenceMap;
@@ -163,7 +162,7 @@ class ReferenceMapper implements CustomMapper {
         DBRef dbRef = (DBRef) mf.getDbObjectValue(dbObject);
         if (dbRef != null) {
             Object resolvedObject = null;
-            if (refAnn.lazy() && LazyFeatureDependencies.assertDependencyFullFilled()) {
+            if (refAnn.lazy()) {
                 if (exists(referenceObjClass, dbRef, cache, mapr)) {
                     resolvedObject = createOrReuseProxy(referenceObjClass, dbRef, cache, mapr);
                 } else {
@@ -188,7 +187,7 @@ class ReferenceMapper implements CustomMapper {
         Class referenceObjClass = mf.getSubClass();
         Collection references = mf.isSet() ? mapr.getOptions().objectFactory.createSet(mf) : mapr.getOptions().objectFactory.createList(mf);
 
-        if (refAnn.lazy() && LazyFeatureDependencies.assertDependencyFullFilled()) {
+        if (refAnn.lazy()) {
             Object dbVal = mf.getDbObjectValue(dbObject);
             if (dbVal != null) {
                 references = mapr.getProxyFactory().createListProxy(references, referenceObjClass, refAnn.ignoreMissing(),
@@ -302,7 +301,7 @@ class ReferenceMapper implements CustomMapper {
 
         DBObject dbVal = (DBObject) mf.getDbObjectValue(dbObject);
         if (dbVal != null) {
-            if (refAnn.lazy() && LazyFeatureDependencies.assertDependencyFullFilled()) {
+            if (refAnn.lazy()) {
                 // replace map by proxy to it.
                 m = mapr.getProxyFactory().createMapProxy(m, referenceObjClass, refAnn.ignoreMissing(),
                         mapr.getDatastoreProvider());
@@ -316,7 +315,7 @@ class ReferenceMapper implements CustomMapper {
 
                     Object objKey = mapr.getConverters().decode(mf.getMapKeyClass(), key);
 
-                    if (refAnn.lazy() && LazyFeatureDependencies.assertDependencyFullFilled()) {
+                    if (refAnn.lazy()) {
                         ProxiedEntityReferenceMap proxiedMap = (ProxiedEntityReferenceMap) map;
                         proxiedMap.__put(objKey, mapr.refToKey(dbRef));
                     } else {

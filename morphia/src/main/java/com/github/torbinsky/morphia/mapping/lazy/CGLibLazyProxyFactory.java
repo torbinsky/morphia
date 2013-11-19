@@ -3,6 +3,10 @@
  */
 package com.github.torbinsky.morphia.mapping.lazy;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Map;
+
 import com.github.torbinsky.morphia.Key;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedEntityReference;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxiedEntityReferenceList;
@@ -13,9 +17,6 @@ import com.github.torbinsky.morphia.mapping.lazy.proxy.SerializableMapObjectRefe
 import com.thoughtworks.proxy.factory.CglibProxyFactory;
 import com.thoughtworks.proxy.toys.delegate.DelegationMode;
 import com.thoughtworks.proxy.toys.dispatch.Dispatching;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * i have to admit, there are plenty of open questions for me on that

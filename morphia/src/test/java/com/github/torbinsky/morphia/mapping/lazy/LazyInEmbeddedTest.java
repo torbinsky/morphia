@@ -76,12 +76,6 @@ public class LazyInEmbeddedTest extends TestBase
 	@Test
     public void testLoadingOfRefInField() throws Exception
     {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
         morphia.map(ContainerWithRefInField.class);
         morphia.map(OtherEntity.class);
 
@@ -109,12 +103,6 @@ public class LazyInEmbeddedTest extends TestBase
     @Test
     public void testLoadingOfRefThroughInheritanceInField() throws Exception
     {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
         morphia.map(ContainerWithRefInField.class);
         morphia.map(OtherEntityChild.class);
 
@@ -142,12 +130,6 @@ public class LazyInEmbeddedTest extends TestBase
     @Test
     public void testLoadingOfRefInList() throws Exception
     {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
         morphia.map(ContainerWithRefList.class);
         morphia.map(OtherEntity.class);
 
@@ -179,12 +161,6 @@ public class LazyInEmbeddedTest extends TestBase
     @Test
     public void testLoadingOfRefThroughInheritanceInList() throws Exception
     {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
         morphia.map(ContainerWithRefList.class);
         morphia.map(OtherEntityChild.class);
 

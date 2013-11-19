@@ -13,13 +13,6 @@ import com.github.torbinsky.morphia.testutil.TestEntity;
 public class TestLazyCircularReference extends ProxyTestBase {
 	@Test
 	public final void testCreateProxy() {
-
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
 		RootEntity root = new RootEntity();
 		ReferencedEntity reference = new ReferencedEntity();
 		reference.parent = root;
@@ -54,12 +47,6 @@ public class TestLazyCircularReference extends ProxyTestBase {
 
 	@Test
 	public final void testShortcutInterface() {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
         RootEntity root = new RootEntity();
 		ReferencedEntity reference = new ReferencedEntity();
 		reference.parent = root;
@@ -101,12 +88,6 @@ public class TestLazyCircularReference extends ProxyTestBase {
 
 	@Test
 	public final void testSerialization() {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
 		RootEntity e1 = new RootEntity();
 		ReferencedEntity e2 = new ReferencedEntity();
 		e2.parent = e1;
@@ -131,12 +112,6 @@ public class TestLazyCircularReference extends ProxyTestBase {
 
 	@Test
 	public final void testGetKeyWithoutFetching() {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
 		RootEntity root = new RootEntity();
 		ReferencedEntity reference = new ReferencedEntity();
 		reference.parent = root;

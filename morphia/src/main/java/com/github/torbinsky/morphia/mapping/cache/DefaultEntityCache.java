@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import relocated.morphia.org.apache.commons.collections.ReferenceMap;
 
 import com.github.torbinsky.morphia.Key;
-import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
 import com.github.torbinsky.morphia.mapping.lazy.proxy.ProxyHelper;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -46,13 +45,11 @@ public class DefaultEntityCache implements EntityCache {
     public <T> T getEntity(Key<T> k) {
         Object o = entityMap.get(k);
         if (o == null) {
-            if (LazyFeatureDependencies.testDependencyFullFilled()) {
-                Object proxy = proxyMap.get(k);
-                if (proxy != null) {
-                    ProxyHelper.isFetched(proxy);
-                    stats.hits++;
-                    return (T) ProxyHelper.unwrap(proxy);
-                }
+            Object proxy = proxyMap.get(k);
+            if (proxy != null) {
+                ProxyHelper.isFetched(proxy);
+                stats.hits++;
+                return (T) ProxyHelper.unwrap(proxy);
             }
             // System.out.println("miss entity " + k + ":" + this);
             stats.misses++;

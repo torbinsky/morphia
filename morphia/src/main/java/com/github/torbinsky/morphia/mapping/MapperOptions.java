@@ -2,9 +2,9 @@ package com.github.torbinsky.morphia.mapping;
 
 import com.github.torbinsky.morphia.ObjectFactory;
 import com.github.torbinsky.morphia.converters.DefaultConverters;
+import com.github.torbinsky.morphia.mapping.lazy.CGLibLazyProxyFactory;
 import com.github.torbinsky.morphia.mapping.lazy.DatastoreProvider;
 import com.github.torbinsky.morphia.mapping.lazy.DefaultDatastoreProvider;
-import com.github.torbinsky.morphia.mapping.lazy.LazyFeatureDependencies;
 import com.github.torbinsky.morphia.mapping.lazy.LazyProxyFactory;
 
 /**
@@ -36,7 +36,7 @@ public class MapperOptions {
     public CustomMapper defaultMapper = embeddedMapper;
 
     public ObjectFactory objectFactory = new DefaultCreator();
-    public LazyProxyFactory proxyFactory = LazyFeatureDependencies.createDefaultProxyFactory();
+    public LazyProxyFactory proxyFactory = new CGLibLazyProxyFactory();
     public DatastoreProvider datastoreProvider = new DefaultDatastoreProvider();
     public DefaultConverters converters = new DefaultConverters();
 

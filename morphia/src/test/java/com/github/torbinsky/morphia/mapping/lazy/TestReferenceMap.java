@@ -16,12 +16,6 @@ public class TestReferenceMap extends ProxyTestBase
 {
 	@Test
 	public final void testCreateProxy() {
-        // TODO us: exclusion does not work properly with maven + junit4
-        if (!LazyFeatureDependencies.testDependencyFullFilled())
-        {
-            return;
-        }
-
 		A a = new A();
 		B b1 = new B();
 		B b2 = new B();
