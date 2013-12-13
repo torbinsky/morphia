@@ -4,9 +4,9 @@
   <artifactId>morphia</artifactId>
   <version>1.3.6-SNAPSHOT</version>
   <versioning>
-    <versions>
-      <version>1.3.6-SNAPSHOT</version>
-    </versions>
+    <snapshot>
+      <localCopy>true</localCopy>
+    </snapshot>
     <lastUpdated>20131213235437</lastUpdated>
   </versioning>
 </metadata>
