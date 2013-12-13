@@ -22,10 +22,20 @@ public class TenantMapper extends DefaultMapper {
 
 	@Inject
 	public TenantMapper(Provider<IsTenant> tenantProvider) {
+	    super();
 		this.tenantProvider = tenantProvider;
 	}
+	
+	
 
-	@SuppressWarnings("rawtypes")
+	public TenantMapper(Provider<IsTenant> tenantProvider, MapperOptions opts) {
+        super(opts);
+        this.tenantProvider = tenantProvider;
+    }
+
+
+
+    @SuppressWarnings("rawtypes")
 	@Override
 	public MappedClass addMappedClass(Class c) {
 		return addMappedClass(mapClass(c), true);
