@@ -241,7 +241,7 @@ public class MappedClass {
     }
 
     public MappedField getMappedIdField() {
-    	List<MappedField> fields = getFieldsAnnotatedWith(Id.class);
+    	List<MappedField> fields = getFieldsAnnotatedWith(Id.class, javax.persistence.Id.class);
         return fields.isEmpty() ? null : fields.get(0);
     }
 
