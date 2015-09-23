@@ -241,7 +241,8 @@ public class MappedClass {
     }
 
     public MappedField getMappedIdField() {
-        return getFieldsAnnotatedWith(Id.class, javax.persistence.Id.class).get(0);
+    	List<MappedField> fields = getFieldsAnnotatedWith(Id.class);
+        return fields.isEmpty() ? null : fields.get(0);
     }
 
     /**
@@ -376,7 +377,7 @@ public class MappedClass {
             else if (mapr.getOptions().ignoreFinals && ((fieldMods & Modifier.FINAL) == Modifier.FINAL))
                 continue;
             else if (field.isAnnotationPresent(Id.class) || field.isAnnotationPresent(javax.persistence.Id.class)) {
-                MappedField mf = new MappedField(field, clazz);
+                MappedField mf = new MappedField(field, clazz, getMapper());
                 mappedFields.add(mf);
                 update();
             } else if (field.isAnnotationPresent(Property.class) ||
@@ -385,10 +386,10 @@ public class MappedClass {
                     field.isAnnotationPresent(Serialized.class) ||
                     isSupportedType(field.getType()) ||
                     ReflectionUtils.implementsInterface(field.getType(), Serializable.class)) {
-                mappedFields.add(new MappedField(field, clazz));
+                mappedFields.add(new MappedField(field, clazz, getMapper()));
             } else {
                 if (mapr.getOptions().defaultMapper != null)
-                    mappedFields.add(new MappedField(field, clazz));
+                    mappedFields.add(new MappedField(field, clazz, getMapper()));
                 else if (log.isWarnEnabled())
                     log.warn("Ignoring (will not persist) field: " + clazz.getName() + "." + field.getName() + " [type:" + field.getType().getName() + "]");
             }

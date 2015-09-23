@@ -311,7 +311,7 @@ public class DefaultMapper implements Mapper {
         if (isAnAssignableField(mf, value) || isAnEntity(mc)) {
             try {
                 if (value instanceof Iterable) {
-                    return getDbRefs((Iterable) value);
+                    return getDbRefs(mf, (Iterable) value);
                 }
 
                 if (value.getClass().isAssignableFrom(Boolean.class)) {
@@ -725,11 +725,12 @@ public class DefaultMapper implements Mapper {
         return (mc != null && mc.getEntityAnnotation() != null);
     }
 
-    private ArrayList<DBRef> getDbRefs(Iterable value) {
-        ArrayList<DBRef> refs = new ArrayList<DBRef>();
+    private Object getDbRefs(final MappedField field, Iterable value) {
+        final List<Object> refs = new ArrayList<Object>();
+        boolean idOnly = field.getAnnotation(Reference.class).idOnly();
         for (Object o : value) {
-            Key<?> k = (o instanceof Key) ? (Key<?>) o : getKey(o);
-            refs.add(keyToRef(k));
+            Key<?> key = (o instanceof Key) ? (Key<?>) o : getKey(o);
+            refs.add(idOnly ? key.getId() : keyToRef(key));
         }
         return refs;
     }
@@ -1009,8 +1010,8 @@ public class DefaultMapper implements Mapper {
             }
 
             if (validateTypes)
-                if ((mf.isSingleValue() && !isCompatibleForOperator(mf.getType(), op, val)) ||
-                        ((mf.isMultipleValues() && !(isCompatibleForOperator(mf.getSubClass(), op, val) || isCompatibleForOperator(mf.getType(), op, val))))) {
+                if ((mf.isSingleValue() && !isCompatibleForOperator(mf, mf.getType(), op, val)) ||
+                        ((mf.isMultipleValues() && !(isCompatibleForOperator(mf, mf.getSubClass(), op, val) || isCompatibleForOperator(mf, mf.getType(), op, val))))) {
 
 
                     if (log.isDebugEnabled()) {
@@ -1050,28 +1051,31 @@ public class DefaultMapper implements Mapper {
         return !(mf.hasAnnotation(Reference.class) || mf.hasAnnotation(Serialized.class));
     }
 
-    public static boolean isCompatibleForOperator(Class<?> type, FilterOperator op, Object value) {
-        if (value == null || type == null)
+    public static boolean isCompatibleForOperator(final MappedField mf, Class<?> type, FilterOperator op, Object value) {
+        if (value == null || type == null) {
             return true;
-        else if (op.equals(FilterOperator.EXISTS) && (value instanceof Boolean))
+        } else if (op.equals(FilterOperator.EXISTS) && (value instanceof Boolean)) {
             return true;
-        else if (op.equals(FilterOperator.IN) && (value.getClass().isArray() || Iterable.class.isAssignableFrom(value.getClass()) || Map.class.isAssignableFrom(value.getClass())))
+        } else if (op.equals(FilterOperator.IN) && (value.getClass().isArray() || Iterable.class.isAssignableFrom(value.getClass()) || Map.class.isAssignableFrom(value.getClass()))) {
             return true;
-        else if (op.equals(FilterOperator.NOT_IN) && (value.getClass().isArray() || Iterable.class.isAssignableFrom(value.getClass()) || Map.class.isAssignableFrom(value.getClass())))
+        } else if (op.equals(FilterOperator.NOT_IN) && (value.getClass().isArray() || Iterable.class.isAssignableFrom(value.getClass()) || Map.class.isAssignableFrom(value.getClass()))) {
             return true;
-        else if (op.equals(FilterOperator.ALL) && (value.getClass().isArray() || Iterable.class.isAssignableFrom(value.getClass()) || Map.class.isAssignableFrom(value.getClass())))
+        } else if (op.equals(FilterOperator.ALL) && (value.getClass().isArray() || Iterable.class.isAssignableFrom(value.getClass()) || Map.class.isAssignableFrom(value.getClass()))) {
             return true;
-        else if (value instanceof Integer && (int.class.equals(type) || long.class.equals(type) || Long.class.equals(type)))
+        } else if (value instanceof Integer && (int.class.equals(type) || long.class.equals(type) || Long.class.equals(type))) {
             return true;
-        else if ((value instanceof Integer || value instanceof Long) && (double.class.equals(type) || Double.class.equals(type)))
+        } else if ((value instanceof Integer || value instanceof Long) && (double.class.equals(type) || Double.class.equals(type))) {
             return true;
-        else if (value instanceof Pattern && String.class.equals(type))
+        } else if (value instanceof Pattern && String.class.equals(type)) {
             return true;
-        else if (value.getClass().getAnnotation(Entity.class) != null && Key.class.equals(type))
+        } else if (value.getClass().getAnnotation(Entity.class) != null && Key.class.equals(type)) {
             return true;
-        else if (value instanceof List<?>)
+        } else if (value instanceof List<?>) {
             return true;
-        else if (!value.getClass().isAssignableFrom(type) &&
+        } else if (mf.getMapper().getMappedClass(type) != null && mf.getMapper().getMappedClass(type).getMappedIdField() != null
+        		&& value.getClass().equals(mf.getMapper().getMappedClass(type).getMappedIdField().getConcreteType())) {
+            return true;
+        } else if (!value.getClass().isAssignableFrom(type) &&
                 //hack to let Long match long, and so on
                 !value.getClass().getSimpleName().toLowerCase().equals(type.getSimpleName().toLowerCase())) {
             return false;

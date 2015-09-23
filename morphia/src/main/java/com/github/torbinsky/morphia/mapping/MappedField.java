@@ -61,6 +61,7 @@ public class MappedField {
             javax.persistence.Id.class
     ));
 
+    private final Mapper mapper;
     protected Class persistedClass;
     /**
      * The field :).
@@ -112,8 +113,9 @@ public class MappedField {
     /**
      * The constructor.
      */
-    MappedField(Field f, Class<?> clazz) {
-        f.setAccessible(true);
+    MappedField(final Field f, final Class<?> clazz, final Mapper mapper) {
+        this.mapper = mapper;
+		f.setAccessible(true);
         field = f;
         persistedClass = clazz;
         discover();
@@ -123,6 +125,7 @@ public class MappedField {
      * The constructor.
      */
     protected MappedField() {
+    	this.mapper = null;
     }
 
     /**
@@ -146,10 +149,11 @@ public class MappedField {
             isMongoType = ReflectionUtils.isPropertyType(subType);
 
         if (!isMongoType && !isSingleValue && (subType == null || subType.equals(Object.class))) {
-            if (log.isWarnEnabled())
+            if (log.isWarnEnabled() && !mapper.getConverters().hasDbObjectConverter(this)) {
                 log.warn("The multi-valued field '"
                         + getFullName()
                         + "' is a possible heterogenous collection. It cannot be verified. Please declare a valid type to get rid of this warn. " + subType);
+            }
             isMongoType = true;
         }
     }
@@ -568,5 +572,9 @@ public class MappedField {
             }
         }
         return getType();
+    }
+    
+    public Mapper getMapper() {
+        return mapper;
     }
 }
